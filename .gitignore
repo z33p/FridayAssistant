@@ -1,0 +1,9 @@
+# ignore target directory
+target/
+
+# ignore Cargo metadata files
+Cargo.lock
+Cargo.toml.orig
+
+# ignore IntelliJ metadata files
+.idea/
