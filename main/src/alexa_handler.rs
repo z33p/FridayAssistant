@@ -19,7 +19,7 @@ pub struct RequestData {
     #[serde(rename = "locale")]
     locale: String,
     #[serde(rename = "intent")]
-    intent: Intent,
+    intent: Option<Intent>,
 }
 
 #[derive(Deserialize, Serialize)]
@@ -65,9 +65,11 @@ pub async fn handler(e: LambdaEvent<AlexaRequest>) -> Result<AlexaResponse, Erro
     // da requisição.
     let response = match e.payload.request.request_type.as_ref() {
         "IntentRequest" => {
-            debug!("Trying intent: {}", e.payload.request.intent.name);
+            let intent = e.payload.request.intent.unwrap();
 
-            let intent_response = match e.payload.request.intent.name.as_ref() {
+            debug!("Trying intent: {}", intent.name);
+
+            let intent_response = match intent.name.as_ref() {
                 "HelloIntent" => "Olá!",
                 "GoodbyeIntent" => "Adeus!",
                 _ => "Não entendi o que você quer dizer.",
