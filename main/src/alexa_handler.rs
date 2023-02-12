@@ -87,6 +87,15 @@ pub async fn handler(e: LambdaEvent<AlexaRequest>) -> Result<AlexaResponse, Erro
                 },
             }
         }
+        "LaunchRequest" => AlexaResponse {
+            version: "1.0".to_string(),
+            response: Response {
+                output_speech: OutputSpeech {
+                    speech_type: "PlainText".to_string(),
+                    text: "Olá, AWS lambda acionada com sucesso".to_string(),
+                },
+            },
+        },
         _ => AlexaResponse {
             version: "1.0".to_string(),
             response: Response {
