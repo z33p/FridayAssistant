@@ -1,6 +1,9 @@
+mod intent_request_matcher;
+mod launch_request;
+mod request_type_default;
 use lambda_runtime::{Error, LambdaEvent};
 use serde_derive::{Deserialize, Serialize};
-use tracing::{debug, info};
+use tracing::debug;
 
 #[derive(Deserialize, Serialize)]
 pub struct AlexaRequest {
@@ -57,54 +60,16 @@ pub struct OutputSpeech {
     text: String,
 }
 
-pub async fn handler(e: LambdaEvent<AlexaRequest>) -> Result<AlexaResponse, Error> {
-    info!("Starting alexa lambda handler");
+pub async fn handler(event: LambdaEvent<AlexaRequest>) -> Result<AlexaResponse, Error> {
+    debug!("Starting alexa lambda handler");
 
     // Aqui você pode processar a requisição Alexa e tomar decisões sobre
     // qual frase retornar com base no tipo de requisição ou no conteúdo
     // da requisição.
-    let response = match e.payload.request.request_type.as_ref() {
-        "IntentRequest" => {
-            let intent = e.payload.request.intent.unwrap();
-
-            debug!("Trying intent: {}", intent.name);
-
-            let intent_response = match intent.name.as_ref() {
-                "HelloIntent" => "Olá Iago!",
-                "GoodbyeIntent" => "Adeus!",
-                _ => "Não entendi o que você quer dizer.",
-            };
-
-            info!("Intent response: {}", intent_response);
-
-            AlexaResponse {
-                version: "1.0".to_string(),
-                response: Response {
-                    output_speech: OutputSpeech {
-                        speech_type: "PlainText".to_string(),
-                        text: intent_response.to_string(),
-                    },
-                },
-            }
-        }
-        "LaunchRequest" => AlexaResponse {
-            version: "1.0".to_string(),
-            response: Response {
-                output_speech: OutputSpeech {
-                    speech_type: "PlainText".to_string(),
-                    text: "Olá, AWS lambda acionada com sucesso".to_string(),
-                },
-            },
-        },
-        _ => AlexaResponse {
-            version: "1.0".to_string(),
-            response: Response {
-                output_speech: OutputSpeech {
-                    speech_type: "PlainText".to_string(),
-                    text: "Não entendi o que você quer dizer.".to_string(),
-                },
-            },
-        },
+    let response = match event.payload.request.request_type.as_ref() {
+        "IntentRequest" => intent_request_matcher::handle_intent(event),
+        "LaunchRequest" => launch_request::handle_launch(),
+        _ => request_type_default::not_handled_request_type(),
     };
 
     Ok(response)
