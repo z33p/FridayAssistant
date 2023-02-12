@@ -1,5 +1,6 @@
 use lambda_runtime::{Error, LambdaEvent};
 use serde_derive::{Deserialize, Serialize};
+use tracing::log::{debug, info};
 
 #[derive(Deserialize, Serialize)]
 pub struct AlexaRequest {
@@ -51,27 +52,33 @@ pub struct OutputSpeech {
 }
 
 pub async fn handler(e: LambdaEvent<AlexaRequest>) -> Result<AlexaResponse, Error> {
+    info!("Starting alexa lambda handler");
+
     // Aqui você pode processar a requisição Alexa e tomar decisões sobre
     // qual frase retornar com base no tipo de requisição ou no conteúdo
     // da requisição.
     let response = match e.payload.request_type.as_ref() {
         "IntentRequest" => {
-            let text = match e.payload.intent.name.as_ref() {
+            debug!("Trying intent: {}", e.payload.intent.name);
+
+            let intent_response = match e.payload.intent.name.as_ref() {
                 "HelloIntent" => "Olá!",
                 "GoodbyeIntent" => "Adeus!",
                 _ => "Não entendi o que você quer dizer.",
             };
+
+            info!("Intent response: {}", intent_response);
 
             AlexaResponse {
                 version: "1.0".to_string(),
                 response: Response {
                     output_speech: OutputSpeech {
                         speech_type: "PlainText".to_string(),
-                        text: text.to_string(),
+                        text: intent_response.to_string(),
                     },
                 },
             }
-        },
+        }
         _ => AlexaResponse {
             version: "1.0".to_string(),
             response: Response {
