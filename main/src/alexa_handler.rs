@@ -1,6 +1,6 @@
 use lambda_runtime::{Error, LambdaEvent};
 use serde_derive::{Deserialize, Serialize};
-use tracing::log::{debug, info};
+use tracing::{debug, info};
 
 #[derive(Deserialize, Serialize)]
 pub struct AlexaRequest {

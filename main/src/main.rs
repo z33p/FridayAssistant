@@ -1,6 +1,6 @@
 use lambda_runtime::service_fn;
 use std::error::Error;
-use tracing::log::error;
+use tracing::error;
 
 mod alexa_handler;
 
