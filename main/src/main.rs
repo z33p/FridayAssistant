@@ -1,6 +1,11 @@
-mod server_api;
+use lambda_runtime::{service_fn, Error};
 
-fn main() {
-    println!("Starting");
-    server_api::server_run();
+mod alexa_handler;
+
+#[tokio::main]
+async fn main() -> Result<(), Error> {
+    let func = service_fn(alexa_handler::handler);
+    lambda_runtime::run(func).await?;
+
+    Ok(())
 }
