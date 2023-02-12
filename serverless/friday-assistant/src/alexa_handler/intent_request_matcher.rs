@@ -11,9 +11,19 @@ pub fn handle_intent(e: LambdaEvent<AlexaRequest>) -> AlexaResponse {
     debug!("Trying intent: {}", intent.name);
 
     let intent_response = match intent.name.as_ref() {
-        "HelloIntent" => "Olá Iago!",
-        "GoodbyeIntent" => "Adeus!",
-        _ => "Não entendi o que você quer dizer.",
+        "HelloIntent" => {
+            let mut first_name = String::from("ouvinte");
+
+            if let Some(slots) = intent.slots {
+                if !slots.first_name.is_empty() {
+                    first_name = slots.first_name;
+                }
+            }
+
+            format!("Olá {}!", first_name)
+        }
+        "GoodbyeIntent" => "Adeus!".to_string(),
+        _ => "Não entendi o que você quer dizer.".to_string(),
     };
 
     info!("Intent response: {}", intent_response);

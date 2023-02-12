@@ -36,6 +36,8 @@ pub struct Intent {
 #[derive(Deserialize, Serialize)]
 pub struct Slots {
     // Define os slots aqui, se for o caso
+    #[serde(rename = "FirstName")]
+    first_name: String,
 }
 
 #[derive(Serialize, Deserialize)]
