@@ -70,7 +70,7 @@ pub async fn handler(e: LambdaEvent<AlexaRequest>) -> Result<AlexaResponse, Erro
             debug!("Trying intent: {}", intent.name);
 
             let intent_response = match intent.name.as_ref() {
-                "HelloIntent" => "Olá!",
+                "HelloIntent" => "Olá Iago!",
                 "GoodbyeIntent" => "Adeus!",
                 _ => "Não entendi o que você quer dizer.",
             };
