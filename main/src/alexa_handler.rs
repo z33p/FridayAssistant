@@ -4,6 +4,12 @@ use tracing::log::{debug, info};
 
 #[derive(Deserialize, Serialize)]
 pub struct AlexaRequest {
+    #[serde(rename = "request")]
+    request: RequestData,
+}
+
+#[derive(Deserialize, Serialize)]
+pub struct RequestData {
     #[serde(rename = "requestId")]
     request_id: String,
     #[serde(rename = "type")]
@@ -57,11 +63,11 @@ pub async fn handler(e: LambdaEvent<AlexaRequest>) -> Result<AlexaResponse, Erro
     // Aqui você pode processar a requisição Alexa e tomar decisões sobre
     // qual frase retornar com base no tipo de requisição ou no conteúdo
     // da requisição.
-    let response = match e.payload.request_type.as_ref() {
+    let response = match e.payload.request.request_type.as_ref() {
         "IntentRequest" => {
-            debug!("Trying intent: {}", e.payload.intent.name);
+            debug!("Trying intent: {}", e.payload.request.intent.name);
 
-            let intent_response = match e.payload.intent.name.as_ref() {
+            let intent_response = match e.payload.request.intent.name.as_ref() {
                 "HelloIntent" => "Olá!",
                 "GoodbyeIntent" => "Adeus!",
                 _ => "Não entendi o que você quer dizer.",
