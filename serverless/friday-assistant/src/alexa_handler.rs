@@ -37,7 +37,7 @@ pub struct Intent {
 pub struct Slots {
     // Define os slots aqui, se for o caso
     #[serde(rename = "FirstName")]
-    first_name: String,
+    first_name: Option<String>,
 }
 
 #[derive(Serialize, Deserialize)]

@@ -12,13 +12,13 @@ pub fn handle_intent(e: LambdaEvent<AlexaRequest>) -> AlexaResponse {
 
     let intent_response = match intent.name.as_ref() {
         "HelloIntent" => {
-            let mut first_name = String::from("ouvinte");
+            let first_name = String::from("mundo");
 
-            if let Some(slots) = intent.slots {
-                if !slots.first_name.is_empty() {
-                    first_name = slots.first_name;
-                }
-            }
+            // if let Some(slots) = intent.slots {
+            //     if !slots.first_name.is_empty() {
+            //         first_name = slots.first_name;
+            //     }
+            // }
 
             format!("Olá {}!", first_name)
         }
