@@ -6,7 +6,7 @@ pub fn handle_launch() -> AlexaResponse {
         response: Response {
             output_speech: OutputSpeech {
                 speech_type: "PlainText".to_string(),
-                text: "Olá, AWS lambda acionada com sucesso".to_string(),
+                text: "Hello friend".to_string(),
             },
         },
     }
