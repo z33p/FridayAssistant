@@ -9,12 +9,12 @@ on:
     branches: [master]
     paths:
       - serverless/friday-assistant/**
-      - .github\workflows\friday-assistant.yml
+      - .github/workflows/friday-assistant.yml
   pull_request:
     branches: [master]
     paths:
       - serverless/friday-assistant/**
-      - .github\workflows\friday-assistant.yml
+      - .github/workflows/friday-assistant.yml
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
