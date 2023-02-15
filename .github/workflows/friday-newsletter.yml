@@ -35,6 +35,9 @@ jobs:
         with:
           toolchain: stable
 
+      - name: Setup linux dependencies
+        run: sudo apt-get install libssl-dev
+
       - name: Setup Cargo-Lambda
         run: pip3 install cargo-lambda
 
