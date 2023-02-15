@@ -36,10 +36,10 @@ jobs:
           toolchain: stable
 
       - name: Setup linux dependencies
-        run: sudo apt-get install libssl libssl-dev pkg-config 
+        run: sudo apt-get install libssl-dev pkg-config 
 
       - name: Setup Cargo-Lambda
-        run: pip3 install cargo-lambda
+        run: pip3 install cargo-lambda pyopenssl
 
       - name: Setup AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
