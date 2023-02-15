@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 dotenv = "0.15.0"
 envy = "0.4.2"
+openssl = { version = "0.10", features = ["vendored"] }
 reqwest = "0.11.14"
 serde = "1.0.152"
 serde_derive = "1.0.152"

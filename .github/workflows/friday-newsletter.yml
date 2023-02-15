@@ -38,7 +38,7 @@ jobs:
           toolchain: stable
 
       - name: Setup linux dependencies
-        run: sudo apt-get install libssl-dev pkg-config
+        run: sudo apt-get install pkg-config libssl-dev
 
       - name: Setup Cargo-Lambda
         run: pip3 install cargo-lambda
@@ -52,7 +52,7 @@ jobs:
           aws-region: sa-east-1
 
       - name: Build
-        run: sudo apt-get install libssl-dev pkg-config && cargo lambda build --release
+        run: cargo lambda build --release
 
       - name: Deploy to AWS Lambda
         run: |
