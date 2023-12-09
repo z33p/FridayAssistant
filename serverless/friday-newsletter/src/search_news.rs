@@ -1,9 +1,10 @@
 extern crate reqwest;
 
+use crate::ENV_CONFIG;
+use reqwest::header;
+use tracing::debug;
 use std::fs::File;
 use std::io::Read;
-use reqwest::header;
-use crate::ENV_CONFIG;
 
 use self::news_contracts::NewsResponse;
 
@@ -32,7 +33,7 @@ pub async fn fetch_news() -> Result<String, Box<dyn std::error::Error>> {
     let api_key = format!("apiKey={}", ENV_CONFIG.news_api_key);
 
     let url = format!("{}?{}&{}&{}", base_url, country, category, api_key);
-    println!("{}", url);
+    debug!("OpenNews search headlines url: {}", url);
 
     let client = reqwest::Client::new();
     let response = client
@@ -43,14 +44,19 @@ pub async fn fetch_news() -> Result<String, Box<dyn std::error::Error>> {
 
     if response.status().is_success() {
         let response_body = response.text().await?;
-        println!("Response body: {}", response_body);
+        debug!(
+            "OpenNews search headlines success response: {}",
+            response_body
+        );
 
         return Ok(response_body);
     }
 
     let response_body = response.text().await?;
-    println!("Response body: {}", response_body);
-    panic!("Request failed with a non-success status");
+    panic!(
+        "OpenNews search headlines error response: {}",
+        response_body
+    );
 }
 
 pub fn read_local_file() -> Result<String, Box<dyn std::error::Error>> {

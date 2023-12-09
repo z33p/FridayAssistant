@@ -21,5 +21,4 @@ pub struct EnvVariables {
     pub is_prod: bool,
     pub open_ai_api_key: String,
     pub news_api_key: String,
-    pub request_max_tokens: u16,
 }
