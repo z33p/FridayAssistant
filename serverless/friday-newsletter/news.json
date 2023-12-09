@@ -1,0 +1,266 @@
+{
+    "status": "ok",
+    "totalResults": 34,
+    "articles": [
+        {
+            "source": {
+                "id": "google-news",
+                "name": "Google News"
+            },
+            "author": "UOL Economia",
+            "title": "Itaú muda logo, e Madonna será uma das estrelas da campanha - UOL Economia",
+            "description": null,
+            "url": "https://news.google.com/rss/articles/CBMie2h0dHBzOi8vZWNvbm9taWEudW9sLmNvbS5ici9ub3RpY2lhcy9yZWRhY2FvLzIwMjMvMTIvMDcvaXRhdS1tdWRhLWxvZ28tbWFzLW5hby1jb21lbnRhLWNvbWVyY2lhbC1taXN0ZXJpb3NvLWNvbS1tYWRvbm5hLmh0bdIBAA?oc=5",
+            "urlToImage": null,
+            "publishedAt": "2023-12-07T16:18:59Z",
+            "content": null
+        },
+        {
+            "source": {
+                "id": "google-news",
+                "name": "Google News"
+            },
+            "author": "G1",
+            "title": "WhatsApp agora permite enviar mensagem de voz de reprodução única; veja como fazer - G1",
+            "description": null,
+            "url": "https://news.google.com/rss/articles/CBMiigFodHRwczovL2cxLmdsb2JvLmNvbS90ZWNub2xvZ2lhL25vdGljaWEvMjAyMy8xMi8wNy93aGF0c2FwcC1hZ29yYS1wZXJtaXRlLWVudmlhci1tZW5zYWdlbS1kZS12b3otZGUtcmVwcm9kdWNhby11bmljYS12ZWphLWNvbW8tZmF6ZXIuZ2h0bWzSAQA?oc=5",
+            "urlToImage": null,
+            "publishedAt": "2023-12-07T16:00:53Z",
+            "content": null
+        },
+        {
+            "source": {
+                "id": "google-news",
+                "name": "Google News"
+            },
+            "author": "Meu Timão",
+            "title": "Corinthians garante mais de R$ 17 milhões de premiação do Brasileirão; veja valores - Meu Timão",
+            "description": null,
+            "url": "https://news.google.com/rss/articles/CBMijAFodHRwczovL3d3dy5tZXV0aW1hby5jb20uYnIvbm90aWNpYXMtZG8tY29yaW50aGlhbnMvNDY2MjEwL2NvcmludGhpYW5zLWdhcmFudGUtbWFpcy1kZS1yLTE3LW1pbGhvZXMtZGUtcHJlbWlhY2FvLWRvLWJyYXNpbGVpcmFvLXZlamEtdmFsb3Jlc9IBgAFodHRwczovL3d3dy5tZXV0aW1hby5jb20uYnIvYW1wLW5vdGljaWEvNDY2MjEwL2NvcmludGhpYW5zLWdhcmFudGUtbWFpcy1kZS1yLTE3LW1pbGhvZXMtZGUtcHJlbWlhY2FvLWRvLWJyYXNpbGVpcmFvLXZlamEtdmFsb3Jlcw?oc=5",
+            "urlToImage": null,
+            "publishedAt": "2023-12-07T15:32:00Z",
+            "content": null
+        },
+        {
+            "source": {
+                "id": "google-news",
+                "name": "Google News"
+            },
+            "author": "Diário do Nordeste",
+            "title": "Polícia Civil prende suspeito de chefiar grupo criminoso responsável por crimes na Grande Fortaleza - Diário do Nordeste",
+            "description": null,
+            "url": "https://news.google.com/rss/articles/CBMioAFodHRwczovL2RpYXJpb2Rvbm9yZGVzdGUudmVyZGVzbWFyZXMuY29tLmJyL3NlZ3VyYW5jYS9wb2xpY2lhLWNpdmlsLXByZW5kZS1zdXBvc3RvLWNoZWZlLWRlLWdydXBvLWNyaW1pbm9zby1yZXNwb25zYXZlbC1wb3ItY3JpbWVzLW5hLWdyYW5kZS1mb3J0YWxlemEtMS4zNDUyOTU20gGkAWh0dHBzOi8vZGlhcmlvZG9ub3JkZXN0ZS52ZXJkZXNtYXJlcy5jb20uYnIvc2VndXJhbmNhL2FtcC9wb2xpY2lhLWNpdmlsLXByZW5kZS1zdXBvc3RvLWNoZWZlLWRlLWdydXBvLWNyaW1pbm9zby1yZXNwb25zYXZlbC1wb3ItY3JpbWVzLW5hLWdyYW5kZS1mb3J0YWxlemEtMS4zNDUyOTU2?oc=5",
+            "urlToImage": null,
+            "publishedAt": "2023-12-07T15:17:06Z",
+            "content": null
+        },
+        {
+            "source": {
+                "id": "google-news",
+                "name": "Google News"
+            },
+            "author": "Notícias da TV",
+            "title": "Enquete A Fazenda: Participante é rejeitado após acusações a Adriane Galisteu - Notícias da TV",
+            "description": null,
+            "url": "https://news.google.com/rss/articles/CBMihQFodHRwczovL25vdGljaWFzZGF0di51b2wuY29tLmJyL25vdGljaWEvYS1mYXplbmRhL2VucXVldGUtYS1mYXplbmRhLXBhcnRpY2lwYW50ZS1lLXJlamVpdGFkby1hcG9zLWFjdXNhY29lcy1hLWFkcmlhbmUtZ2FsaXN0ZXUtMTEyNTY10gEA?oc=5",
+            "urlToImage": null,
+            "publishedAt": "2023-12-07T15:12:00Z",
+            "content": null
+        },
+        {
+            "source": {
+                "id": "google-news",
+                "name": "Google News"
+            },
+            "author": "G1",
+            "title": "Petrobras anuncia redução do preço do diesel para as distribuidoras - G1",
+            "description": null,
+            "url": "https://news.google.com/rss/articles/CBMiYWh0dHBzOi8vZzEuZ2xvYm8uY29tL2NhcnJvcy9ub3RpY2lhLzIwMjMvMTIvMDcvcGV0cm9icmFzLWFudW5jaWEtcmVkdWNhby1kby1wcmVjby1kby1kaWVzZWwuZ2h0bWzSAWxodHRwczovL2cxLmdsb2JvLmNvbS9nb29nbGUvYW1wL2NhcnJvcy9ub3RpY2lhLzIwMjMvMTIvMDcvcGV0cm9icmFzLWFudW5jaWEtcmVkdWNhby1kby1wcmVjby1kby1kaWVzZWwuZ2h0bWw?oc=5",
+            "urlToImage": null,
+            "publishedAt": "2023-12-07T14:53:46Z",
+            "content": null
+        },
+        {
+            "source": {
+                "id": "google-news",
+                "name": "Google News"
+            },
+            "author": "Poder360",
+            "title": "\"Tudo o que ele fez foi endividar Minas\", diz Haddad sobre Zema - Poder360",
+            "description": null,
+            "url": "https://news.google.com/rss/articles/CBMiYmh0dHBzOi8vd3d3LnBvZGVyMzYwLmNvbS5ici9lY29ub21pYS90dWRvLW8tcXVlLWVsZS1mZXotZm9pLWVuZGl2aWRhci1taW5hcy1kaXotaGFkZGFkLXNvYnJlLXplbWEv0gEA?oc=5",
+            "urlToImage": null,
+            "publishedAt": "2023-12-07T14:35:07Z",
+            "content": null
+        },
+        {
+            "source": {
+                "id": "google-news",
+                "name": "Google News"
+            },
+            "author": "UOL",
+            "title": "Moro pode ser cassado: Bolsonaro cavou cova e Michelle pode ser 'lápide' de Moro, diz Josias - UOL",
+            "description": null,
+            "url": "https://news.google.com/rss/articles/CCAiC0dBUjhaN1JoLUJnmAEB?oc=5",
+            "urlToImage": null,
+            "publishedAt": "2023-12-07T13:42:51Z",
+            "content": null
+        },
+        {
+            "source": {
+                "id": "google-news",
+                "name": "Google News"
+            },
+            "author": "ESPN.com.br",
+            "title": "'Não vou me despedir de ninguém': como foi o discurso de Abel no vestiário após a conquista do Brasileiro com o Palmeiras - ESPN.com.br",
+            "description": null,
+            "url": "https://news.google.com/rss/articles/CBMilwFodHRwczovL3d3dy5lc3BuLmNvbS5ici9mdXRlYm9sL3BhbG1laXJhcy9hcnRpZ28vXy9pZC8xMjk2MjYwNy9uYW8tdm91LWRlc3BlZGlyLW5pbmd1ZW0tY29tby1mb2ktZGlzY3Vyc28tYWJlbC12ZXN0aWFyaW8tY29ucXVpc3RhLWJyYXNpbGVpcm8tcGFsbWVpcmFz0gEA?oc=5",
+            "urlToImage": null,
+            "publishedAt": "2023-12-07T13:29:00Z",
+            "content": null
+        },
+        {
+            "source": {
+                "id": "google-news",
+                "name": "Google News"
+            },
+            "author": "G1",
+            "title": "EUA anunciam manobras militares na Guiana após Venezuela aprovar anexação de Essequibo - G1",
+            "description": null,
+            "url": "https://news.google.com/rss/articles/CBMiW2h0dHBzOi8vZzEuZ2xvYm8uY29tL211bmRvL25vdGljaWEvMjAyMy8xMi8wNy9lc3NlcXVpYm8tZXVhLWV4ZXJjaWNpby1jb25qdW50by1ndWlhbmEuZ2h0bWzSAWZodHRwczovL2cxLmdsb2JvLmNvbS9nb29nbGUvYW1wL211bmRvL25vdGljaWEvMjAyMy8xMi8wNy9lc3NlcXVpYm8tZXVhLWV4ZXJjaWNpby1jb25qdW50by1ndWlhbmEuZ2h0bWw?oc=5",
+            "urlToImage": null,
+            "publishedAt": "2023-12-07T13:13:06Z",
+            "content": null
+        },
+        {
+            "source": {
+                "id": "google-news",
+                "name": "Google News"
+            },
+            "author": "LANCE!",
+            "title": "Torcedores do Palmeiras fazem memes após 12º título brasileiro: “Querem com ou sem fax?” – LANCE! - LANCE!",
+            "description": null,
+            "url": "https://news.google.com/rss/articles/CBMid2h0dHBzOi8vd3d3LmxhbmNlLmNvbS5ici9nYWxlcmlhcy90b3JjZWRvcmVzLWRvLXBhbG1laXJhcy1mYXplbS1tZW1lcy1hcG9zLTEyby10aXR1bG8tYnJhc2lsZWlyby1xdWVyZW0tY29tLW91LXNlbS1mYXgv0gEA?oc=5",
+            "urlToImage": null,
+            "publishedAt": "2023-12-07T13:05:04Z",
+            "content": null
+        },
+        {
+            "source": {
+                "id": "google-news",
+                "name": "Google News"
+            },
+            "author": "O Antagonista",
+            "title": "Após esnobar, governo avalia vacina japonesa contra dengue - O Antagonista",
+            "description": null,
+            "url": "https://news.google.com/rss/articles/CBMiXWh0dHBzOi8vb2FudGFnb25pc3RhLmNvbS5ici9icmFzaWwvYXBvcy1lc25vYmFyLWdvdmVybm8tYXZhbGlhLXZhY2luYS1qYXBvbmVzYS1jb250cmEtZGVuZ3VlL9IBYWh0dHBzOi8vb2FudGFnb25pc3RhLmNvbS5ici9icmFzaWwvYXBvcy1lc25vYmFyLWdvdmVybm8tYXZhbGlhLXZhY2luYS1qYXBvbmVzYS1jb250cmEtZGVuZ3VlL2FtcC8?oc=5",
+            "urlToImage": null,
+            "publishedAt": "2023-12-07T12:37:37Z",
+            "content": null
+        },
+        {
+            "source": {
+                "id": "google-news",
+                "name": "Google News"
+            },
+            "author": "R7.com",
+            "title": "Filho de Zezé Di Camargo ironiza 'vitória' de Graciele Lacerda em processo - R7.com",
+            "description": null,
+            "url": "https://news.google.com/rss/articles/CBMifGh0dHBzOi8vZW50cmV0ZW5pbWVudG8ucjcuY29tL2ZhbW9zb3MtZS10di9maWxoby1kZS16ZXplLWRpLWNhbWFyZ28taXJvbml6YS12aXRvcmlhLWRlLWdyYWNpZWxlLWxhY2VyZGEtZW0tcHJvY2Vzc28tMDcxMjIwMjPSAYABaHR0cHM6Ly9lbnRyZXRlbmltZW50by5yNy5jb20vZmFtb3Nvcy1lLXR2L2ZpbGhvLWRlLXplemUtZGktY2FtYXJnby1pcm9uaXphLXZpdG9yaWEtZGUtZ3JhY2llbGUtbGFjZXJkYS1lbS1wcm9jZXNzby0wNzEyMjAyMz9hbXA?oc=5",
+            "urlToImage": null,
+            "publishedAt": "2023-12-07T12:31:48Z",
+            "content": null
+        },
+        {
+            "source": {
+                "id": "google-news",
+                "name": "Google News"
+            },
+            "author": "Fortnite",
+            "title": "Vincule Suas Contas Epic e LEGO, e Ganhe Um Traje do Fortnite Grátis! - Fortnite",
+            "description": null,
+            "url": "https://news.google.com/rss/articles/CBMiZ2h0dHBzOi8vd3d3LmZvcnRuaXRlLmNvbS9uZXdzL2Nvbm5lY3QteW91ci1lcGljLWFuZC1sZWdvLWFjY291bnRzLWdldC1hLWZyZWUtZm9ydG5pdGUtb3V0Zml0P2xhbmc9cHQtQlLSAQA?oc=5",
+            "urlToImage": null,
+            "publishedAt": "2023-12-07T12:03:25Z",
+            "content": null
+        },
+        {
+            "source": {
+                "id": "google-news",
+                "name": "Google News"
+            },
+            "author": "Notícias Agrícolas",
+            "title": "Conab: Produção de grãos na safra 2023/24 deve atingir 312,3 milhões de toneladas influenciada por clima - Notícias Agrícolas",
+            "description": null,
+            "url": "https://news.google.com/rss/articles/CBMioQFodHRwczovL3d3dy5ub3RpY2lhc2Fncmljb2xhcy5jb20uYnIvbm90aWNpYXMvZ3Jhb3MvMzY1NTY3LXByb2R1Y2FvLWRlLWdyYW9zLW5hLXNhZnJhLTIwMjMtMjQtZGV2ZS1hdGluZ2lyLTMxMi0zLW1pbGhvZXMtZGUtdG9uZWxhZGFzLWluZmx1ZW5jaWFkYS1wb3ItY2xpbWEuaHRtbNIBpQFodHRwczovL3d3dy5ub3RpY2lhc2Fncmljb2xhcy5jb20uYnIvbm90aWNpYXMvZ3Jhb3MvMzY1NTY3LXByb2R1Y2FvLWRlLWdyYW9zLW5hLXNhZnJhLTIwMjMtMjQtZGV2ZS1hdGluZ2lyLTMxMi0zLW1pbGhvZXMtZGUtdG9uZWxhZGFzLWluZmx1ZW5jaWFkYS1wb3ItY2xpbWEuYW1wLmh0bWw?oc=5",
+            "urlToImage": null,
+            "publishedAt": "2023-12-07T12:00:46Z",
+            "content": null
+        },
+        {
+            "source": {
+                "id": "google-news",
+                "name": "Google News"
+            },
+            "author": "UOL Economia",
+            "title": "Fundos offshore e de super-ricos: Onde super-ricos investem agora - UOL Economia",
+            "description": null,
+            "url": "https://news.google.com/rss/articles/CBMiXWh0dHBzOi8vZWNvbm9taWEudW9sLmNvbS5ici9tYWlzL3VsdGltYXMtbm90aWNpYXMvMjAyMy8xMi8wNy9pbnZlc3RpbWVudG8tZG9zLXN1cGVyLXJpY29zLmh0bdIBAA?oc=5",
+            "urlToImage": null,
+            "publishedAt": "2023-12-07T12:00:00Z",
+            "content": null
+        },
+        {
+            "source": {
+                "id": "google-news",
+                "name": "Google News"
+            },
+            "author": "Estado de Minas",
+            "title": "Adolescente mata colega de turma e comete suicídio em escola - Estado de Minas",
+            "description": null,
+            "url": "https://news.google.com/rss/articles/CBMidWh0dHBzOi8vd3d3LmVtLmNvbS5ici9pbnRlcm5hY2lvbmFsLzIwMjMvMTIvNjY2NjQ0MC1hZG9sZXNjZW50ZS1tYXRhLWNvbGVnYS1kZS10dXJtYS1lLWNvbWV0ZS1zdWljaWRpby1lbS1lc2NvbGEuaHRtbNIBeWh0dHBzOi8vd3d3LmVtLmNvbS5ici9pbnRlcm5hY2lvbmFsLzIwMjMvMTIvYW1wLzY2NjY0NDAtYWRvbGVzY2VudGUtbWF0YS1jb2xlZ2EtZGUtdHVybWEtZS1jb21ldGUtc3VpY2lkaW8tZW0tZXNjb2xhLmh0bWw?oc=5",
+            "urlToImage": null,
+            "publishedAt": "2023-12-07T11:59:00Z",
+            "content": null
+        },
+        {
+            "source": {
+                "id": "google-news",
+                "name": "Google News"
+            },
+            "author": "R7.com",
+            "title": "Oposição quer entrar com mandado de segurança para anular sessão de privatização da Sabesp - R7.com",
+            "description": null,
+            "url": "https://news.google.com/rss/articles/CBMihgFodHRwczovL25vdGljaWFzLnI3LmNvbS9zYW8tcGF1bG8vb3Bvc2ljYW8tZmFsYS1lbS1pbXBldHJhci1tYW5kYWRvLWRlLXNlZ3VyYW5jYS1wYXJhLWFudWxhci1zZXNzYW8tZGUtcHJpdmF0aXphY2FvLWRhLXNhYmVzcC0wNzEyMjAyM9IBAA?oc=5",
+            "urlToImage": null,
+            "publishedAt": "2023-12-07T11:56:00Z",
+            "content": null
+        },
+        {
+            "source": {
+                "id": "google-news",
+                "name": "Google News"
+            },
+            "author": "G1",
+            "title": "Santos amanhece com cenário de destruição e CT pichado após rebaixamento inédito do clube da Vila Belmiro; VÍDEO - G1",
+            "description": null,
+            "url": "https://news.google.com/rss/articles/CBMitQFodHRwczovL2cxLmdsb2JvLmNvbS9zcC9zYW50b3MtcmVnaWFvL25vdGljaWEvMjAyMy8xMi8wNy9zYW50b3MtYW1hbmhlY2UtY29tLWNlbmFyaW8tZGUtZGVzdHJ1aWNhby1lLWN0LXBpY2hhZG8tdW0tZGlhLWFwb3MtcmViYWl4YW1lbnRvLWluZWRpdG8tZG8tY2x1YmUtZGEtdmlsYS1iZWxtaXJvLXZpZGVvLmdodG1s0gHAAWh0dHBzOi8vZzEuZ2xvYm8uY29tL2dvb2dsZS9hbXAvc3Avc2FudG9zLXJlZ2lhby9ub3RpY2lhLzIwMjMvMTIvMDcvc2FudG9zLWFtYW5oZWNlLWNvbS1jZW5hcmlvLWRlLWRlc3RydWljYW8tZS1jdC1waWNoYWRvLXVtLWRpYS1hcG9zLXJlYmFpeGFtZW50by1pbmVkaXRvLWRvLWNsdWJlLWRhLXZpbGEtYmVsbWlyby12aWRlby5naHRtbA?oc=5",
+            "urlToImage": null,
+            "publishedAt": "2023-12-07T11:54:35Z",
+            "content": null
+        },
+        {
+            "source": {
+                "id": "google-news",
+                "name": "Google News"
+            },
+            "author": "G1",
+            "title": "Bruno de Luca anuncia pausa na carreira: 'Tirar um período só pra mim' - G1",
+            "description": null,
+            "url": "https://news.google.com/rss/articles/CBMiemh0dHBzOi8vZzEuZ2xvYm8uY29tL3BvcC1hcnRlL25vdGljaWEvMjAyMy8xMi8wNy9icnVuby1kZS1sdWNhLWFudW5jaWEtcGF1c2EtbmEtY2FycmVpcmEtdGlyYXItdW0tcGVyaW9kby1zby1wcmEtbWltLmdodG1s0gGFAWh0dHBzOi8vZzEuZ2xvYm8uY29tL2dvb2dsZS9hbXAvcG9wLWFydGUvbm90aWNpYS8yMDIzLzEyLzA3L2JydW5vLWRlLWx1Y2EtYW51bmNpYS1wYXVzYS1uYS1jYXJyZWlyYS10aXJhci11bS1wZXJpb2RvLXNvLXByYS1taW0uZ2h0bWw?oc=5",
+            "urlToImage": null,
+            "publishedAt": "2023-12-07T11:34:57Z",
+            "content": null
+        }
+    ]
+}

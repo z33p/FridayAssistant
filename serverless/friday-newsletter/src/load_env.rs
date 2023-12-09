@@ -6,7 +6,7 @@ pub fn load_env_variables() -> EnvVariables {
     } else {
         dotenv::dotenv().ok();
     }
-
+    
     let config = envy::from_env::<EnvVariables>().unwrap();
 
     config
@@ -18,6 +18,8 @@ fn release_mode() -> bool {
 
 #[derive(Debug, Deserialize)]
 pub struct EnvVariables {
+    pub is_prod: bool,
     pub open_ai_api_key: String,
+    pub news_api_key: String,
     pub request_max_tokens: u16,
 }
