@@ -11,9 +11,16 @@ static ENV_CONFIG: Lazy<EnvVariables> = Lazy::new(|| load_env_variables());
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let news_response = search_news::handle_get_news().await?;
 
-    for article in news_response.articles.iter() {
-        println!("{}", article.title);
-    }
+    let article = news_response
+        .articles
+        .first()
+        .unwrap();
+
+    println!("{}", article.title);
+
+    let summary = chat_api::send_request_to_openai(article.title.as_str()).await.unwrap();
+
+    println!("{}", summary);
 
     println!("Finished");
     Ok(())

@@ -5,9 +5,9 @@ use std::io::Read;
 use reqwest::header;
 use crate::ENV_CONFIG;
 
-use self::news_response::NewsResponse;
+use self::news_contracts::NewsResponse;
 
-mod news_response;
+mod news_contracts;
 
 pub async fn handle_get_news() -> Result<NewsResponse, Box<dyn std::error::Error>> {
     let response_body: String;
@@ -29,7 +29,7 @@ pub async fn fetch_news() -> Result<String, Box<dyn std::error::Error>> {
     let base_url = "https://newsapi.org/v2/top-headlines";
     let country = "country=br";
     let category = "category=technology";
-    let api_key = format!("apiKey={}", ENV_CONFIG.open_ai_api_key);
+    let api_key = format!("apiKey={}", ENV_CONFIG.news_api_key);
 
     let url = format!("{}?{}&{}&{}", base_url, country, category, api_key);
     println!("{}", url);

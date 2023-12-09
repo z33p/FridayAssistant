@@ -7,3 +7,7 @@ Cargo.toml.orig
 
 # ignore IntelliJ metadata files
 .idea/
+
+# Environment
+.env
+.env.prod

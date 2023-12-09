@@ -1,78 +1,64 @@
-use reqwest::Client;
-use serde_derive::{Deserialize, Serialize};
+use reqwest::header::{HeaderMap, AUTHORIZATION, CONTENT_TYPE};
 use serde_json::json;
 
-use crate::load_env;
+use crate::ENV_CONFIG;
 
-pub async fn send_request_to_openai(text: &str) -> Result<String, Box<dyn std::error::Error>> {
-    let client = Client::new();
+use self::chat_response::ChatResponse;
 
-    let env_variables = load_env::load_env_variables();
+mod chat_api_contracts;
+mod chat_response;
 
-    let request_body = json!({
-        "model": "text-davinci-003",
-        "prompt": text,
-        "max_tokens": env_variables.request_max_tokens,
-        "temperature": 0.3,
-        "max_tokens": 64,
-        "top_p": 1.0,
-        "frequency_penalty": 0.2,
-        "presence_penalty": 0.2,
+pub async fn send_request_to_openai(prompt: &str) -> Result<String, Box<dyn std::error::Error>> {
+    // Set up the headers
+    let mut headers = HeaderMap::new();
+    headers.insert(
+        AUTHORIZATION,
+        format!("Bearer {}", ENV_CONFIG.open_ai_api_key).parse()?,
+    );
+    headers.insert(CONTENT_TYPE, "application/json".parse()?);
+
+    // Define the request body with all available parameters
+    let body = json!({
+        "messages": [
+            {"role": "system", "content": "Em uma frase fale sobre esse tópico"},
+            {"role": "user", "content": prompt}
+        ],
+        "model": "gpt-3.5-turbo",  // specify the model
+        "frequency_penalty": 0.0,  // decreases the model's likelihood to repeat the same line verbatim
+        "logprobs": null,  // include the log probabilities on the logprobs most likely tokens, up to a maximum of 5. Set to null if not used
+        "max_tokens": ENV_CONFIG.request_max_tokens,  // maximum number of tokens to generate
+        "n": 1,  // number of completions to generate
+        "presence_penalty": 0.0,  // increases the model's likelihood to talk about new topics
+        "stop": ["\n", "<|endoftext|>"],  // stop sequence to end generation
+        "stream": false,  // whether to stream back partial progress
+        "temperature": 0.7,  // controls randomness
+        "top_p": 1.0,  // controls diversity
     });
 
-    let request_body = serde_json::to_string(&request_body).unwrap();
+    // URL for the OpenAI completion endpoint
+    let url = "https://api.openai.com/v1/chat/completions";
+    print!("{}", url);
 
+    // Create a client and post the request
+    let client = reqwest::Client::new();
     let response = client
-        .post("https://api.openai.com/v1/completions")
-        .header("Content-Type", "application/json")
-        .header(
-            "Authorization",
-            format!("Bearer {}", env_variables.open_ai_api_key),
-        )
-        .body(request_body)
+        .post(url)
+        .headers(headers)
+        .body(body.to_string())
         .send()
         .await?;
 
     let response_body = response.text().await?;
-    let response: AiResponse = serde_json::from_str(&response_body)?;
+    print!("{}", response_body);
+
+    let response: ChatResponse = serde_json::from_str(&response_body)?;
 
     let first_choice = response
         .choices
         .first()
         .ok_or("No choices found in response")?;
 
-    let summary = first_choice.text.clone();
+    let summary = first_choice.message.content.clone().unwrap_or_default();
 
     Ok(summary)
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-pub struct Choice {
-    pub text: String,
-    // index: u8,
-    // logprobs: Option<()>,
-    pub finish_reason: String,
-}
-
-// #[derive(Debug, Deserialize, Serialize)]
-// pub struct Usage {
-//     prompt_tokens: u8,
-//     completion_tokens: u8,
-//     total_tokens: u8,
-// }
-
-#[derive(Debug, Deserialize, Serialize)]
-pub struct AiResponse {
-    // id: String,
-    // object: String,
-    // created: i64,
-    // model: String,
-    pub choices: Vec<Choice>,
-    // usage: Usage,
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-pub struct Response {
-    #[serde(rename = "Summary")]
-    summary: AiResponse,
 }
