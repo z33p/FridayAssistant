@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    /* Opções Básicas */
+    "target": "es2020", // Define o alvo do ECMAScript para a versão suportada pelo Node.js 20
+    "module": "ESNext", // Define o sistema de módulos para CommonJS, usado no Node.js
+    "lib": [
+      "es2020"
+    ], // Define as bibliotecas do ambiente de execução
+    "outDir": "./dist", // Redireciona a saída para a pasta 'dist'
+    "rootDir": "./src", // Define a pasta raiz do código fonte
+    "strict": true, // Ativa um conjunto rigoroso de verificações de tipo
+    /* Opções de Módulo */
+    "moduleResolution": "node", // Escolhe a estratégia de resolução de módulos do Node.js
+    "esModuleInterop": true, // Permite a interoperabilidade de módulos ES6 padrão
+    "forceConsistentCasingInFileNames": true, // Evita problemas em sistemas de arquivos que não diferenciam maiúsculas de minúsculas
+    /* Opções Avançadas */
+    "skipLibCheck": true, // Pula a checagem de tipos em arquivos de declaração
+    "resolveJsonModule": true // Permite a importação de módulos JSON
+  },
+  "include": [
+    "src/**/*"
+  ], // Inclui todos os arquivos TypeScript na pasta 'src'
+  "exclude": [
+    "node_modules",
+    "dist"
+  ] // Exclui as pastas 'node_modules' e 'dist'
+}
