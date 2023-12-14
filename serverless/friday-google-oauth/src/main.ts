@@ -13,7 +13,9 @@ async function getAccessToken(client: OAuth2Client, data: GetAccessTokenRequest)
 
   return {
     statusCode: 200,
-    data: tokens,
+    data: {
+      tokens
+    },
   };
 }
 
@@ -25,7 +27,9 @@ async function generateOAuthUrl(client: OAuth2Client, _: any): Promise<LambdaRes
 
   return {
     statusCode: 200,
-    data: url,
+    data: {
+      url
+    },
   };
 }
 
