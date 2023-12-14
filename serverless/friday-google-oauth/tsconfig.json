@@ -3,6 +3,8 @@
     "target": "ES2022",
     "module": "CommonJS",
     "outDir": "dist",
-    "sourceMap": true
-  }
+    "sourceMap": true,
+    "esModuleInterop": true,
+  },
+  "types": ["node", "dotenv"]
 }
