@@ -45,7 +45,7 @@ jobs:
         run: yarn build
 
       - name: Zip Build Files
-        run: cd dist && zip main.zip *
+        run: zip -r main.zip dist/ node_modules/
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -55,5 +55,5 @@ jobs:
           aws-region: sa-east-1  # Substitua pela sua região AWS
 
       - name: Deploy to AWS Lambda
-        run: aws lambda update-function-code --function-name friday-google-oauth --zip-file fileb://dist/main.zip
+        run: aws lambda update-function-code --function-name friday-google-oauth --zip-file fileb://main.zip
 
