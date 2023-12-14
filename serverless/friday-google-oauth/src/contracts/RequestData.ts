@@ -1,4 +1,8 @@
 export interface RequestData {
-    url?: string;
     action: string;
+    payload: GetAccessTokenRequest | null
+}
+
+export interface GetAccessTokenRequest {
+    url?: string
 }
