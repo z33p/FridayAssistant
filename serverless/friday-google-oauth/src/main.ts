@@ -49,7 +49,7 @@ async function main(request_data: RequestData): Promise<LambdaResponse> {
 }
 
 export const handler: APIGatewayProxyHandler = async (event) => {
-  const request_data: RequestData = JSON.parse(event.body);
+  const request_data: RequestData = handleEventBodyAsRequestData(event.body);
   const response = await main(request_data);
 
   return {
@@ -57,3 +57,8 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     body: JSON.stringify(response.data)
   };
 };
+
+function handleEventBodyAsRequestData(event_body: any): RequestData {
+  return typeof event_body === 'string' ? JSON.parse(event_body) : event_body;
+}
+
