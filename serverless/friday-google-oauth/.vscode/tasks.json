@@ -1,9 +1,0 @@
-{
-    "tasks": [
-        {
-            "label": "dev",
-            "type": "npm",
-            "script": "dev",
-        }
-    ]
-}
