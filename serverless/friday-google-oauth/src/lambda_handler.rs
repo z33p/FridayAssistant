@@ -1,5 +1,4 @@
 use lambda_runtime::{Error, LambdaEvent};
-use serde_derive::{Deserialize, Serialize};
 
 use crate::{
     generate_oauth_url,
