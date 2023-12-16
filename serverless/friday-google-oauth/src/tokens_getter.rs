@@ -3,6 +3,7 @@ use std::time::Duration;
 use aws_config::BehaviorVersion;
 use aws_sdk_dynamodb::types::AttributeValue;
 use chrono::Utc;
+use chrono_tz::America::Sao_Paulo;
 use oauth2::{AuthorizationCode, RefreshToken, TokenResponse};
 
 use serde_json::json;
@@ -71,7 +72,9 @@ fn extract_oauth_tokens(
 
     let expires_in = tokens_response.expires_in().unwrap().as_millis();
     let expiry_date = now + Duration::from_millis(expires_in.try_into().unwrap());
-    let expiry_date_utc = expiry_date.to_rfc3339_opts(chrono::SecondsFormat::Secs, false);
+    let expiry_date_utc = expiry_date
+        .with_timezone(&Sao_Paulo)
+        .to_rfc3339_opts(chrono::SecondsFormat::Secs, false);
 
     let oauth_tokens = OAuthTokens {
         access_token,
