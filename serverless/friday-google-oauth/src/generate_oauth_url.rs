@@ -9,6 +9,7 @@ pub async fn generate_oauth_url() -> Result<LambdaOAuthResponse, Box<dyn std::er
 
     let (auth_url, _) = client
         .authorize_url(CsrfToken::new_random)
+        .add_extra_param("access_type", "offline")
         .add_scope(Scope::new(
             "https://www.googleapis.com/auth/gmail.modify".to_string(),
         ))

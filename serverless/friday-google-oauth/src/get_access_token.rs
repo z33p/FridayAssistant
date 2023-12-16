@@ -1,12 +1,10 @@
-use std::time::Duration;
-
 use aws_config::BehaviorVersion;
 use aws_sdk_dynamodb::types::AttributeValue;
 use chrono::{TimeZone, Utc};
 use oauth2::{AuthorizationCode, TokenResponse};
 
 use serde_json::json;
-use tracing::{debug, info};
+use tracing::{debug, info, warn};
 use uuid::Uuid;
 
 use crate::{get_oauth_client, lambda_handler::lambda_oauth_response::LambdaOAuthResponse};
@@ -29,7 +27,7 @@ pub async fn get_access_token(
     let access_token = token_result.access_token().secret().to_string();
     debug!("Access Token: {}", access_token);
 
-    let refresh_token = token_result.refresh_token().unwrap().secret().to_string();
+    let refresh_token = handle_get_refresh_token(&token_result);
     let expiry_date = token_result.expires_in().unwrap().as_millis();
 
     db_insert_tokens(&access_token, refresh_token, expiry_date).await;
@@ -38,6 +36,23 @@ pub async fn get_access_token(
         status_code: 200,
         data: json!({ "tokens": access_token }),
     })
+}
+
+fn handle_get_refresh_token(
+    token_result: &oauth2::StandardTokenResponse<
+        oauth2::EmptyExtraTokenFields,
+        oauth2::basic::BasicTokenType,
+    >
+) -> String {
+    let refresh_token = match token_result.refresh_token() {
+        Some(token) => token.secret().to_string(),
+        None => {
+            warn!("refresh_token não estava presente na resposta");
+            String::new()
+        }
+    };
+
+    refresh_token
 }
 
 async fn db_insert_tokens(access_token: &String, refresh_token: String, expiry_date: u128) {
