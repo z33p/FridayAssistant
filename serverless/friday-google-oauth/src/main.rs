@@ -25,7 +25,7 @@ async fn main() {
     let res = lambda_runtime::run(func).await;
 
     if res.is_ok() {
-        return;
+    return;
     }
 
     let err = res.err().unwrap();
@@ -65,7 +65,7 @@ pub fn get_gmail_oauth_client() -> Result<
     let client_id = ClientId::new(ENV_CONFIG.oauth_client_id.to_string());
     let client_secret = ClientSecret::new(ENV_CONFIG.oauth_client_secret.to_string());
     let auth_url = AuthUrl::new("https://accounts.google.com/o/oauth2/v2/auth".to_string())?;
-    let token_url = TokenUrl::new("https://www.googleapis.com/oauth2/v4/token".to_string())?;
+    let token_url = TokenUrl::new("https://oauth2.googleapis.com/token".to_string())?;
     let redirect_url = RedirectUrl::new("http://localhost/".to_string())?;
     let client = BasicClient::new(client_id, Some(client_secret), auth_url, Some(token_url))
         .set_redirect_uri(redirect_url);

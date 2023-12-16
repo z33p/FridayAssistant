@@ -1,10 +1,10 @@
 use std::time::Duration;
 
-use aws_config::BehaviorVersion;
+use aws_config::{sso::token, BehaviorVersion};
 use aws_sdk_dynamodb::types::AttributeValue;
 use chrono::Utc;
 use chrono_tz::America::Sao_Paulo;
-use oauth2::{AuthorizationCode, RefreshToken, TokenResponse, Scope};
+use oauth2::{AuthorizationCode, RefreshToken, Scope, TokenResponse};
 
 use serde_json::json;
 use tracing::{debug, error, info, warn};
@@ -30,9 +30,6 @@ pub async fn get_oauth_tokens(
     let tokens_response = client
         .exchange_code(code)
         .add_extra_param("access_type", "offline")
-        // .add_scope(Scope::new(
-        //     "https://www.googleapis.com/auth/gmail.send".to_string(),
-        // ))
         .request_async(oauth2::reqwest::async_http_client)
         .await?;
 
@@ -154,9 +151,7 @@ pub async fn refresh_access_token(
     match client
         .exchange_refresh_token(&RefreshToken::new(request.refresh_token))
         .add_extra_param("access_type", "offline")
-        .add_scope(Scope::new(
-            "https://www.googleapis.com/auth/gmail.send".to_string(),
-        ))
+        .add_scope(Scope::new("https://mail.google.com/".to_string()))
         .request_async(oauth2::reqwest::async_http_client)
         .await
     {
