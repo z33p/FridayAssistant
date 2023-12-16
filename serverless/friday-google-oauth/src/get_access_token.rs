@@ -74,8 +74,8 @@ async fn db_insert_tokens(access_token: &String, refresh_token: String, expiry_d
             AttributeValue::S(id_oauth_tokens.to_owned()),
         )
         .item("access_token", AttributeValue::S(access_token.to_owned()))
-        .item("refresh_token", AttributeValue::N(refresh_token))
-        .item("expiry_date", AttributeValue::S(expiry_date.to_string()))
+        .item("refresh_token", AttributeValue::S(refresh_token))
+        .item("expiry_date", AttributeValue::N(expiry_date.to_string()))
         .item("expiry_date_utc", AttributeValue::S(expiry_date_utc));
 
     info!(
