@@ -4,13 +4,13 @@ use aws_config::BehaviorVersion;
 use aws_sdk_dynamodb::types::AttributeValue;
 use chrono::Utc;
 use chrono_tz::America::Sao_Paulo;
-use oauth2::{AuthorizationCode, RefreshToken, TokenResponse};
+use oauth2::{AuthorizationCode, RefreshToken, TokenResponse, Scope};
 
 use serde_json::json;
 use tracing::{debug, error, info, warn};
 use uuid::Uuid;
 
-use crate::{get_oauth_client, lambda_handler::lambda_oauth_response::LambdaOAuthResponse};
+use crate::{get_gmail_oauth_client, lambda_handler::lambda_oauth_response::LambdaOAuthResponse};
 
 use self::{
     get_oauth_tokens_request::GetOAuthTokensRequest, oauth_tokens::OAuthTokens,
@@ -24,11 +24,15 @@ pub mod refresh_access_token_request;
 pub async fn get_oauth_tokens(
     request: GetOAuthTokensRequest,
 ) -> Result<LambdaOAuthResponse, Box<dyn std::error::Error>> {
-    let client = get_oauth_client()?;
+    let client = get_gmail_oauth_client()?;
 
     let code = AuthorizationCode::new(extract_code_from_url(&request.url)?);
     let tokens_response = client
         .exchange_code(code)
+        .add_extra_param("access_type", "offline")
+        // .add_scope(Scope::new(
+        //     "https://www.googleapis.com/auth/gmail.send".to_string(),
+        // ))
         .request_async(oauth2::reqwest::async_http_client)
         .await?;
 
@@ -145,10 +149,14 @@ fn extract_code_from_url(url: &str) -> Result<String, Box<dyn std::error::Error>
 pub async fn refresh_access_token(
     request: RefreshAccessTokenRequest,
 ) -> Result<LambdaOAuthResponse, Box<dyn std::error::Error>> {
-    let client = get_oauth_client()?;
+    let client = get_gmail_oauth_client()?;
 
     match client
         .exchange_refresh_token(&RefreshToken::new(request.refresh_token))
+        .add_extra_param("access_type", "offline")
+        .add_scope(Scope::new(
+            "https://www.googleapis.com/auth/gmail.send".to_string(),
+        ))
         .request_async(oauth2::reqwest::async_http_client)
         .await
     {

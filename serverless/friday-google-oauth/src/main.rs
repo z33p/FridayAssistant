@@ -48,7 +48,7 @@ fn logging_init() {
         .init();
 }
 
-pub fn get_oauth_client() -> Result<
+pub fn get_gmail_oauth_client() -> Result<
     oauth2::Client<
         oauth2::StandardErrorResponse<oauth2::basic::BasicErrorResponseType>,
         oauth2::StandardTokenResponse<oauth2::EmptyExtraTokenFields, oauth2::basic::BasicTokenType>,

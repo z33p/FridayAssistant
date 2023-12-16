@@ -2,16 +2,16 @@ use oauth2::{CsrfToken, Scope};
 use serde_json::json;
 use tracing::debug;
 
-use crate::{get_oauth_client, lambda_handler::lambda_oauth_response::LambdaOAuthResponse};
+use crate::{get_gmail_oauth_client, lambda_handler::lambda_oauth_response::LambdaOAuthResponse};
 
 pub async fn generate_oauth_url() -> Result<LambdaOAuthResponse, Box<dyn std::error::Error>> {
-    let client = get_oauth_client()?;
+    let client = get_gmail_oauth_client()?;
 
     let (auth_url, _) = client
         .authorize_url(CsrfToken::new_random)
         .add_extra_param("access_type", "offline")
         .add_scope(Scope::new(
-            "https://www.googleapis.com/auth/gmail.modify".to_string(),
+            "https://www.googleapis.com/auth/gmail.send".to_string(),
         ))
         .url();
 
