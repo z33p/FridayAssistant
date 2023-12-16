@@ -1,6 +1,8 @@
+use std::time::Duration;
+
 use aws_config::BehaviorVersion;
 use aws_sdk_dynamodb::types::AttributeValue;
-use chrono::{TimeZone, Utc};
+use chrono::Utc;
 use oauth2::{AuthorizationCode, RefreshToken, TokenResponse};
 
 use serde_json::json;
@@ -29,7 +31,8 @@ pub async fn get_oauth_tokens(
         .request_async(oauth2::reqwest::async_http_client)
         .await?;
 
-    let oauth_tokens = db_insert_oauth(tokens_response).await;
+    let oauth_tokens = extract_oauth_tokens(tokens_response);
+    db_insert_oauth(&oauth_tokens).await;
 
     Ok(LambdaOAuthResponse {
         status_code: 200,
@@ -54,24 +57,34 @@ fn handle_get_refresh_token(
     refresh_token
 }
 
-async fn db_insert_oauth(
+fn extract_oauth_tokens(
     tokens_response: oauth2::StandardTokenResponse<
         oauth2::EmptyExtraTokenFields,
         oauth2::basic::BasicTokenType,
     >,
 ) -> OAuthTokens {
+    let now = Utc::now();
     let access_token = tokens_response.access_token().secret().to_string();
     debug!("Access Token: {}", access_token);
 
     let refresh_token = handle_get_refresh_token(&tokens_response);
-    let expiry_date = tokens_response.expires_in().unwrap().as_millis();
 
+    let expires_in = tokens_response.expires_in().unwrap().as_millis();
+    let expiry_date = now + Duration::from_millis(expires_in.try_into().unwrap());
+    let expiry_date_utc = expiry_date.to_rfc3339_opts(chrono::SecondsFormat::Secs, false);
+
+    let oauth_tokens = OAuthTokens {
+        access_token,
+        refresh_token,
+        expiry_date: expiry_date.timestamp_millis(),
+        expiry_date_utc: expiry_date_utc,
+    };
+
+    oauth_tokens
+}
+
+async fn db_insert_oauth(oauth_tokens: &OAuthTokens) {
     let client = get_aws_client().await;
-
-    let expiry_date_utc = Utc
-        .timestamp_millis_opt(cast_u128_into_i64(expiry_date))
-        .unwrap()
-        .to_rfc3339_opts(chrono::SecondsFormat::Secs, false);
 
     let tb_oauth_tokens = "tb_oauth_tokens";
     let id_oauth_tokens = Uuid::new_v4().to_string();
@@ -83,14 +96,22 @@ async fn db_insert_oauth(
             "id_oauth_tokens",
             AttributeValue::S(id_oauth_tokens.to_owned()),
         )
-        .item("access_token", AttributeValue::S(access_token.to_owned()))
-        .item("refresh_token", AttributeValue::S(refresh_token.to_owned()))
-        .item("expiry_date", AttributeValue::N(expiry_date.to_string()))
+        .item(
+            "access_token",
+            AttributeValue::S(oauth_tokens.access_token.to_owned()),
+        )
+        .item(
+            "refresh_token",
+            AttributeValue::S(oauth_tokens.refresh_token.to_owned()),
+        )
+        .item(
+            "expiry_date",
+            AttributeValue::N(oauth_tokens.expiry_date.to_string()),
+        )
         .item(
             "expiry_date_utc",
-            AttributeValue::S(expiry_date_utc.to_owned()),
+            AttributeValue::S(oauth_tokens.expiry_date_utc.to_owned()),
         );
-
     info!(
         "Iniciando inserção na tabela {} uuid {}",
         tb_oauth_tokens, id_oauth_tokens
@@ -98,13 +119,6 @@ async fn db_insert_oauth(
 
     _ = request.send().await.unwrap();
     info!("Tokens inseridos com sucesso uuid {}", id_oauth_tokens);
-
-    OAuthTokens {
-        access_token,
-        refresh_token,
-        expiry_date,
-        expiry_date_utc,
-    }
 }
 
 async fn get_aws_client() -> aws_sdk_dynamodb::Client {
@@ -112,15 +126,6 @@ async fn get_aws_client() -> aws_sdk_dynamodb::Client {
     let client = aws_sdk_dynamodb::Client::new(&config);
     debug!("Client AWS criado com sucesso");
     client
-}
-
-fn cast_u128_into_i64(expiry_date: u128) -> i64 {
-    let expiry_date_i64: i64 = if expiry_date <= i64::MAX as u128 {
-        expiry_date as i64
-    } else {
-        panic!("Não foi possível realizar o cast de u128 em i64")
-    };
-    expiry_date_i64
 }
 
 fn extract_code_from_url(url: &str) -> Result<String, Box<dyn std::error::Error>> {
@@ -145,7 +150,7 @@ pub async fn refresh_access_token(
         .await
     {
         Ok(tokens_response) => {
-            let oauth_tokens = db_insert_oauth(tokens_response).await;
+            let oauth_tokens = extract_oauth_tokens(tokens_response);
 
             Ok(LambdaOAuthResponse {
                 status_code: 200,
