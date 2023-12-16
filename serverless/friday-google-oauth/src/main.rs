@@ -1,5 +1,5 @@
 mod generate_oauth_url;
-mod get_access_token;
+mod tokens_getter;
 mod load_env;
 mod lambda_handler;
 

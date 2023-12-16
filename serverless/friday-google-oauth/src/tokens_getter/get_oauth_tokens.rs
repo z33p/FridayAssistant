@@ -1,6 +1,6 @@
 use serde_derive::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct GetAccessTokenRequest {
+pub struct GetOAuthTokens {
     pub url: String,
 }

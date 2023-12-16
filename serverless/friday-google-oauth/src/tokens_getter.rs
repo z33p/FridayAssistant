@@ -9,12 +9,12 @@ use uuid::Uuid;
 
 use crate::{get_oauth_client, lambda_handler::lambda_oauth_response::LambdaOAuthResponse};
 
-use self::get_access_token_request::GetAccessTokenRequest;
+use self::get_oauth_tokens::GetOAuthTokens;
 
-pub mod get_access_token_request;
+pub mod get_oauth_tokens;
 
-pub async fn get_access_token(
-    request: GetAccessTokenRequest,
+pub async fn get_oauth_tokens(
+    request: GetOAuthTokens,
 ) -> Result<LambdaOAuthResponse, Box<dyn std::error::Error>> {
     let client = get_oauth_client()?;
 
@@ -42,7 +42,7 @@ fn handle_get_refresh_token(
     token_result: &oauth2::StandardTokenResponse<
         oauth2::EmptyExtraTokenFields,
         oauth2::basic::BasicTokenType,
-    >
+    >,
 ) -> String {
     let refresh_token = match token_result.refresh_token() {
         Some(token) => token.secret().to_string(),

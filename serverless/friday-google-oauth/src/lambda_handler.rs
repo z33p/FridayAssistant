@@ -2,7 +2,7 @@ use lambda_runtime::{Error, LambdaEvent};
 
 use crate::{
     generate_oauth_url,
-    get_access_token::{self, get_access_token_request::GetAccessTokenRequest},
+    tokens_getter::{self, get_oauth_tokens::GetOAuthTokens},
 };
 
 use self::{lambda_oauth_request::LambdaOAuthRequest, lambda_oauth_response::LambdaOAuthResponse};
@@ -16,10 +16,11 @@ pub async fn handler(event: LambdaEvent<LambdaOAuthRequest>) -> Result<LambdaOAu
             let response = generate_oauth_url::generate_oauth_url().await;
             response
         }
-        "GET_ACCESS_TOKEN" => {
-            let request_get_access_token: GetAccessTokenRequest = serde_json::from_value(event.payload.data)
-                .expect("Falha ao deserializar GetAccessTokenRequest");
-            let response = get_access_token::get_access_token(request_get_access_token).await;
+        "GET_OAUTH_TOKENS" => {
+            let request_get_oauth_token: GetOAuthTokens =
+                serde_json::from_value(event.payload.data)
+                    .expect("Falha ao deserializar GetAccessTokenRequest");
+            let response = tokens_getter::get_oauth_tokens(request_get_oauth_token).await;
             response
         }
         _ => {
