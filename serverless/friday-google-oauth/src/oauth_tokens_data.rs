@@ -1,4 +1,4 @@
-use sqlx::{PgPool, postgres::PgPoolOptions};
+use sqlx::{postgres::PgPoolOptions, PgPool};
 use tracing::debug;
 
 use crate::{tokens_getter::oauth_tokens::OAuthTokens, ENV_CONFIG};
@@ -26,10 +26,12 @@ pub async fn insert_oauth_token(oauth_tokens: &OAuthTokens) -> Result<(), sqlx::
     Ok(())
 }
 
-pub async fn update_oauth_token(oauth_tokens: &OAuthTokens) -> Result<(), sqlx::Error> {
+pub async fn update_oauth_token_by_refresh_token(
+    oauth_tokens: &OAuthTokens,
+) -> Result<(), sqlx::Error> {
     let pool = create_database_pool().await?;
 
-    sqlx::query("CALL pr_upd_oauth_tokens($1, $2, $3)")
+    sqlx::query("CALL pr_upd_oauth_tokens_by_refresh_token($1, $2, $3)")
         .bind(&oauth_tokens.access_token)
         .bind(&oauth_tokens.refresh_token)
         .bind(oauth_tokens.expiry_date)

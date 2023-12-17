@@ -109,9 +109,10 @@ pub async fn refresh_access_token(
     {
         Ok(tokens_response) => {
             let oauth_tokens = extract_oauth_tokens(tokens_response);
-            if let Some(on_update_exception) = oauth_tokens_data::update_oauth_token(&oauth_tokens)
-                .await
-                .err()
+            if let Some(on_update_exception) =
+                oauth_tokens_data::update_oauth_token_by_refresh_token(&oauth_tokens)
+                    .await
+                    .err()
             {
                 error!(
                     "Erro ao tentar atualizar oauth tokens: {}",

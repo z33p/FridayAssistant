@@ -1,6 +1,5 @@
--- DROP PROCEDURE pr_upd_oauth_tokens
-CREATE OR REPLACE PROCEDURE pr_upd_oauth_tokens(
-    IN p_id_oauth_tokens UUID,
+-- DROP PROCEDURE pr_upd_oauth_tokens_by_refresh_token
+CREATE OR REPLACE PROCEDURE pr_upd_oauth_tokens_by_refresh_token(
     IN p_access_token VARCHAR(2048),
     IN p_refresh_token VARCHAR(255),
     IN p_expiry_date TIMESTAMP WITH TIME ZONE
@@ -11,9 +10,8 @@ BEGIN
     UPDATE tb_oauth_tokens
     SET
         access_token = p_access_token,
-        refresh_token = p_refresh_token,
         expiry_date = p_expiry_date
     WHERE
-        id_oauth_tokens = p_id_oauth_tokens;
+        refresh_token = p_refresh_token;
 END;
 $$;
