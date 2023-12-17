@@ -101,14 +101,16 @@ pub async fn refresh_access_token(
     let client = get_gmail_oauth_client()?;
 
     match client
-        .exchange_refresh_token(&RefreshToken::new(request.refresh_token))
+        .exchange_refresh_token(&RefreshToken::new(request.refresh_token.to_owned()))
         .add_extra_param("access_type", "offline")
         .add_scope(Scope::new("https://mail.google.com/".to_string()))
         .request_async(oauth2::reqwest::async_http_client)
         .await
     {
         Ok(tokens_response) => {
-            let oauth_tokens = extract_oauth_tokens(tokens_response);
+            let mut oauth_tokens = extract_oauth_tokens(tokens_response);
+            oauth_tokens.refresh_token = request.refresh_token;
+
             if let Some(on_update_exception) =
                 oauth_tokens_data::update_oauth_token_by_refresh_token(&oauth_tokens)
                     .await
