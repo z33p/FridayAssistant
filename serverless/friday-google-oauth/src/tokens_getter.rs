@@ -1,18 +1,15 @@
-use std::{error::Error, panic, time::Duration};
+use std::time::Duration;
 
-use aws_config::BehaviorVersion;
-use aws_sdk_dynamodb::{
-    operation::execute_statement::ExecuteStatementOutput, types::AttributeValue,
-};
 use chrono::Utc;
-use chrono_tz::America::Sao_Paulo;
 use oauth2::{AuthorizationCode, RefreshToken, Scope, TokenResponse};
 
 use serde_json::json;
-use tracing::{debug, error, info, warn};
-use uuid::Uuid;
+use tracing::{debug, error, warn};
 
-use crate::{get_gmail_oauth_client, lambda_handler::lambda_oauth_response::LambdaOAuthResponse};
+use crate::{
+    get_gmail_oauth_client, lambda_handler::lambda_oauth_response::LambdaOAuthResponse,
+    oauth_tokens_data,
+};
 
 use self::{
     get_oauth_tokens_request::GetOAuthTokensRequest, oauth_tokens::OAuthTokens,
@@ -36,7 +33,7 @@ pub async fn get_oauth_tokens(
         .await?;
 
     let oauth_tokens = extract_oauth_tokens(tokens_response);
-    db_insert_oauth(&oauth_tokens).await;
+    oauth_tokens_data::insert_oauth_token(&oauth_tokens).await?;
 
     Ok(LambdaOAuthResponse {
         status_code: 200,
@@ -76,63 +73,15 @@ fn extract_oauth_tokens(
 
     let expires_in = tokens_response.expires_in().unwrap().as_millis();
     let expiry_date = now + Duration::from_millis(expires_in.try_into().unwrap());
-    let expiry_date_utc = expiry_date
-        .with_timezone(&Sao_Paulo)
-        .to_rfc3339_opts(chrono::SecondsFormat::Secs, false);
 
     let oauth_tokens = OAuthTokens {
+        id_oauth_tokens: None,
         access_token,
         refresh_token,
-        expiry_date: expiry_date.timestamp_millis(),
-        expiry_date_utc: expiry_date_utc,
+        expiry_date,
     };
 
     oauth_tokens
-}
-
-async fn db_insert_oauth(oauth_tokens: &OAuthTokens) {
-    let client = get_aws_client().await;
-
-    let tb_oauth_tokens = "tb_oauth_tokens";
-    let id_oauth_tokens = Uuid::new_v4().to_string();
-
-    let request = client
-        .put_item()
-        .table_name(tb_oauth_tokens)
-        .item(
-            "id_oauth_tokens",
-            AttributeValue::S(id_oauth_tokens.to_owned()),
-        )
-        .item(
-            "access_token",
-            AttributeValue::S(oauth_tokens.access_token.to_owned()),
-        )
-        .item(
-            "refresh_token",
-            AttributeValue::S(oauth_tokens.refresh_token.to_owned()),
-        )
-        .item(
-            "expiry_date",
-            AttributeValue::N(oauth_tokens.expiry_date.to_string()),
-        )
-        .item(
-            "expiry_date_utc",
-            AttributeValue::S(oauth_tokens.expiry_date_utc.to_owned()),
-        );
-    info!(
-        "Iniciando inserção na tabela {} uuid {}",
-        tb_oauth_tokens, id_oauth_tokens
-    );
-
-    _ = request.send().await.unwrap();
-    info!("Tokens inseridos com sucesso uuid {}", id_oauth_tokens);
-}
-
-async fn get_aws_client() -> aws_sdk_dynamodb::Client {
-    let config = aws_config::load_defaults(BehaviorVersion::latest()).await;
-    let client = aws_sdk_dynamodb::Client::new(&config);
-    debug!("Client AWS criado com sucesso");
-    client
 }
 
 fn extract_code_from_url(url: &str) -> Result<String, Box<dyn std::error::Error>> {
@@ -160,8 +109,9 @@ pub async fn refresh_access_token(
     {
         Ok(tokens_response) => {
             let oauth_tokens = extract_oauth_tokens(tokens_response);
-            if let Some(on_update_exception) =
-                db_update_oauth_by_refresh_token(&oauth_tokens).await.err()
+            if let Some(on_update_exception) = oauth_tokens_data::update_oauth_token(&oauth_tokens)
+                .await
+                .err()
             {
                 error!(
                     "Erro ao tentar atualizar oauth tokens: {}",
@@ -182,62 +132,15 @@ pub async fn refresh_access_token(
     }
 }
 
-async fn db_update_oauth_by_refresh_token(
-    oauth_tokens: &OAuthTokens,
-) -> Result<ExecuteStatementOutput, Box<dyn Error>> {
-    let aws_client = get_aws_client().await;
-
-    let statement = format!(
-        "UPDATE tb_oauth_tokens 
-         SET
-            access_token = ?, 
-            expiry_date = ?, 
-            expiry_date_utc = ? 
-        WHERE refresh_token = ?"
-    );
-
-    let response = aws_client
-        .execute_statement()
-        .statement(statement)
-        .set_parameters(Some(vec![
-            AttributeValue::S(oauth_tokens.access_token.to_owned()),
-            AttributeValue::N(oauth_tokens.expiry_date.to_string()),
-            AttributeValue::S(oauth_tokens.expiry_date_utc.to_owned()),
-            AttributeValue::S(oauth_tokens.refresh_token.to_owned()),
-        ]))
-        .send()
-        .await?;
-
-    Ok(response)
-}
-
 pub async fn generate_access_token() -> Result<LambdaOAuthResponse, Box<dyn std::error::Error>> {
-    let client = get_aws_client().await;
+    let response_oauth_tokens = oauth_tokens_data::get_first_oauth_token_by_refresh_token().await?;
 
-    // Construa a expressão de consulta para obter o último refresh_token ordenando pelo expiry_date
-    let query = "SELECT refresh_token FROM tb_oauth_tokens ORDER BY expiry_date DESC";
-
-    // Executar a consulta
-    let db_response = client
-        .execute_statement()
-        .statement(query)
-        .limit(1)
-        .send()
-        .await
-        .expect("Não foi possível obter a resposta do banco de dados");
-
-    let first_item = db_response.items().first();
-
-    match first_item {
-        Some(item) => {
-            let refresh_token = item
-                .get("refresh_token")
-                .unwrap()
-                .as_s()
-                .unwrap()
-                .to_string();
-
-            let response = refresh_access_token(RefreshAccessTokenRequest { refresh_token }).await;
+    match response_oauth_tokens {
+        Some(oauth_tokens) => {
+            let response = refresh_access_token(RefreshAccessTokenRequest {
+                refresh_token: oauth_tokens.refresh_token,
+            })
+            .await;
 
             response
         }
