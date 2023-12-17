@@ -1,6 +1,6 @@
-use std::time::Duration;
+use std::{panic, time::Duration};
 
-use aws_config::{sso::token, BehaviorVersion};
+use aws_config::BehaviorVersion;
 use aws_sdk_dynamodb::types::AttributeValue;
 use chrono::Utc;
 use chrono_tz::America::Sao_Paulo;
@@ -39,6 +39,7 @@ pub async fn get_oauth_tokens(
     Ok(LambdaOAuthResponse {
         status_code: 200,
         data: json!({ "oauth_tokens": oauth_tokens }),
+        errors: None,
     })
 }
 
@@ -161,11 +162,55 @@ pub async fn refresh_access_token(
             Ok(LambdaOAuthResponse {
                 status_code: 200,
                 data: json!({ "oauth_tokens": oauth_tokens }),
+                errors: None,
             })
         }
         Err(e) => {
             error!("Failed to refresh access token: {}", e);
             Err(Box::new(e))
+        }
+    }
+}
+
+pub async fn generate_access_token() -> Result<LambdaOAuthResponse, Box<dyn std::error::Error>> {
+    let client = get_aws_client().await;
+
+    // Construa a expressão de consulta para obter o último refresh_token ordenando pelo expiry_date
+    let query = "SELECT refresh_token FROM tb_oauth_tokens ORDER BY expiry_date DESC LIMIT 1";
+
+    // Executar a consulta
+    let db_response = client
+        .execute_statement()
+        .statement(query)
+        .send()
+        .await
+        .expect("Não foi possível obter a resposta do banco de dados");
+
+    let first_item = db_response.items().first();
+
+    match first_item {
+        Some(item) => {
+            let refresh_token = item
+                .get("refresh_token")
+                .unwrap()
+                .as_s()
+                .unwrap()
+                .to_string();
+
+            let response = refresh_access_token(RefreshAccessTokenRequest { refresh_token }).await;
+
+            response
+        }
+        None => {
+            let response = LambdaOAuthResponse {
+                status_code: 500,
+                data: serde_json::Value::Null,
+                errors: Some(vec![String::from(
+                    "Não foram encontrados refresh_token disponíveis para geração do access_token",
+                )]),
+            };
+
+            Ok(response)
         }
     }
 }

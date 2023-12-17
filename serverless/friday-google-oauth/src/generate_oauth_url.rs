@@ -18,5 +18,6 @@ pub async fn generate_oauth_url() -> Result<LambdaOAuthResponse, Box<dyn std::er
     Ok(LambdaOAuthResponse {
         status_code: 200,
         data: json!({ "url": auth_url.to_string() }),
+        errors: None
     })
 }

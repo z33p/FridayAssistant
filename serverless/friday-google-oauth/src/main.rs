@@ -1,7 +1,7 @@
 mod generate_oauth_url;
-mod tokens_getter;
-mod load_env;
 mod lambda_handler;
+mod load_env;
+mod tokens_getter;
 
 extern crate dotenv;
 
@@ -12,7 +12,7 @@ use lambda_runtime::service_fn;
 use load_env::{load_env_variables, EnvVariables};
 use oauth2::{basic::BasicClient, AuthUrl, ClientId, ClientSecret, RedirectUrl, TokenUrl};
 use once_cell::sync::Lazy;
-use tracing::{Level, error};
+use tracing::{error, Level};
 
 static ENV_CONFIG: Lazy<EnvVariables> = Lazy::new(|| load_env_variables());
 
@@ -25,7 +25,7 @@ async fn main() {
     let res = lambda_runtime::run(func).await;
 
     if res.is_ok() {
-    return;
+        return;
     }
 
     let err = res.err().unwrap();
