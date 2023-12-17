@@ -1,4 +1,5 @@
-CREATE OR REPLACE PROCEDURE pr_update_oauth_token(
+-- DROP PROCEDURE pr_upd_oauth_tokens
+CREATE OR REPLACE PROCEDURE pr_upd_oauth_tokens(
     IN p_id_oauth_tokens UUID,
     IN p_access_token VARCHAR(2048),
     IN p_refresh_token VARCHAR(255),

@@ -1,4 +1,5 @@
-CREATE OR REPLACE PROCEDURE pr_ins_oauth_token(
+-- DROP PROCEDURE pr_ins_oauth_tokens
+CREATE OR REPLACE PROCEDURE pr_ins_oauth_tokens(
     IN p_access_token VARCHAR(2048),
     IN p_refresh_token VARCHAR(255),
     IN p_expiry_date TIMESTAMP WITH TIME ZONE
