@@ -215,12 +215,13 @@ pub async fn generate_access_token() -> Result<LambdaOAuthResponse, Box<dyn std:
     let client = get_aws_client().await;
 
     // Construa a expressão de consulta para obter o último refresh_token ordenando pelo expiry_date
-    let query = "SELECT refresh_token FROM tb_oauth_tokens ORDER BY expiry_date DESC LIMIT 1";
+    let query = "SELECT refresh_token FROM tb_oauth_tokens ORDER BY expiry_date DESC";
 
     // Executar a consulta
     let db_response = client
         .execute_statement()
         .statement(query)
+        .limit(1)
         .send()
         .await
         .expect("Não foi possível obter a resposta do banco de dados");
