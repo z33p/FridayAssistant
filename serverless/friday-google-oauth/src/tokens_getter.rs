@@ -1,7 +1,9 @@
-use std::{panic, time::Duration};
+use std::{error::Error, panic, time::Duration};
 
 use aws_config::BehaviorVersion;
-use aws_sdk_dynamodb::types::AttributeValue;
+use aws_sdk_dynamodb::{
+    operation::execute_statement::ExecuteStatementOutput, types::AttributeValue,
+};
 use chrono::Utc;
 use chrono_tz::America::Sao_Paulo;
 use oauth2::{AuthorizationCode, RefreshToken, Scope, TokenResponse};
@@ -158,6 +160,14 @@ pub async fn refresh_access_token(
     {
         Ok(tokens_response) => {
             let oauth_tokens = extract_oauth_tokens(tokens_response);
+            if let Some(on_update_exception) =
+                db_update_oauth_by_refresh_token(&oauth_tokens).await.err()
+            {
+                error!(
+                    "Erro ao tentar atualizar oauth tokens: {}",
+                    on_update_exception
+                );
+            }
 
             Ok(LambdaOAuthResponse {
                 status_code: 200,
@@ -170,6 +180,35 @@ pub async fn refresh_access_token(
             Err(Box::new(e))
         }
     }
+}
+
+async fn db_update_oauth_by_refresh_token(
+    oauth_tokens: &OAuthTokens,
+) -> Result<ExecuteStatementOutput, Box<dyn Error>> {
+    let aws_client = get_aws_client().await;
+
+    let statement = format!(
+        "UPDATE tb_oauth_tokens 
+         SET
+            access_token = ?, 
+            expiry_date = ?, 
+            expiry_date_utc = ? 
+        WHERE refresh_token = ?"
+    );
+
+    let response = aws_client
+        .execute_statement()
+        .statement(statement)
+        .set_parameters(Some(vec![
+            AttributeValue::S(oauth_tokens.access_token.to_owned()),
+            AttributeValue::N(oauth_tokens.expiry_date.to_string()),
+            AttributeValue::S(oauth_tokens.expiry_date_utc.to_owned()),
+            AttributeValue::S(oauth_tokens.refresh_token.to_owned()),
+        ]))
+        .send()
+        .await?;
+
+    Ok(response)
 }
 
 pub async fn generate_access_token() -> Result<LambdaOAuthResponse, Box<dyn std::error::Error>> {
