@@ -4,7 +4,7 @@ use chrono::Utc;
 use oauth2::{AuthorizationCode, RefreshToken, Scope, TokenResponse};
 
 use serde_json::json;
-use tracing::{debug, error, warn};
+use tracing::{debug, error, info, warn};
 
 use crate::{
     get_gmail_oauth_client, lambda_handler::lambda_oauth_response::LambdaOAuthResponse,
@@ -121,6 +121,8 @@ pub async fn refresh_access_token(
                     on_update_exception
                 );
             }
+
+            info!("Access Token gerado com sucesso");
 
             Ok(LambdaOAuthResponse {
                 status_code: 200,
