@@ -9,28 +9,23 @@ extern crate dotenv;
 use std::error::Error;
 
 use dotenv::dotenv;
-use lambda_runtime::service_fn;
+use lambda_http::service_fn;
 use load_env::{load_env_variables, EnvVariables};
 use oauth2::{basic::BasicClient, AuthUrl, ClientId, ClientSecret, RedirectUrl, TokenUrl};
 use once_cell::sync::Lazy;
-use tracing::{error, Level};
+use tracing::Level;
 
 static ENV_CONFIG: Lazy<EnvVariables> = Lazy::new(|| load_env_variables());
 
 #[tokio::main]
-async fn main() {
+async fn main() -> Result<(), Box<dyn Error + Send + Sync>>{
     dotenv().ok();
     logging_init();
 
     let func = service_fn(lambda_handler::handler);
-    let res = lambda_runtime::run(func).await;
+    let response = lambda_http::run(func).await;
 
-    if res.is_ok() {
-        return;
-    }
-
-    let err = res.err().unwrap();
-    error!("Error: {}", err.to_string());
+    response
 }
 
 fn logging_init() {
