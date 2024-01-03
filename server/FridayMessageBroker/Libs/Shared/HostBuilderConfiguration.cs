@@ -11,7 +11,15 @@ public class HostBuilderConfiguration
             .CreateDefaultBuilder()
             .ConfigureAppConfiguration(configurationBuilder =>
             {
-                configurationBuilder.AddJsonFile("./Libs/Shared/appsettings.Development.json", false, true);
+                string? environment = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT");
+                if (environment is null || string.Compare(environment, "DEV", StringComparison.OrdinalIgnoreCase) == 0)
+                {
+                    configurationBuilder.AddJsonFile("./Libs/Shared/appsettings.Development.json", false, true);
+                }
+                else
+                {
+                    configurationBuilder.AddJsonFile("./appsettings.json", false, true);
+                }
             })
             .ConfigureServices((hostContext, services) =>
             {

@@ -11,4 +11,14 @@
     <ProjectReference Include="../Libs/Shared/Shared.csproj" />
     <ProjectReference Include="../Libs/NewsletterStateMachine/NewsletterStateMachine.csproj" />
   </ItemGroup>
+
+  <Target Name="CopyCustomContent" AfterTargets="AfterBuild">
+    <Copy SourceFiles="../Libs/Shared/appsettings.json" DestinationFolder="$(OutDir)" />
+    <Copy SourceFiles="../Libs/Shared/appsettings.Development.json" DestinationFolder="$(OutDir)" />
+  </Target>
+
+  <Target Name="CopyCustomContentOnPublish" AfterTargets="Publish">
+    <Copy SourceFiles="../Libs/Shared/appsettings.json" DestinationFolder="$(PublishDir)" />
+    <Copy SourceFiles="../Libs/Shared/appsettings.Development.json" DestinationFolder="$(PublishDir)" />
+  </Target>
 </Project>
