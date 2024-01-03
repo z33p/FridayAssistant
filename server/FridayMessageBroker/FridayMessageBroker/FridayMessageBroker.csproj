@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>dotnet-FridayMessageBroker-2f38f588-4d01-4dd3-a465-c12f4889c2ca</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../Libs/Shared/Shared.csproj" />
+    <ProjectReference Include="../Libs/NewsletterStateMachine/NewsletterStateMachine.csproj" />
+  </ItemGroup>
+</Project>
