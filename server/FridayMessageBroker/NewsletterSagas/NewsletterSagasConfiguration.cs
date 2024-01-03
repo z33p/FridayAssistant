@@ -36,7 +36,13 @@ public class NewsletterSagasConfiguration
                     configure.Username(rabbitConfigSection.GetValue<string>("Password"));
                 });
 
-                EndpointConvention.Map<ReleaseInEvent>(new Uri($"exchange:{massTransitEndpoints.GetValue<string>("ReleaseIn")}"));
+                Uri messageBrokerEndpoint = new($"exchange:{massTransitEndpoints.GetValue<string>("MessageBroker")}");
+
+                EndpointConvention.Map<ReleaseInEvent>(messageBrokerEndpoint);
+                EndpointConvention.Map<FetchOAuthTokenEvent>(messageBrokerEndpoint);
+                EndpointConvention.Map<SendNewsletterEvent>(messageBrokerEndpoint);
+                EndpointConvention.Map<ConcludedEvent>(messageBrokerEndpoint);
+
                 ConfigureSagasReceiveEndpoint(busContext, rabbitBusConfigurator, massTransitEndpoints);
 
                 rabbitBusConfigurator.ConfigureEndpoints(busContext);

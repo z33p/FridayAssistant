@@ -42,7 +42,7 @@ public class Program
     )
     {
         MassTransitConfiguration.RegisterConsumerEndpoint<MessageBrokerJob>(
-            massTransitEndpoints.GetValue<string>("ReleaseIn")!,
+            massTransitEndpoints.GetValue<string>("MessageBroker")!,
             rabbitMqBusFactoryConfigurator,
             busRegistrationContext
         );
