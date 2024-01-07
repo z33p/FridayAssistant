@@ -1,4 +1,4 @@
-using Libs.NewsletterStateMachine.Sagas;
+using Libs.NewsletterStateMachine.Sagas.Events;
 using MassTransit;
 
 namespace FridayMessageBroker.Services;
@@ -34,6 +34,7 @@ public class MassTransitConfiguration
                 Uri newsletterSagasEndpoint = new($"exchange:{massTransitEndpoints.GetValue<string>("NewsletterSagasEndpoint")!}");
 
                 EndpointConvention.Map<ReleaseInEvent>(newsletterSagasEndpoint);
+                EndpointConvention.Map<FetchContentEvent>(newsletterSagasEndpoint);
                 EndpointConvention.Map<FetchOAuthTokenEvent>(newsletterSagasEndpoint);
                 EndpointConvention.Map<SendNewsletterEvent>(newsletterSagasEndpoint);
                 EndpointConvention.Map<ConcludedEvent>(newsletterSagasEndpoint);

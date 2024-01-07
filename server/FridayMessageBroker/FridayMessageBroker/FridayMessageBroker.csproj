@@ -12,6 +12,10 @@
     <ProjectReference Include="../Libs/NewsletterStateMachine/NewsletterStateMachine.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="AWSSDK.Lambda" Version="3.7.303.25" />
+  </ItemGroup>
+
   <Target Name="CopyCustomContent" AfterTargets="AfterBuild">
     <Copy SourceFiles="../Libs/Shared/appsettings.json" DestinationFolder="$(OutDir)" />
     <Copy SourceFiles="../Libs/Shared/appsettings.Development.json" DestinationFolder="$(OutDir)" />

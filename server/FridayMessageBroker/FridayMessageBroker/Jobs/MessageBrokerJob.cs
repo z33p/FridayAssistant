@@ -1,25 +1,51 @@
-using Libs.NewsletterStateMachine.Sagas;
+using Amazon;
+using Amazon.Lambda;
+using Amazon.Lambda.Model;
+using Libs.NewsletterStateMachine.Sagas.Events;
 using MassTransit;
 
 namespace FridayMessageBroker.Jobs;
 
-public class MessageBrokerJob
-    : IConsumer<FetchOAuthTokenEvent>,
-    IConsumer<SendNewsletterEvent>,
-    IConsumer<ConcludedEvent>
+public class MessageBrokerJob : IConsumer<IActionEvent>
 {
-    public Task Consume(ConsumeContext<FetchOAuthTokenEvent> context)
+    private readonly ILogger<MessageBrokerJob> _logger;
+    private readonly AmazonLambdaClient _amazonLambdaClient;
+
+    public MessageBrokerJob(ILogger<MessageBrokerJob> logger, IConfiguration configuration)
     {
-        throw new NotImplementedException();
+        _logger = logger;
+        RegionEndpoint region = ResolveAwsRegion(configuration);
+        _amazonLambdaClient = new AmazonLambdaClient(region);
     }
 
-    public Task Consume(ConsumeContext<SendNewsletterEvent> context)
+    private static RegionEndpoint ResolveAwsRegion(IConfiguration configuration)
     {
-        throw new NotImplementedException();
+        string awsRegion = configuration.GetValue<string>("AWSRegion")!;
+        RegionEndpoint region = RegionEndpoint.GetBySystemName(awsRegion);
+        return region;
     }
 
-    public Task Consume(ConsumeContext<ConcludedEvent> context)
+    public Task Consume(ConsumeContext<IActionEvent> context)
     {
-        throw new NotImplementedException();
+        InvokeRequest request = new()
+        {
+            FunctionName = context.Message.FunctionName,
+            Payload = context.Message.GetInvocationPayload()
+        };
+
+        FireAndForgetLambdaInvocation(request);
+        return Task.CompletedTask;
     }
+
+    public async void FireAndForgetLambdaInvocation(InvokeRequest request)
+    {
+        try
+        {
+            await _amazonLambdaClient.InvokeAsync(request);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Erro ao invocar a função lambda {functionName}", request.FunctionName);
+        }
+    }    
 }

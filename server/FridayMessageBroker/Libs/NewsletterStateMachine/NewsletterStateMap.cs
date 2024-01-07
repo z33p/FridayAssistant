@@ -13,6 +13,7 @@ public class NewsletterStateMap : SagaClassMap<NewsletterState>
             .HasColumnType("xid")
             .IsRowVersion();
 
+        entity.Property(state => state.Payload).HasColumnType("json");
         entity.Property(state => state.PreviousState).HasMaxLength(64);
         entity.Property(state => state.CurrentState).HasMaxLength(64);
     }

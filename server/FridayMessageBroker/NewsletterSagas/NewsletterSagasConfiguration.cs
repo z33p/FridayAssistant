@@ -1,5 +1,6 @@
 using System.Reflection;
 using Libs.NewsletterStateMachine.Sagas;
+using Libs.NewsletterStateMachine.Sagas.Events;
 using MassTransit;
 using MassTransit.EntityFrameworkCoreIntegration;
 using Microsoft.EntityFrameworkCore;
@@ -39,6 +40,7 @@ public class NewsletterSagasConfiguration
                 Uri messageBrokerEndpoint = new($"exchange:{massTransitEndpoints.GetValue<string>("MessageBroker")}");
 
                 EndpointConvention.Map<ReleaseInEvent>(messageBrokerEndpoint);
+                EndpointConvention.Map<FetchContentEvent>(messageBrokerEndpoint);
                 EndpointConvention.Map<FetchOAuthTokenEvent>(messageBrokerEndpoint);
                 EndpointConvention.Map<SendNewsletterEvent>(messageBrokerEndpoint);
                 EndpointConvention.Map<ConcludedEvent>(messageBrokerEndpoint);

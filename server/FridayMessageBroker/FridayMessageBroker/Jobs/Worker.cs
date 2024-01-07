@@ -1,4 +1,4 @@
-using Libs.NewsletterStateMachine.Sagas;
+using Libs.NewsletterStateMachine.Sagas.Events;
 using MassTransit;
 
 namespace FridayMessageBroker.Jobs;
