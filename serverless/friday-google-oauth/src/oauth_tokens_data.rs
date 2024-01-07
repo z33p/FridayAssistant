@@ -1,5 +1,5 @@
 use sqlx::{postgres::PgPoolOptions, PgPool};
-use tracing::debug;
+use tracing::{debug, error};
 
 use crate::{tokens_getter::oauth_tokens::OAuthTokens, ENV_CONFIG};
 
@@ -14,12 +14,17 @@ async fn create_database_pool() -> Result<PgPool, sqlx::Error> {
 pub async fn insert_oauth_token(oauth_tokens: &OAuthTokens) -> Result<(), sqlx::Error> {
     let pool = create_database_pool().await?;
 
-    sqlx::query("CALL pr_ins_oauth_tokens($1, $2, $3)")
+    let result = sqlx::query("CALL pr_ins_oauth_tokens($1, $2, $3)")
         .bind(&oauth_tokens.access_token)
         .bind(&oauth_tokens.refresh_token)
         .bind(oauth_tokens.expiry_date)
         .execute(&pool)
-        .await?;
+        .await;
+
+    if let Err(e) = result {
+        error!("Erro ao inserir oauth_tokens: {:?}", e);
+        return Err(e);
+    }
 
     debug!("Registro inserido com sucesso");
 
