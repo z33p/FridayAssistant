@@ -2,9 +2,9 @@ use oauth2::{CsrfToken, Scope};
 use serde_json::json;
 use tracing::debug;
 
-use crate::{get_gmail_oauth_client, lambda_handler::lambda_oauth_response::LambdaOAuthResponse};
+use crate::{get_gmail_oauth_client, lambda_handler::lambda_response::LambdaResponse};
 
-pub async fn generate_oauth_url() -> Result<LambdaOAuthResponse, Box<dyn std::error::Error>> {
+pub async fn generate_oauth_url() -> Result<LambdaResponse, Box<dyn std::error::Error>> {
     let client = get_gmail_oauth_client()?;
 
     let (auth_url, _) = client
@@ -15,9 +15,9 @@ pub async fn generate_oauth_url() -> Result<LambdaOAuthResponse, Box<dyn std::er
 
     debug!("{}", auth_url.to_string());
 
-    Ok(LambdaOAuthResponse {
+    Ok(LambdaResponse {
         status_code: 200,
         data: json!({ "url": auth_url.to_string() }),
-        errors: None
+        errors: None,
     })
 }

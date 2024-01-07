@@ -8,12 +8,14 @@ use crate::{
     },
 };
 
-use self::{lambda_oauth_request::LambdaOAuthRequest, lambda_oauth_response::LambdaOAuthResponse};
+use self::{lambda_request::LambdaRequest, lambda_response::LambdaResponse};
 
-pub mod lambda_oauth_request;
-pub mod lambda_oauth_response;
+pub mod lambda_request;
+pub mod lambda_response;
 
-pub async fn handler(event: LambdaEvent<LambdaOAuthRequest>) -> Result<LambdaOAuthResponse, Error> {
+pub async fn handler(
+    event: LambdaEvent<LambdaRequest>,
+) -> Result<LambdaResponse, lambda_runtime::Error> {
     let lambda_response = match event.payload.action.as_ref() {
         "GENERATE_ACCESS_TOKEN" => {
             let response = tokens_getter::generate_access_token().await;

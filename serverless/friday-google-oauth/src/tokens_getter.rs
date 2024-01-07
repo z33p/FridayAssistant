@@ -7,7 +7,7 @@ use serde_json::json;
 use tracing::{debug, error, info, warn};
 
 use crate::{
-    get_gmail_oauth_client, lambda_handler::lambda_oauth_response::LambdaOAuthResponse,
+    get_gmail_oauth_client, lambda_handler::lambda_response::LambdaResponse,
     oauth_tokens_data,
 };
 
@@ -22,7 +22,7 @@ pub mod refresh_access_token_request;
 
 pub async fn get_oauth_tokens(
     request: GetOAuthTokensRequest,
-) -> Result<LambdaOAuthResponse, Box<dyn std::error::Error>> {
+) -> Result<LambdaResponse, Box<dyn std::error::Error>> {
     let client = get_gmail_oauth_client()?;
 
     let code = AuthorizationCode::new(extract_code_from_url(&request.url)?);
@@ -35,7 +35,7 @@ pub async fn get_oauth_tokens(
     let oauth_tokens = extract_oauth_tokens(tokens_response);
     oauth_tokens_data::insert_oauth_token(&oauth_tokens).await?;
 
-    Ok(LambdaOAuthResponse {
+    Ok(LambdaResponse {
         status_code: 200,
         data: json!({ "oauth_tokens": oauth_tokens }),
         errors: None,
@@ -97,7 +97,7 @@ fn extract_code_from_url(url: &str) -> Result<String, Box<dyn std::error::Error>
 
 pub async fn refresh_access_token(
     request: RefreshAccessTokenRequest,
-) -> Result<LambdaOAuthResponse, Box<dyn std::error::Error>> {
+) -> Result<LambdaResponse, Box<dyn std::error::Error>> {
     let client = get_gmail_oauth_client()?;
 
     match client
@@ -124,7 +124,7 @@ pub async fn refresh_access_token(
 
             info!("Access Token gerado com sucesso");
 
-            Ok(LambdaOAuthResponse {
+            Ok(LambdaResponse {
                 status_code: 200,
                 data: json!({ "oauth_tokens": oauth_tokens }),
                 errors: None,
@@ -137,7 +137,7 @@ pub async fn refresh_access_token(
     }
 }
 
-pub async fn generate_access_token() -> Result<LambdaOAuthResponse, Box<dyn std::error::Error>> {
+pub async fn generate_access_token() -> Result<LambdaResponse, Box<dyn std::error::Error>> {
     let response_oauth_tokens = oauth_tokens_data::get_first_oauth_token_by_refresh_token().await?;
 
     match response_oauth_tokens {
@@ -150,7 +150,7 @@ pub async fn generate_access_token() -> Result<LambdaOAuthResponse, Box<dyn std:
             response
         }
         None => {
-            let response = LambdaOAuthResponse {
+            let response = LambdaResponse {
                 status_code: 500,
                 data: serde_json::Value::Null,
                 errors: Some(vec![String::from(
