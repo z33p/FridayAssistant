@@ -1,51 +1,41 @@
 mod chat_api;
+mod lambda_handler;
+mod linkedin_news_post;
 mod load_env;
 mod search_news;
 
+extern crate dotenv;
+
+use dotenv::dotenv;
+use lambda_runtime::service_fn;
 use load_env::{load_env_variables, EnvVariables};
 use once_cell::sync::Lazy;
-use tracing::{debug, Level};
+use tracing::{error, Level};
 
 static ENV_CONFIG: Lazy<EnvVariables> = Lazy::new(|| load_env_variables());
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() {
+    dotenv().ok();
     logging_init();
 
-    let news_response = search_news::handle_get_news().await?;
+    let func = service_fn(lambda_handler::handler);
+    let res = lambda_runtime::run(func).await;
 
-    // Initialize an empty string to store concatenated titles
-    let mut concatenated_titles = String::new();
-
-    // Iterate through the list of objects and concatenate title with ordinal number
-    for (index, article) in news_response.articles.iter().enumerate() {
-        let ordinal_number = index;
-        let concatenated_title = format!("{}. {}\n", ordinal_number, &article.title);
-
-        // Append the concatenated title to the existing string
-        concatenated_titles.push_str(&concatenated_title);
+    if res.is_ok() {
+        return;
     }
 
-    debug!("Top Headlines:\n\n{}", concatenated_titles);
-
-    let relevant_articles_indexes = chat_api::rank_most_relevant_text(concatenated_titles.as_str())
-        .await
-        .unwrap();
-
-    for article_index in relevant_articles_indexes {
-        let article = news_response.articles.get(article_index).unwrap();
-
-        let post_content = chat_api::write_relevant_post_about(&article.title).await?;
-
-        debug!("Relevant post written: \n\n{}\n", post_content);
-    }
-
-    debug!("Finished");
-    Ok(())
+    let err = res.err().unwrap();
+    error!("Error: {}", err.to_string());
 }
 
 fn logging_init() {
-    let log_level = if ENV_CONFIG.is_prod { Level::INFO } else { Level::DEBUG };
+    let log_level = if ENV_CONFIG.is_prod {
+        Level::INFO
+    } else {
+        Level::DEBUG
+    };
 
     tracing_subscriber::fmt()
         .with_max_level(log_level)
