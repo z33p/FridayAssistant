@@ -37,11 +37,11 @@ pub async fn write_relevant_post_about(
 ) -> Result<String, Box<dyn std::error::Error>> {
     let system_prompt = format!(
         "{} {} {} {} {} {}",
-        "Em formato bem humorado de post para o LinkedIn.",
+        "Em formato educacional de post para o LinkedIn.",
         "Escreva de forma pessoal você não está somente compartilhando a notícia. Você entende do tema e sua importância.",
         "Sempre responda o texto nessa estrutura:",
-        "2 frases sobre a relevância do tópico,",
-        "2 frases sobre a tecnologia e a relevância da tecnologia em si,",
+        "1 paragrafo frases sobre a relevância do tópico,",
+        "1 paragrafo sobre a tecnologia e a relevância da tecnologia em si,",
         "1 frase finalize o texto.",
     );
 
@@ -50,7 +50,7 @@ pub async fn write_relevant_post_about(
     debug!("System Prompt: {}", system_prompt);
     debug!("User Prompt: {}", formated_user_prompt);
 
-    return send_request_to_openai(system_prompt.as_str(), formated_user_prompt.as_str(), 1024)
+    return send_request_to_openai(system_prompt.as_str(), formated_user_prompt.as_str(), 2048)
         .await;
 }
 

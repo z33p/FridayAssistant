@@ -8,14 +8,14 @@ pub struct Source {
 
 #[derive(Debug, Deserialize)]
 pub struct Article {
-    pub source: Source,
-    pub author: Option<String>,
+    // pub source: Source,
+    // pub author: Option<String>,
     pub title: String,
     pub description: Option<String>,
-    pub url: String,
-    pub urlToImage: Option<String>,
-    pub publishedAt: String,
-    pub content: Option<String>,
+    // pub url: String,
+    // pub urlToImage: Option<String>,
+    // pub publishedAt: String,
+    // pub content: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]

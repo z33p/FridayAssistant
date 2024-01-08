@@ -11,13 +11,11 @@ use self::news_contracts::NewsResponse;
 mod news_contracts;
 
 pub async fn handle_get_news() -> Result<NewsResponse, Box<dyn std::error::Error>> {
-    let response_body: String;
-
-    if ENV_CONFIG.is_prod {
-        response_body = fetch_news().await?;
+    let response_body: String = if ENV_CONFIG.is_prod {
+        fetch_news().await?
     } else {
-        response_body = read_local_file()?;
-    }
+        read_local_file()?
+    };
 
     let news_response: NewsResponse = serde_json::from_str(&response_body)?;
 
@@ -28,7 +26,7 @@ pub async fn fetch_news() -> Result<String, Box<dyn std::error::Error>> {
     let user_agent = "FridayNewsletter/1.0";
 
     let base_url = "https://newsapi.org/v2/top-headlines";
-    let country = "country=br";
+    let country = "country=us";
     let category = "category=technology";
     let api_key = format!("apiKey={}", ENV_CONFIG.news_api_key);
 
