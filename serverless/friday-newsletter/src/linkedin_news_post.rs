@@ -1,3 +1,4 @@
+use serde_json::json;
 use tracing::debug;
 
 use crate::{chat_api, lambda_handler::lambda_response::LambdaResponse, search_news};
@@ -19,6 +20,8 @@ pub async fn generate_post() -> Result<LambdaResponse, Box<dyn std::error::Error
 
     debug!("Top Headlines:\n\n{}", concatenated_titles);
 
+    let mut post_content_list = Vec::new();
+
     let relevant_articles_indexes = chat_api::rank_most_relevant_text(concatenated_titles.as_str())
         .await
         .unwrap();
@@ -31,13 +34,15 @@ pub async fn generate_post() -> Result<LambdaResponse, Box<dyn std::error::Error
             .unwrap();
 
         debug!("Relevant post written: \n\n{}\n", post_content);
+
+        post_content_list.push(post_content);
     }
 
     debug!("Finished");
 
     let response = LambdaResponse {
         status_code: 200,
-        data: serde_json::Value::Null,
+        data: json!(post_content_list),
         errors: None,
     };
 
