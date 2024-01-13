@@ -2,6 +2,7 @@ mod chat_api;
 mod lambda_handler;
 mod linkedin_news_post;
 mod load_env;
+mod message_broker_sagas_queue;
 mod search_news;
 
 extern crate dotenv;

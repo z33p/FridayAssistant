@@ -1,9 +1,9 @@
 use serde_json::json;
 use tracing::debug;
 
-use crate::{chat_api, lambda_handler::lambda_response::LambdaResponse, search_news};
+use crate::{chat_api, lambda_handler::responses::BusinessResponse, search_news};
 
-pub async fn generate_post() -> Result<LambdaResponse, Box<dyn std::error::Error>> {
+pub async fn generate_post() -> Result<BusinessResponse, Box<dyn std::error::Error>> {
     let news_response = search_news::handle_get_news().await.unwrap();
 
     // Initialize an empty string to store concatenated titles
@@ -40,7 +40,7 @@ pub async fn generate_post() -> Result<LambdaResponse, Box<dyn std::error::Error
 
     debug!("Finished");
 
-    let response = LambdaResponse {
+    let response = BusinessResponse {
         status_code: 200,
         data: json!(post_content_list),
         errors: None,
