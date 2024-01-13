@@ -21,6 +21,7 @@ pub struct Article {
 #[derive(Debug, Deserialize)]
 pub struct NewsResponse {
     pub status: String,
-    pub totalResults: u32,
+    #[serde(rename = "totalResults")]
+    pub total_results: u32,
     pub articles: Vec<Article>,
 }

@@ -12,5 +12,6 @@ pub struct LambdaResponse {
     pub status_code: u16,
     pub data: serde_json::Value,
     pub errors: Option<Vec<String>>,
+    #[serde(rename = "correlationId")]
     pub correlation_id: Option<String>,
 }

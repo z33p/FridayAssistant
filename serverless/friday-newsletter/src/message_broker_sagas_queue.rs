@@ -1,7 +1,7 @@
 use std::error::Error;
 
 use lapin::{options::*, types::FieldTable, BasicProperties, Connection, ConnectionProperties};
-use tracing::{debug, error, info};
+use tracing::{debug, error};
 
 use crate::{lambda_handler::responses::LambdaResponse, ENV_CONFIG};
 use urlencoding::encode;
