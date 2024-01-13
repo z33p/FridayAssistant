@@ -23,9 +23,6 @@ pub struct EnvVariables {
     pub news_api_key: String,
 
     pub rabbit_host: String,
-    pub rabbit_port: u16,
     pub rabbit_user: String,
-    pub rabbit_password: String,
-
-    pub queue_newsletter_message_broker_response: String
+    pub rabbit_password: String
 }

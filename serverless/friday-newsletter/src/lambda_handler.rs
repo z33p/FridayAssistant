@@ -1,5 +1,3 @@
-// use std::error::Error;
-
 use std::error::Error;
 
 use lambda_runtime::LambdaEvent;

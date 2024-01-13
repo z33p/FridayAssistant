@@ -1,15 +1,16 @@
 use std::error::Error;
 
 use lapin::{options::*, types::FieldTable, BasicProperties, Connection, ConnectionProperties};
-use tracing::debug;
+use tracing::{debug, error, info};
 
 use crate::{lambda_handler::responses::LambdaResponse, ENV_CONFIG};
+use urlencoding::encode;
 
 pub async fn respond_to_sagas(payload: &LambdaResponse) -> Result<(), Box<dyn std::error::Error>> {
     let channel = get_channel().await?;
 
     // Declare a queue
-    let queue_name = &ENV_CONFIG.queue_newsletter_message_broker_response;
+    let queue_name = "NEWSLETTER.MESSAGE.BROKER.RESPONSE";
     declare_queue(&channel, queue_name).await?;
 
     // Publish a message
@@ -57,13 +58,22 @@ async fn declare_queue(channel: &lapin::Channel, queue_name: &str) -> Result<(),
 
 async fn get_channel() -> Result<lapin::Channel, Box<dyn Error>> {
     let addr = format!(
-        "amqp://{}:{}@{}:{}/%2f",
+        "amqp://{}:{}@{}:5672/%2f",
         ENV_CONFIG.rabbit_user,
-        ENV_CONFIG.rabbit_password,
+        encode(&ENV_CONFIG.rabbit_password),
         ENV_CONFIG.rabbit_host,
-        ENV_CONFIG.rabbit_port,
     );
-    let conn = Connection::connect(&addr, ConnectionProperties::default()).await?;
-    let channel = conn.create_channel().await?;
-    Ok(channel)
+
+    let conn = Connection::connect(&addr, ConnectionProperties::default()).await;
+
+    match conn {
+        Ok(conn) => {
+            let channel = conn.create_channel().await?;
+            Ok(channel)
+        }
+        Err(err) => {
+            error!("Falha ao se conectar ao RabbitMq error: {}", err);
+            Err(err.into())
+        }
+    }
 }
