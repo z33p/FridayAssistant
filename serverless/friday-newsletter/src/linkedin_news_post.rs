@@ -1,7 +1,7 @@
 use serde_json::json;
 use tracing::debug;
 
-use crate::{chat_api, lambda_handler::responses::BusinessResponse, search_news};
+use crate::{chat_api, search_news, message_broker::queue_response::BusinessResponse};
 
 pub async fn generate_post() -> Result<BusinessResponse, Box<dyn std::error::Error>> {
     let news_response = search_news::handle_get_news().await.unwrap();

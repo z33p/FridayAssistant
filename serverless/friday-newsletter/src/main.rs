@@ -1,17 +1,16 @@
 mod chat_api;
-mod lambda_handler;
 mod linkedin_news_post;
 mod load_env;
-mod message_broker_sagas_queue;
+mod message_broker;
 mod search_news;
 
 extern crate dotenv;
 
 use dotenv::dotenv;
-use lambda_runtime::service_fn;
 use load_env::{load_env_variables, EnvVariables};
+use message_broker::generate_news_post_queue;
 use once_cell::sync::Lazy;
-use tracing::{error, Level};
+use tracing::Level;
 
 static ENV_CONFIG: Lazy<EnvVariables> = Lazy::new(|| load_env_variables());
 
@@ -20,15 +19,12 @@ async fn main() {
     dotenv().ok();
     logging_init();
 
-    let func = service_fn(lambda_handler::handler);
-    let res = lambda_runtime::run(func).await;
+    generate_news_post_queue::start_consume()
+        .await
+        .expect("Erro ao iniciar consumidor generate_news_post_queue");
 
-    if res.is_ok() {
-        return;
-    }
-
-    let err = res.err().unwrap();
-    error!("Error: {}", err.to_string());
+    let forever = futures_util::future::pending::<()>();
+    forever.await;
 }
 
 fn logging_init() {
