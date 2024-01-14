@@ -1,5 +1,5 @@
 [package]
-name = "friday-newsletter"
+name = "core_infra"
 version = "0.1.0"
 edition = "2021"
 
@@ -8,7 +8,6 @@ edition = "2021"
 [dependencies]
 dotenv = "0.15.0"
 envy = "0.4.2"
-core_infra = { path = "./core_infra" }
 openssl = { version = "0.10", features = ["vendored"] }
 once_cell = "1.8"
 reqwest = "0.11.14"

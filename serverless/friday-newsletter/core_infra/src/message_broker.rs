@@ -1,4 +1,4 @@
-use std::{error::Error, pin::Pin, sync::Arc};
+use std::{error::Error, pin::Pin};
 
 use futures_util::{Future, StreamExt};
 use lapin::{
@@ -7,17 +7,7 @@ use lapin::{
     BasicProperties, Channel, Connection, ConnectionProperties,
 };
 use serde::de::DeserializeOwned;
-use tokio::{sync::Semaphore, task};
-use urlencoding::encode;
-
-use crate::ENV_CONFIG;
-
-use self::queue_response::{BusinessResponse, QueueResponse};
-
-pub mod generate_news_post_queue;
-pub mod queue_request;
-pub mod queue_response;
-pub mod sagas_queue;
+use tokio::task;
 
 pub async fn declare_queue(
     channel: &lapin::Channel,
@@ -33,12 +23,14 @@ pub async fn declare_queue(
     Ok(())
 }
 
-pub async fn get_channel() -> Result<lapin::Channel, Box<dyn Error>> {
+pub async fn get_channel(
+    rabbit_user: &str,
+    rabbit_password: &str,
+    rabbit_host: &str,
+) -> Result<lapin::Channel, Box<dyn Error>> {
     let addr = format!(
         "amqp://{}:{}@{}:5672/%2f",
-        ENV_CONFIG.rabbit_user,
-        encode(&ENV_CONFIG.rabbit_password),
-        ENV_CONFIG.rabbit_host,
+        rabbit_user, rabbit_password, rabbit_host,
     );
 
     let conn = Connection::connect(&addr, ConnectionProperties::default()).await;
@@ -144,18 +136,4 @@ where
     });
 
     Ok(())
-}
-
-pub fn map_queue_response(
-    business_response: BusinessResponse,
-    correlation_id: Option<String>,
-) -> QueueResponse {
-    let queue_response = QueueResponse {
-        status_code: business_response.status_code,
-        data: business_response.data,
-        errors: business_response.errors,
-        correlation_id,
-    };
-
-    queue_response
 }

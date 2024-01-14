@@ -2,12 +2,7 @@ use reqwest::header::{HeaderMap, AUTHORIZATION, CONTENT_TYPE};
 use serde_json::json;
 use tracing::debug;
 
-use crate::ENV_CONFIG;
-
-use self::chat_response::ChatResponse;
-
-mod chat_api_contracts;
-mod chat_response;
+use crate::{models::chat_api_dto::chat_response::ChatResponse, ENV_CONFIG};
 
 pub async fn rank_most_relevant_text(
     user_prompt: &str,

@@ -1,14 +1,11 @@
 extern crate reqwest;
 
 use crate::ENV_CONFIG;
+use crate::models::search_news_dto::news_contracts::NewsResponse;
 use reqwest::header;
-use tracing::debug;
 use std::fs::File;
 use std::io::Read;
-
-use self::news_contracts::NewsResponse;
-
-mod news_contracts;
+use tracing::debug;
 
 pub async fn handle_get_news() -> Result<NewsResponse, Box<dyn std::error::Error>> {
     let response_body: String = if ENV_CONFIG.is_prod {

@@ -1,15 +1,21 @@
-use std::{error::Error, pin::Pin, time::Duration};
+use std::{error::Error, pin::Pin};
 
+use core_infra::message_broker;
 use futures_util::Future;
-use tokio::time::sleep;
-use tracing::info;
 
-use crate::{linkedin_news_post, message_broker};
-
-use super::{queue_request::QueueRequest, sagas_queue};
+use crate::{
+    linkedin_news_post, message_broker::sagas_queue,
+    models::message_broker_dto::queue_request::QueueRequest, ENV_CONFIG,
+};
 
 pub async fn start_consume() -> Result<(), Box<dyn Error>> {
-    let channel = message_broker::get_channel().await.unwrap();
+    let channel = message_broker::get_channel(
+        ENV_CONFIG.rabbit_user.as_str(),
+        ENV_CONFIG.rabbit_password.as_str(),
+        ENV_CONFIG.rabbit_host.as_str(),
+    )
+    .await
+    .unwrap();
 
     // Declare a queue
     let queue_name = "NEWSLETTER.GENERATE.NEWS.POST";
@@ -25,7 +31,7 @@ pub async fn start_consume() -> Result<(), Box<dyn Error>> {
         queue_name,
         handler,
         prefetch_count,
-        max_concurrent_messages
+        max_concurrent_messages,
     )
     .await;
 
