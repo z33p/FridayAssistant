@@ -18,13 +18,6 @@
             "request": "launch",
             "preLaunchTask": "build",
             "program": "${workspaceFolder}/NewsletterSagas/bin/Debug/net8.0/NewsletterSagas.dll"
-        },
-        {
-            "name": "FridayMessageBroker",
-            "type": "coreclr",
-            "request": "launch",
-            // "preLaunchTask": "build",
-            "program": "${workspaceFolder}/FridayMessageBroker/bin/Debug/net8.0/FridayMessageBroker.dll"
         }
     ]
 }
