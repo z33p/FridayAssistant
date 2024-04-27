@@ -2,14 +2,13 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"label": "build",
-			"command": "dotnet",
-			"type": "process",
-			"args": [
-				"build",
-				"/property:GenerateFullPaths=true",
-				"/consoleloggerparameters:NoSummary"
-			]
+			"label": "docker build",
+			"type": "shell",
+			"command": "docker build --pull --rm -f \"NewsletterSagas/NewsletterSagas.Dockerfile\" -t friday-newsletter-sagas:latest ./",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
 		}
 	]
 }
