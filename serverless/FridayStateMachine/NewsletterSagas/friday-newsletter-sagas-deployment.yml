@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: friday-newsletter-sagas
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: friday-newsletter-newsletter
+  template:
+    metadata:
+      labels:
+        app: friday-newsletter-newsletter
+    spec:
+      containers:
+      - name: friday-newsletter-sagas
+        image: z33p/friday-docker-hub:newsletter-sagas
+        resources:
+          limits:
+            cpu: "0.5"
+            memory: "128Mi"
