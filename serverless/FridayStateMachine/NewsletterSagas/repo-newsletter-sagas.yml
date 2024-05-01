@@ -1,0 +1,10 @@
+apiVersion: fleet.cattle.io/v1alpha1
+kind: GitRepo
+metadata:
+  name: repo-newsletter-sagas
+  # This namespace is special and auto-wired to deploy to the local cluster
+  namespace: fleet-local
+spec:
+  repo: "https://github.com/z33p/FridayAssistant"
+  paths:
+  - "serverless/FridayStateMachine/NewsletterSagas"

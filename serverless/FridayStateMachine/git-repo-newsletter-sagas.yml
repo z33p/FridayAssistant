@@ -1,9 +1,0 @@
-kind: GitRepo
-apiVersion: fleet.cattle.io/v1alpha1
-metadata:
-  name: git-repo-newsletter-sagas
-spec:
-  repo: https://github.com/z33p/FridayAssistant
-  paths:
-    - serverless/FridayStateMachine/NewsletterSagas
-    # - serverless/FridayStateMachine/Libs

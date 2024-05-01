@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: friday-newsletter-sagas
+  # namespace: friday-newsletter-sagas 
 spec:
   replicas: 1
   selector:
