@@ -2,16 +2,15 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: friday-newsletter-sagas
-  # namespace: friday-newsletter-sagas 
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: friday-newsletter-newsletter
+      app: friday-newsletter-sagas
   template:
     metadata:
       labels:
-        app: friday-newsletter-newsletter
+        app: friday-newsletter-sagas
     spec:
       containers:
       - name: friday-newsletter-sagas
@@ -20,3 +19,6 @@ spec:
           limits:
             cpu: "0.5"
             memory: "128Mi"
+        env:
+        - name: DOTNET_ENVIRONMENT
+          value: "PROD"
