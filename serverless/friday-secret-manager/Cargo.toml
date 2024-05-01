@@ -1,0 +1,19 @@
+[package]
+name = "friday-secret-manager"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+actix-web = "4.5.1"
+dotenv = "0.15.0"
+envy = "0.4.2"
+once_cell = "1.19.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_derive = "1.0.193"
+serde_json = "1.0"
+sqlx = { version = "0.7.3", features = ["runtime-tokio", "postgres", "macros", "chrono", "uuid"] }
+tokio = { version = "1.25.0", features = ["full"] }
+tracing = { version = "0.1", features = ["log"] }
+tracing-subscriber = { version = "0.3", default-features = false, features = ["fmt"] }
