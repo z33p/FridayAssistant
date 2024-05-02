@@ -1,34 +1,22 @@
-# Use the official Rust image as the base image
-FROM rust:1.75 as builder
+# Stage 1: Build the application
+FROM rust:1.77-bookworm as builder
 
 # Set the working directory inside the container
-WORKDIR /app
+WORKDIR /usr/src/friday-secret-manager
 
-# Copy the Cargo.toml and Cargo.lock files to the container
+# Copy the source code files to the working directory
 COPY src/ ./src/
 COPY Cargo.lock .
 COPY Cargo.toml .
 
-# Build the dependencies
-RUN cargo build --release
+# Install the application dependencies and build the application
+RUN cargo install --path .
 
-# Copy the source code to the container
-COPY src ./src
+# Stage 2: Create the final image
+FROM debian:bookworm
 
-# Build the application
-RUN cargo build --release
+# Copy the built application binary from the builder stage to the final image
+COPY --from=builder /usr/local/cargo/bin/friday-secret-manager /usr/local/bin/friday-secret-manager
 
-# Create a new stage for the final image
-FROM debian:buster-slim
-
-# Set the working directory inside the container
-WORKDIR /app
-
-# Copy the built binary from the builder stage to the final image
-COPY --from=builder /app/target/release/friday-secret-manager .
-
-# Expose the port(s) that the application listens on
-EXPOSE 8000
-
-# Set the command to run the application
-CMD ["./friday-secret-manager"]
+# Set the command to run when the container starts
+CMD ["friday-secret-manager"]
