@@ -31,6 +31,7 @@ async fn main() -> std::io::Result<()> {
             .service(secrets_controller::delete_secret)
             .service(secrets_controller::refresh_secrets)
     })
+    .workers(4)
     .bind(("127.0.0.1", 5000))?
     .run()
     .await
