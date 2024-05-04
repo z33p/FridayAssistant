@@ -1,51 +1,20 @@
-use actix_web::{delete, get, post, put, App, HttpServer, Responder};
-
-mod load_env;
-mod secrets_data;
-
-extern crate dotenv;
-
+use actix_web::{get, App, HttpServer, Responder};
 use dotenv::dotenv;
 use load_env::{load_env_variables, EnvVariables};
 use once_cell::sync::Lazy;
-use secrets_data::Secret;
-use serde::Deserialize;
 use tracing::Level;
+
+mod load_env;
+mod secrets_mod;
+mod secrets_controller;
+
+extern crate dotenv;
 
 static ENV_CONFIG: Lazy<EnvVariables> = Lazy::new(|| load_env_variables());
 
 #[get("/")]
 async fn index() -> impl Responder {
     "Hello, World!"
-}
-
-#[get("/get_all_secrets")]
-async fn get_all_secrets() -> impl Responder {
-    let secrets = secrets_data::get_all_secrets().await.unwrap();
-    actix_web::web::Json(secrets)
-}
-
-#[post("/insert_secret")]
-async fn insert_secret(secret: actix_web::web::Json<Secret>) -> impl Responder {
-    let result = secrets_data::insert_secret(secret.into_inner()).await.unwrap();
-    actix_web::web::Json(result)
-}
-
-#[put("/update_secret")]
-async fn update_secret(secret: actix_web::web::Json<Secret>) -> impl Responder {
-    let result = secrets_data::update_secret(secret.into_inner()).await.unwrap();
-    actix_web::web::Json(result)
-}
-
-#[delete("/delete_secret")]
-async fn delete_secret(secret: actix_web::web::Json<DeleteSecretRequest>) -> impl Responder {
-    let result = secrets_data::delete_secret(&secret.key).await.unwrap();
-    actix_web::web::Json(result)
-}
-
-#[derive(Deserialize)]
-struct DeleteSecretRequest {
-    key: String,
 }
 
 #[actix_web::main]
@@ -55,10 +24,10 @@ async fn main() -> std::io::Result<()> {
 
     HttpServer::new(|| App::new()
         .service(index)
-        .service(get_all_secrets)
-        .service(insert_secret)
-        .service(update_secret)
-        .service(delete_secret))
+        .service(secrets_controller::get_all_secrets)
+        .service(secrets_controller::insert_secret)
+        .service(secrets_controller::update_secret)
+        .service(secrets_controller::delete_secret))
         .bind(("127.0.0.1", 5000))?
         .run()
         .await
