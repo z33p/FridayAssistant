@@ -15,6 +15,9 @@ RUN cargo install --path .
 # Stage 2: Create the final image
 FROM debian:bookworm
 
+# Copy the .env.prod file to the working directory
+COPY .env.prod .
+
 # Copy the built application binary from the builder stage to the final image
 COPY --from=builder /usr/local/cargo/bin/friday-secret-manager /usr/local/bin/friday-secret-manager
 

@@ -19,5 +19,6 @@ fn release_mode() -> bool {
 #[derive(Debug, Deserialize)]
 pub struct EnvVariables {
     pub is_prod: bool,
-    pub database_url: String
+    pub database_url: String,
+    pub redis_url: String
 }

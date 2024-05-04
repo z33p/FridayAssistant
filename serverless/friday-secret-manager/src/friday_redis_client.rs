@@ -2,6 +2,8 @@ use std::error::Error;
 
 use redis::AsyncCommands;
 
+use crate::ENV_CONFIG;
+
 /// URL format: `{redis|rediss}://[<username>][:<password>@]<hostname>[:port][/<db>]`
 ///
 /// - Basic: `redis://127.0.0.1:6379`
@@ -11,7 +13,7 @@ use redis::AsyncCommands;
 /// - Enabling TLS: `rediss://127.0.0.1:6379`
 /// - Enabling Insecure TLS: `rediss://127.0.0.1:6379/#insecure`
 fn get_redis_client() -> Result<redis::Client, Box<dyn Error>> {
-    let client = redis::Client::open("redis://:BA1CnZCgFx@127.0.0.1:6379")?;
+    let client = redis::Client::open(ENV_CONFIG.redis_url.clone())?;
     Ok(client)
 }
 

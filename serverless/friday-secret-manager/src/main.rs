@@ -1,5 +1,4 @@
 use actix_web::{get, App, HttpServer, Responder};
-use dotenv::dotenv;
 use load_env::{load_env_variables, EnvVariables};
 use once_cell::sync::Lazy;
 use tracing::Level;
@@ -20,7 +19,6 @@ async fn index() -> impl Responder {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    dotenv().ok();
     logging_init();
 
     HttpServer::new(|| {
