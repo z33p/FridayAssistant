@@ -4,9 +4,10 @@ use load_env::{load_env_variables, EnvVariables};
 use once_cell::sync::Lazy;
 use tracing::Level;
 
+mod friday_redis_client;
 mod load_env;
-mod secrets_mod;
 mod secrets_controller;
+mod secrets_mod;
 
 extern crate dotenv;
 
@@ -22,15 +23,19 @@ async fn main() -> std::io::Result<()> {
     dotenv().ok();
     logging_init();
 
-    HttpServer::new(|| App::new()
-        .service(index)
-        .service(secrets_controller::get_all_secrets)
-        .service(secrets_controller::insert_secret)
-        .service(secrets_controller::update_secret)
-        .service(secrets_controller::delete_secret))
-        .bind(("127.0.0.1", 5000))?
-        .run()
-        .await
+    HttpServer::new(|| {
+        App::new()
+            .service(index)
+            .service(secrets_controller::get_secret_value)
+            .service(secrets_controller::get_all_secrets)
+            .service(secrets_controller::insert_secret)
+            .service(secrets_controller::update_secret)
+            .service(secrets_controller::delete_secret)
+            .service(secrets_controller::refresh_secrets)
+    })
+    .bind(("127.0.0.1", 5000))?
+    .run()
+    .await
 }
 
 fn logging_init() {

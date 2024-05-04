@@ -1,33 +1,52 @@
-use actix_web::{delete, get, post, put, Responder};
+use actix_web::{delete, get, post, put, web, Responder};
 
 extern crate dotenv;
 
 use serde::Deserialize;
 
 use crate::secrets_mod::{secret::Secret, secrets_logic};
+#[get("/api/secrets/get_secret_value/{key}")]
+pub async fn get_secret_value(key: web::Path<String>) -> impl Responder {
+    match secrets_logic::get_secret_value(&key).await {
+        Ok(value) => actix_web::web::Json(value),
+        Err(err) => actix_web::web::Json(Some(err.to_string())),
+    }
+}
 
-#[get("/secrets/get_all_secrets")]
+#[get("/api/secrets/get_all_secrets")]
 pub async fn get_all_secrets() -> impl Responder {
     let secrets = secrets_logic::get_all_secrets().await.unwrap();
     actix_web::web::Json(secrets)
 }
 
-#[post("/secrets/insert_secret")]
+#[post("/api/secrets/insert_secret")]
 pub async fn insert_secret(secret: actix_web::web::Json<Secret>) -> impl Responder {
-    let result = secrets_logic::insert_secret(secret.into_inner()).await.unwrap();
+    let result = secrets_logic::insert_secret(secret.into_inner())
+        .await
+        .unwrap();
     actix_web::web::Json(result)
 }
 
-#[put("/secrets/update_secret")]
+#[put("/api/secrets/update_secret")]
 pub async fn update_secret(secret: actix_web::web::Json<Secret>) -> impl Responder {
-    let result = secrets_logic::update_secret(secret.into_inner()).await.unwrap();
+    let result = secrets_logic::update_secret(secret.into_inner())
+        .await
+        .unwrap();
     actix_web::web::Json(result)
 }
 
-#[delete("/secrets/delete_secret")]
+#[delete("/api/secrets/delete_secret")]
 pub async fn delete_secret(secret: actix_web::web::Json<DeleteSecretRequest>) -> impl Responder {
     let result = secrets_logic::delete_secret(&secret.key).await.unwrap();
     actix_web::web::Json(result)
+}
+
+#[post("/api/secrets/refresh_secrets")]
+pub async fn refresh_secrets() -> impl Responder {
+    match secrets_logic::refresh_tokens().await {
+        Ok(_) => actix_web::HttpResponse::Ok().finish(),
+        Err(err) => actix_web::HttpResponse::InternalServerError().body(err.to_string()),
+    }
 }
 
 #[derive(Deserialize)]
