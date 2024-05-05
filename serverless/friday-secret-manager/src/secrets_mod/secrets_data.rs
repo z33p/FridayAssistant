@@ -1,12 +1,17 @@
 use sqlx::{postgres::PgPoolOptions, PgPool, Row};
 
-use crate::ENV_CONFIG;
+use crate::friday_redis_client;
 
 use super::secret::Secret;
 
 async fn create_database_pool() -> Result<PgPool, sqlx::Error> {
+    let database_connection =
+        friday_redis_client::get_value_in_memory("ConnectionStrings:Postgres")
+            .await
+            .unwrap();
+
     let pool = PgPoolOptions::new()
-        .connect(ENV_CONFIG.database_url.as_str())
+        .connect(&database_connection.unwrap())
         .await?;
 
     Ok(pool)
