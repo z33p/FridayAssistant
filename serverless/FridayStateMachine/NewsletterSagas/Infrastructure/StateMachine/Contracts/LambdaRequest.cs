@@ -1,4 +1,4 @@
-namespace NewsletterStateMachine.Contracts;
+namespace Infrastructure.StateMachine.Contracts;
 
 public class LambdaRequest<TPayload>
 {

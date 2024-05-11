@@ -1,10 +1,10 @@
 using System.Reflection;
-using Libs.NewsletterStateMachine.Sagas;
-using Libs.NewsletterStateMachine.Sagas.Events;
+using Infrastructure.StateMachine.Sagas;
+using Infrastructure.StateMachine.Sagas.Events;
 using MassTransit;
 using MassTransit.EntityFrameworkCoreIntegration;
 using Microsoft.EntityFrameworkCore;
-using NewsletterStateMachine;
+using Infrastructure.StateMachine;
 
 namespace NewsletterSagas;
 
@@ -20,7 +20,7 @@ public class NewsletterSagasConfiguration
         services.AddMassTransit(busConfigurator =>
         {
             busConfigurator
-                .AddSagaStateMachine<Libs.NewsletterStateMachine.Sagas.NewsletterStateMachine, NewsletterState, NewsletterSagaDefinition>()
+                .AddSagaStateMachine<NewsletterStateMachine, NewsletterState, NewsletterSagaDefinition>()
                 .EntityFrameworkRepository(configure => ConfigureEntityFrameworkRepository(
                     configure, context.Configuration.GetValue<string>("ConnectionStrings:Postgres")!
                 ));

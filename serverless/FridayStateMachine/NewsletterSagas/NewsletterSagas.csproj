@@ -9,7 +9,6 @@
 
   <ItemGroup>
     <ProjectReference Include="../Libs/Shared/Shared.csproj" />
-    <ProjectReference Include="../Libs/NewsletterStateMachine/NewsletterStateMachine.csproj" />
   </ItemGroup>
 
   <Target Name="CopyCustomContent" AfterTargets="AfterBuild">

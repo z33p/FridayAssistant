@@ -1,4 +1,4 @@
-namespace Libs.NewsletterStateMachine.Sagas.Events;
+namespace Infrastructure.StateMachine.Sagas.Events;
 
 public interface IActionEvent
 {

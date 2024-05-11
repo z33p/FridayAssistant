@@ -1,6 +1,6 @@
 using MassTransit;
 
-namespace Libs.NewsletterStateMachine.Sagas.Events;
+namespace Infrastructure.StateMachine.Sagas.Events;
 
 public class BaseEvent : NewsletterStateAbstract
 {

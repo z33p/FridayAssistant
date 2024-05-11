@@ -1,7 +1,7 @@
 using System.Text.Json;
-using NewsletterStateMachine.Contracts;
+using Infrastructure.StateMachine.Contracts;
 
-namespace Libs.NewsletterStateMachine.Sagas.Events;
+namespace Infrastructure.StateMachine.Sagas.Events;
 
 public class FetchOAuthTokenEvent : BaseEvent, IActionEvent
 {

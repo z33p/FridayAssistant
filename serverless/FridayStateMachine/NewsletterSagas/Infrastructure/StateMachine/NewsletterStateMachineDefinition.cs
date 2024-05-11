@@ -1,8 +1,8 @@
-using Libs.NewsletterStateMachine.Sagas;
-using Libs.NewsletterStateMachine.Sagas.Events;
+using Infrastructure.StateMachine.Sagas;
+using Infrastructure.StateMachine.Sagas.Events;
 using MassTransit;
 
-namespace NewsletterStateMachine;
+namespace Infrastructure.StateMachine;
 
 public class NewsletterSagaDefinition : SagaDefinition<NewsletterState>
 {
@@ -22,7 +22,7 @@ public class NewsletterSagaDefinition : SagaDefinition<NewsletterState>
         sagaConfigurator.Message<ResultSendNewsletterEvent>(configure => configure.UsePartitioner(partition, keyProvider => keyProvider.Message.CorrelationId));
 
         sagaConfigurator.Message<ConcludedEvent>(configure => configure.UsePartitioner(partition, keyProvider => keyProvider.Message.CorrelationId));
-        
+
         endpointConfigurator.UseMessageRetry(configure => configure.Intervals(1000, 2000, 5000));
         endpointConfigurator.UseInMemoryOutbox();
     }

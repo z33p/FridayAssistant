@@ -1,6 +1,6 @@
 using MassTransit;
 
-namespace Libs.NewsletterStateMachine.Sagas;
+namespace Infrastructure.StateMachine.Sagas;
 
 public class NewsletterState : NewsletterStateAbstract, SagaStateMachineInstance
 {

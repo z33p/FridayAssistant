@@ -1,8 +1,8 @@
-using Libs.NewsletterStateMachine.Sagas.Events;
+using Infrastructure.StateMachine.Sagas.Events;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 
-namespace Libs.NewsletterStateMachine.Sagas;
+namespace Infrastructure.StateMachine.Sagas;
 
 public class NewsletterStateMachine : MassTransitStateMachine<NewsletterState>
 {
@@ -16,7 +16,7 @@ public class NewsletterStateMachine : MassTransitStateMachine<NewsletterState>
     public NewsletterStateMachine(ILogger<NewsletterStateMachine> logger)
     {
         _logger = logger;
-    
+
         InstanceState(state => state.CurrentState);
 
         DeclareEvents();

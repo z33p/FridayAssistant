@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace NewsletterStateMachine.Contracts;
+namespace Infrastructure.StateMachine.Contracts;
 
 public class LambdaResponse<TPayload>
 {

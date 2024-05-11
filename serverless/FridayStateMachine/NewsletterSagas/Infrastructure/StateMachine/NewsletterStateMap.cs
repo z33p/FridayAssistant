@@ -2,7 +2,7 @@ using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Libs.NewsletterStateMachine.Sagas;
+namespace Infrastructure.StateMachine.Sagas;
 
 public class NewsletterStateMap : SagaClassMap<NewsletterState>
 {
