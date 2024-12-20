@@ -1,0 +1,33 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Port-forward Kubernetes Dashboard",
+            "type": "shell",
+            "command": "kubectl -n kubernetes-dashboard port-forward svc/kubernetes-dashboard-kong-proxy 8443:443",
+            "detail": "Port-forward the Kubernetes Dashboard service to localhost:8443"
+        },
+        {
+            "label": "Port-forward Redis",
+            "type": "shell",
+            "command": "kubectl port-forward --namespace default svc/friday-redis-master 6379:6379",
+            "detail": "Port-forward the Redis service to localhost:6379"
+        },
+        {
+            "label": "Port-forward RabbitMQ",
+            "type": "shell",
+            "command": "kubectl port-forward \"service/friday-rabbitmq\" 15672",
+            "detail": "Port-forward the RabbitMQ service to localhost:15672"
+        },
+        {
+            "label": "Port-forward All Services",
+            "dependsOn": [
+                "Port-forward Kubernetes Dashboard",
+                "Port-forward Redis",
+                "Port-forward RabbitMQ"
+            ],
+            "dependsOrder": "parallel",
+            "detail": "Port-forward all services at once"
+        }
+    ]
+}
