@@ -43,7 +43,7 @@ pub async fn delete_secret(secret: actix_web::web::Json<DeleteSecretRequest>) ->
 
 #[post("/api/secrets/refresh_secrets")]
 pub async fn refresh_secrets() -> impl Responder {
-    match secrets_logic::refresh_tokens().await {
+    match secrets_logic::refresh_secrets().await {
         Ok(_) => actix_web::HttpResponse::Ok().finish(),
         Err(err) => actix_web::HttpResponse::InternalServerError().body(err.to_string()),
     }

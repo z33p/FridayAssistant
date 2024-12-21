@@ -44,7 +44,7 @@ pub async fn delete_secret(key: &str) -> Result<(), Box<dyn std::error::Error>> 
     secrets_data::delete_secret(key).await
 }
 
-pub async fn refresh_tokens() -> Result<(), Box<dyn std::error::Error>> {
+pub async fn refresh_secrets() -> Result<(), Box<dyn std::error::Error>> {
     let secrets_list = get_all_secrets().await?;
     for secret_option in secrets_list {
         if let Some(secret) = secret_option {
