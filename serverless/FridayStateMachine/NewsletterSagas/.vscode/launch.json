@@ -16,7 +16,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/NewsletterSagas/WorkerService/bin/Debug/net8.0/WorkerService.dll"
+            "program": "${workspaceFolder}/WorkerService/bin/Debug/net8.0/WorkerService.dll"
         }
     ]
 }

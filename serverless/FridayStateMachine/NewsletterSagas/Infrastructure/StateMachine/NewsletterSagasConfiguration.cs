@@ -4,9 +4,11 @@ using Infrastructure.StateMachine.Sagas.Events;
 using MassTransit;
 using MassTransit.EntityFrameworkCoreIntegration;
 using Microsoft.EntityFrameworkCore;
-using Infrastructure.StateMachine;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace NewsletterSagas;
+namespace Infrastructure.StateMachine;
 
 public class NewsletterSagasConfiguration
 {
@@ -21,20 +23,24 @@ public class NewsletterSagasConfiguration
         {
             busConfigurator
                 .AddSagaStateMachine<NewsletterStateMachine, NewsletterState, NewsletterSagaDefinition>()
-                .EntityFrameworkRepository(configure => ConfigureEntityFrameworkRepository(
-                    configure, context.Configuration.GetValue<string>("ConnectionStrings:Postgres")!
-                ));
+                .EntityFrameworkRepository(configure =>
+                {
+                    string connectionString = context.Configuration.GetValue<string>("ConnectionStrings:Postgres")!;
+                    ConfigureEntityFrameworkRepository(configure, connectionString);
+                });
 
             IConfigurationSection massTransitEndpoints = context.Configuration.GetSection("MassTransitEndpoints");
 
             busConfigurator.UsingRabbitMq((busContext, rabbitBusConfigurator) =>
             {
-                IConfigurationSection rabbitConfigSection = context.Configuration.GetSection("RabbitMQ");
-
-                rabbitBusConfigurator.Host(rabbitConfigSection.GetValue<string>("Host"), "/", configure =>
+                string host = "localhost";
+                string username = context.Configuration.GetValue<string>("RabbitMQ:User");
+                string password = context.Configuration.GetValue<string>("RabbitMQ:Password");
+                
+                rabbitBusConfigurator.Host(host, "/", configure =>
                 {
-                    configure.Username(rabbitConfigSection.GetValue<string>("User"));
-                    configure.Username(rabbitConfigSection.GetValue<string>("Password"));
+                    configure.Username(username);
+                    configure.Password(password);
                 });
 
                 Uri messageBrokerEndpoint = new($"exchange:{massTransitEndpoints.GetValue<string>("MessageBroker")}");

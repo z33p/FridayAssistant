@@ -1,6 +1,8 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Libs.Shared.RestService;
+using Libs.Shared.RestService.Interfaces;
 
 namespace Libs.Shared;
 
@@ -14,7 +16,10 @@ public class HostBuilderConfiguration
                 string? environment = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT");
                 if (environment is null || string.Compare(environment, "DEV", StringComparison.OrdinalIgnoreCase) == 0)
                 {
-                    configurationBuilder.AddJsonFile("./Libs/Shared/appsettings.Development.json", false, true);
+                    // configurationBuilder.AddJsonFile("./Libs/Shared/appsettings.Development.json", false, true);
+
+                    var appsettingsPath = Directory.GetCurrentDirectory() + "/Libs/Shared/appsettings.Development.json";
+                    configurationBuilder.AddJsonFile(appsettingsPath, false, true);
                 }
                 else
                 {
@@ -27,5 +32,27 @@ public class HostBuilderConfiguration
                 {
                     hostOptions.ShutdownTimeout = TimeSpan.FromSeconds(10);
                 });
+
+                services.AddSingleton<ISecretManagerService, SecretManagerService>();
+
+                FetchAndSetConfiguration(hostContext.Configuration, services).Wait();
+
             });
+
+    private static async Task FetchAndSetConfiguration(IConfiguration configuration, IServiceCollection services)
+    {
+        ServiceProvider serviceProvider = services.BuildServiceProvider();
+        ISecretManagerService secretManagerService = serviceProvider.GetRequiredService<ISecretManagerService>();
+
+        await LoadSecretToConfigurationAsync(configuration, secretManagerService, "ConnectionStrings:Postgres");
+        await LoadSecretToConfigurationAsync(configuration, secretManagerService, "RabbitMQ:Password");
+        await LoadSecretToConfigurationAsync(configuration, secretManagerService, "RabbitMQ:User");
+        // await LoadSecretToConfigurationAsync(configuration, secretManagerService, "RabbitMQ:Host");
+    }
+
+    private static async Task LoadSecretToConfigurationAsync(IConfiguration configuration, ISecretManagerService secretManagerService, string secretName)
+    {
+        string connectionStrings = await secretManagerService.GetSecretValue(secretName);
+        configuration[secretName] = connectionStrings;
+    }
 }

@@ -1,7 +1,8 @@
+using Infrastructure.StateMachine;
 using Libs.Shared;
-using NewsletterSagas.Jobs;
+using WorkerService.Jobs;
 
-namespace NewsletterSagas;
+namespace WorkerService;
 
 public class Program
 {

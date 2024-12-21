@@ -9,6 +9,15 @@
 				"kind": "build",
 				"isDefault": true
 			}
+		},
+		{
+			"label": "build",
+			"type": "shell",
+			"command": "dotnet build NewsletterSagas/NewsletterSagas.sln",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
 		}
 	]
 }

@@ -1,6 +1,8 @@
 using MassTransit;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
-namespace NewsletterSagas.Jobs;
+namespace WorkerService.Jobs;
 
 public class BusControlJob : IHostedService
 {
