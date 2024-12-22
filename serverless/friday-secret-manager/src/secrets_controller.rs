@@ -7,10 +7,9 @@ use serde::Deserialize;
 use crate::secrets_mod::{secret::Secret, secrets_logic};
 #[get("/api/secrets/get_secret_value/{key}")]
 pub async fn get_secret_value(key: web::Path<String>) -> impl Responder {
-    match secrets_logic::get_secret_value(&key).await {
-        Ok(value) => actix_web::web::Json(value),
-        Err(err) => actix_web::web::Json(Some(err.to_string())),
-    }
+    let result = secrets_logic::get_secret_value(&key).await.unwrap();
+    actix_web::web::Json(result)
+
 }
 
 #[get("/api/secrets/get_all_secrets")]
@@ -43,10 +42,9 @@ pub async fn delete_secret(secret: actix_web::web::Json<DeleteSecretRequest>) ->
 
 #[post("/api/secrets/refresh_secrets")]
 pub async fn refresh_secrets() -> impl Responder {
-    match secrets_logic::refresh_secrets().await {
-        Ok(_) => actix_web::HttpResponse::Ok().finish(),
-        Err(err) => actix_web::HttpResponse::InternalServerError().body(err.to_string()),
-    }
+    let result = secrets_logic::refresh_secrets().await.unwrap();
+    actix_web::web::Json(result)
+
 }
 
 #[derive(Deserialize)]

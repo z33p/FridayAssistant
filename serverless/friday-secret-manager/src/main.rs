@@ -6,6 +6,7 @@ use tracing::Level;
 mod friday_redis_client;
 mod load_env;
 mod secrets_controller;
+mod business_response;
 mod secrets_mod;
 
 extern crate dotenv;
