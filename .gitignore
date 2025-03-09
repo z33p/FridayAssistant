@@ -11,3 +11,6 @@ Cargo.toml.orig
 # Environment
 .env
 .env.prod
+
+# ignore VSCode settings file
+**/.vscode/settings.json
