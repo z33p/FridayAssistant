@@ -2,7 +2,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Libs.Shared.RestService;
-using Libs.Shared.RestService.Interfaces;
+using Libs.Shared.RestService.Interfaces.Services;
+using RestService.Intefaces.Responses;
 
 namespace Libs.Shared;
 
@@ -52,7 +53,11 @@ public class HostBuilderConfiguration
 
     private static async Task LoadSecretToConfigurationAsync(IConfiguration configuration, ISecretManagerService secretManagerService, string secretName)
     {
-        string connectionStrings = await secretManagerService.GetSecretValue(secretName);
-        configuration[secretName] = connectionStrings;
+        GetSecretResponse connectionStringsResponse = await secretManagerService.GetSecretValue(secretName);
+
+        if (connectionStringsResponse is null)
+            throw new Exception($"Não foi possível obter o valor do segredo {secretName}");
+        else
+            configuration[secretName] = connectionStringsResponse.Data;
     }
 }

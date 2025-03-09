@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
-using Libs.Shared.RestService.Interfaces;
+using Libs.Shared.RestService.Interfaces.Services;
+using System.Net.Http.Json;
+using RestService.Intefaces.Responses;
 
 namespace Libs.Shared.RestService;
 
@@ -12,16 +14,19 @@ public class SecretManagerService : ISecretManagerService
         BASE_URL = configuration.GetValue<string>("Endpoints:SecretManager")!;
     }
 
-    public async Task<string> GetSecretValue(string secretName)
+    public async Task<GetSecretResponse> GetSecretValue(string secretName)
     {
         using HttpClient client = new();
 
         string url = $"{BASE_URL}/get_secret_value/{secretName}";
         HttpResponseMessage response = await client.GetAsync(url);
         response.EnsureSuccessStatusCode();
-        string jsonResponse = await response.Content.ReadAsStringAsync();
 
-        string secretData = System.Text.Json.JsonSerializer.Deserialize<string>(jsonResponse)!;
-        return secretData;
+        GetSecretResponse? secretData = await response.Content.ReadFromJsonAsync<GetSecretResponse>();
+
+        if (secretData is null)
+            return new();
+        else
+            return secretData;
     }
 }
