@@ -18,11 +18,7 @@ public class Program
                 MassTransitInjection.AddMassTransit(
                     context.Configuration,
                     serviceCollection,
-                    () =>
-                    {
-                        string newsletterSagasEndpoint = context.Configuration.GetValue<string>("MassTransitEndpoints:NewsletterSagas")!;
-                        EndpointConvention.Map<ReleaseInEvent>(new Uri($"exchange:{newsletterSagasEndpoint}"));
-                    },
+                    () => SendEndpoint(context),
                     (busRegistrationContext, rabbitMqBusFactoryConfigurator) => ReceiveEndpoint(context.Configuration, busRegistrationContext, rabbitMqBusFactoryConfigurator));
             })
             .Build();
@@ -31,6 +27,18 @@ public class Program
 
         await host.RunAsync();
         await shutdown;
+    }
+
+    private static void SendEndpoint(HostBuilderContext context)
+    {
+        string newsletterSagasEndpoint = context.Configuration.GetValue<string>("MassTransitEndpoints:NewsletterSagas")!;
+        EndpointConvention.Map<ReleaseInEvent>(new Uri($"exchange:{newsletterSagasEndpoint}"));
+
+        Uri messageBrokerEndpoint = new($"exchange:{context.Configuration.GetValue<string>("MassTransitEndpoints:MessageBroker")}");
+        EndpointConvention.Map<FetchContentEvent>(messageBrokerEndpoint);
+        EndpointConvention.Map<FetchOAuthTokenEvent>(messageBrokerEndpoint);
+        EndpointConvention.Map<SendNewsletterEvent>(messageBrokerEndpoint);
+        EndpointConvention.Map<ConcludedEvent>(messageBrokerEndpoint);
     }
 
     private static void ReceiveEndpoint(IConfiguration configuration, IBusRegistrationContext busRegistrationContext, IRabbitMqBusFactoryConfigurator rabbitMqBusFactoryConfigurator)

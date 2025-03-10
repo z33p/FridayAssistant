@@ -47,8 +47,6 @@ public class MassTransitInjection
                     hostConfigurator.Password(password);
                 });
 
-                // Uri messageBrokerEndpoint = new($"exchange:{configuration.GetValue<string>("MassTransitEndpoints:MessageBroker")}");
-
                 configureSendEndpoint();
                 configureReceiveEndpoint(busRegistrationContext, rabbitMqBusFactoryConfigurator);
 
