@@ -29,8 +29,6 @@ public class MassTransitInjection
                     r.ConcurrencyMode = ConcurrencyMode.Optimistic;
                     r.LockStatementProvider = new PostgresLockStatementProvider();
 
-                    // r.UsePostgres();
-
                     r.AddDbContext<DbContext, NewsletterStateDbContext>((provider, builder) =>
                     {
                         string connectionString = configuration.GetValue<string>("ConnectionStrings:Postgres1")!;
