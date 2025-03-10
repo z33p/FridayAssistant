@@ -48,11 +48,10 @@ public class MassTransitInjection
             busConfigurator.UsingRabbitMq((busContext, rabbitBusConfigurator) =>
             {
                 string host = "localhost";
-                ushort port = 5672; // Default RabbitMQ port
                 string username = configuration.GetValue<string>("RabbitMQ:User")!;
                 string password = configuration.GetValue<string>("RabbitMQ:Password")!;
 
-                rabbitBusConfigurator.Host(host, port, "/", hostConfigurator =>
+                rabbitBusConfigurator.Host(host, "/", hostConfigurator =>
                 {
                     hostConfigurator.Username(username);
                     hostConfigurator.Password(password);
