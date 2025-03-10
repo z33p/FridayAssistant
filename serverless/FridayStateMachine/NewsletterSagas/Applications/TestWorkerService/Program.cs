@@ -1,5 +1,5 @@
 using Libs.Shared;
-using Infrastructure.StateMachine;
+using Infrastructure.SagasStateMachine;
 using Applications.TestWorkerService.Jobs;
 
 namespace Applications.TestWorkerService;

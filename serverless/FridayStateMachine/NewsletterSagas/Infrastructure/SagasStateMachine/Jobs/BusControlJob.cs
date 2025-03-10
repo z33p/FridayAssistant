@@ -2,7 +2,7 @@ using MassTransit;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace Infrastructure.StateMachine.Jobs;
+namespace Infrastructure.SagasStateMachine.Jobs;
 
 public class BusControlJob : IHostedService
 {

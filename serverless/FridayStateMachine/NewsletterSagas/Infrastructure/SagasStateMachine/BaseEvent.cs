@@ -1,6 +1,6 @@
 using MassTransit;
 
-namespace Infrastructure.StateMachine;
+namespace Infrastructure.SagasStateMachine;
 
 public class BaseEvent
 {

@@ -1,7 +1,7 @@
 using MassTransit;
 using Microsoft.Extensions.Logging;
 
-namespace Infrastructure.StateMachine;
+namespace Infrastructure.SagasStateMachine;
 
 public class NewsletterStateMachine : MassTransitStateMachine<NewsletterState>
 {

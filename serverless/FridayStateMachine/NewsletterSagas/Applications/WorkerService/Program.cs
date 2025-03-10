@@ -1,5 +1,5 @@
 using Libs.Shared;
-using Infrastructure.StateMachine;
+using Infrastructure.SagasStateMachine;
 
 namespace Applications.WorkerService;
 

@@ -1,7 +1,7 @@
 using MassTransit.EntityFrameworkCoreIntegration;
 using Microsoft.EntityFrameworkCore;
 
-namespace Infrastructure.StateMachine;
+namespace Infrastructure.SagasStateMachine;
 
 public class NewsletterStateDbContext : SagaDbContext
 {

@@ -1,12 +1,12 @@
 using System.Reflection;
-using Infrastructure.StateMachine.Jobs;
+using Infrastructure.SagasStateMachine.Jobs;
 using MassTransit;
 using MassTransit.EntityFrameworkCoreIntegration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Infrastructure.StateMachine;
+namespace Infrastructure.SagasStateMachine;
 
 public class MassTransitInjection
 {
