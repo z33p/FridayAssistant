@@ -10,16 +10,8 @@ namespace Infrastructure.SagasStateMachine;
 
 public class MassTransitInjection
 {
-    private const int SAGAS_CONCURRENT_MESSAGE_LIMIT = 20;
-    private const int SAGAS_PREFETCH_COUNT = 5;
-    private const int SAGAS_RETRY_TIMES = 7;
-    private const int SAGAS_RETRY_SECONDS = 2;
-
-    public static void AddMassTransit(IConfiguration configuration, IServiceCollection serviceCollection, bool isSagas = true)
+    public static void AddMassTransit(IConfiguration configuration, IServiceCollection serviceCollection, Action configureSendEndpoint, Action<IBusRegistrationContext, IRabbitMqBusFactoryConfigurator> configureReceiveEndpoint)
     {
-        if (isSagas)
-            serviceCollection.AddHostedService<BusControlJob>();
-
         serviceCollection.AddMassTransit(busConfigurator =>
         {
             busConfigurator
@@ -43,37 +35,24 @@ public class MassTransitInjection
                     });
                 });
 
-            busConfigurator.UsingRabbitMq((busContext, rabbitBusConfigurator) =>
+            busConfigurator.UsingRabbitMq((busRegistrationContext, rabbitMqBusFactoryConfigurator) =>
             {
                 string host = "localhost";
                 string username = configuration.GetValue<string>("RabbitMQ:User")!;
                 string password = configuration.GetValue<string>("RabbitMQ:Password")!;
 
-                rabbitBusConfigurator.Host(host, "/", hostConfigurator =>
+                rabbitMqBusFactoryConfigurator.Host(host, "/", hostConfigurator =>
                 {
                     hostConfigurator.Username(username);
                     hostConfigurator.Password(password);
                 });
 
                 // Uri messageBrokerEndpoint = new($"exchange:{configuration.GetValue<string>("MassTransitEndpoints:MessageBroker")}");
-                string newsletterSagasEndpoint = configuration.GetValue<string>("MassTransitEndpoints:NewsletterSagas")!;
 
-                EndpointConvention.Map<ReleaseInEvent>(new Uri($"exchange:{newsletterSagasEndpoint}"));
+                configureSendEndpoint();
+                configureReceiveEndpoint(busRegistrationContext, rabbitMqBusFactoryConfigurator);
 
-                if (isSagas)
-                    rabbitBusConfigurator.ReceiveEndpoint(
-                        newsletterSagasEndpoint,
-                        configure =>
-                        {
-                            configure.ConcurrentMessageLimit = SAGAS_CONCURRENT_MESSAGE_LIMIT;
-                            configure.PrefetchCount = SAGAS_PREFETCH_COUNT;
-                            configure.ConfigureConsumeTopology = false;
-                            configure.UseMessageRetry(r => r.Interval(SAGAS_RETRY_TIMES, TimeSpan.FromSeconds(SAGAS_RETRY_SECONDS)));
-                            configure.ConfigureSaga<NewsletterState>(busContext);
-                        }
-                    );
-
-                rabbitBusConfigurator.ConfigureEndpoints(busContext);
+                rabbitMqBusFactoryConfigurator.ConfigureEndpoints(busRegistrationContext);
 
             });
         });
