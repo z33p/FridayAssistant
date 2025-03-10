@@ -23,7 +23,7 @@ public class MassTransitInjection
 
                     r.AddDbContext<DbContext, NewsletterStateDbContext>((provider, builder) =>
                     {
-                        string connectionString = configuration.GetValue<string>("ConnectionStrings:Postgres1")!;
+                        string connectionString = configuration.GetValue<string>("ConnectionStrings:PostgresCsharp")!;
 
                         builder
                             .EnableDetailedErrors()
