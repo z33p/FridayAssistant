@@ -9,6 +9,6 @@
   
   <ItemGroup>
     <ProjectReference Include="../../Domain/Domain.csproj" />
-    <ProjectReference Include="../../Infrastructure/StateMachine/StateMachine.csproj" />
+    <ProjectReference Include="../../Infrastructure/SagasStateMachine/SagasStateMachine.csproj" />
   </ItemGroup>
 </Project>
