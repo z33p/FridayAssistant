@@ -36,7 +36,7 @@ public class NewsletterSagasConfiguration
                 string host = "localhost";
                 string username = context.Configuration.GetValue<string>("RabbitMQ:User");
                 string password = context.Configuration.GetValue<string>("RabbitMQ:Password");
-                
+
                 rabbitBusConfigurator.Host(host, "/", configure =>
                 {
                     configure.Username(username);
@@ -44,14 +44,15 @@ public class NewsletterSagasConfiguration
                 });
 
                 Uri messageBrokerEndpoint = new($"exchange:{massTransitEndpoints.GetValue<string>("MessageBroker")}");
+                string newsletterSagasEndpoint = massTransitEndpoints.GetValue<string>("NewsletterSagasEndpoint")!;
 
-                EndpointConvention.Map<ReleaseInEvent>(messageBrokerEndpoint);
+                EndpointConvention.Map<ReleaseInEvent>(new Uri($"exchange:{newsletterSagasEndpoint}"));
                 EndpointConvention.Map<FetchContentEvent>(messageBrokerEndpoint);
                 EndpointConvention.Map<FetchOAuthTokenEvent>(messageBrokerEndpoint);
                 EndpointConvention.Map<SendNewsletterEvent>(messageBrokerEndpoint);
                 EndpointConvention.Map<ConcludedEvent>(messageBrokerEndpoint);
 
-                ConfigureSagasReceiveEndpoint(busContext, rabbitBusConfigurator, massTransitEndpoints);
+                ConfigureSagasReceiveEndpoint(busContext, rabbitBusConfigurator, newsletterSagasEndpoint);
 
                 rabbitBusConfigurator.ConfigureEndpoints(busContext);
             });
@@ -79,10 +80,8 @@ public class NewsletterSagasConfiguration
         });
     }
 
-    private static void ConfigureSagasReceiveEndpoint(IBusRegistrationContext busContext, IRabbitMqBusFactoryConfigurator rabbitBusConfigurator, IConfigurationSection massTransitEndpoints)
+    private static void ConfigureSagasReceiveEndpoint(IBusRegistrationContext busContext, IRabbitMqBusFactoryConfigurator rabbitBusConfigurator, string newsletterSagasEndpoint)
     {
-        string newsletterSagasEndpoint = massTransitEndpoints.GetValue<string>("NewsletterSagasEndpoint")!;
-
         rabbitBusConfigurator.ReceiveEndpoint(
             newsletterSagasEndpoint,
             configure =>
