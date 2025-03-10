@@ -1,7 +1,7 @@
 using MassTransit.EntityFrameworkCoreIntegration;
 using Microsoft.EntityFrameworkCore;
 
-namespace Infrastructure.StateMachine.Sagas;
+namespace Infrastructure.StateMachine;
 
 public class NewsletterStateDbContext : SagaDbContext
 {
@@ -13,5 +13,11 @@ public class NewsletterStateDbContext : SagaDbContext
     protected override IEnumerable<ISagaClassMap> Configurations
     {
         get { yield return new NewsletterStateMap(); }
+    }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+        modelBuilder.Entity<NewsletterState>().ToTable("tb_newsletter_state");
     }
 }

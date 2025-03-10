@@ -16,7 +16,14 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/NewsletterSagas/WorkerService/bin/Debug/net9/WorkerService.dll"
+            "program": "${workspaceFolder}/NewsletterSagas/Applications/WorkerService/bin/Debug/net9/WorkerService.dll"
+        },
+        {
+            "name": "TestWorkerService",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/NewsletterSagas/Applications/TestWorkerService/bin/Debug/net9/TestWorkerService.dll"
         }
     ]
 }

@@ -1,8 +1,7 @@
-using Infrastructure.StateMachine;
 using Libs.Shared;
-using WorkerService.Jobs;
+using Infrastructure.StateMachine;
 
-namespace WorkerService;
+namespace Applications.WorkerService;
 
 public class Program
 {
@@ -12,8 +11,7 @@ public class Program
             .CreateHostBuilder()
             .ConfigureServices((context, services) =>
             {
-                services.AddHostedService<BusControlJob>();
-                NewsletterSagasConfiguration.AddMassTransit(context, services);
+                MassTransitInjection.AddMassTransit(context.Configuration, services);
             })
             .Build();
 

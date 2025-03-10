@@ -1,4 +1,4 @@
-# Use the dotnet8 image as the base image
+# Use the dotnet9 image as the base image
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 
 # Set the working directory inside the container
@@ -17,7 +17,7 @@ RUN dotnet build NewsletterSagas/NewsletterSagas.csproj -c Release -o /app/build
 # Publish the project
 RUN dotnet publish NewsletterSagas/NewsletterSagas.csproj -c Release -o /app/publish
 
-# Use the dotnet8 image as the base image
+# Use the dotnet9 image as the base image
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 
 # Set the working directory inside the container

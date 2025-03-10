@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <TargetFramework>net9</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>dotnet-TestWorkerService-10e60883-ab16-4b90-abbf-ff9ab647f9c1</UserSecretsId>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="../../Domain/Domain.csproj" />
+    <ProjectReference Include="../../Infrastructure/StateMachine/StateMachine.csproj" />
+  </ItemGroup>
+</Project>

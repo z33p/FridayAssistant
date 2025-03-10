@@ -45,7 +45,7 @@ public class HostBuilderConfiguration
         ServiceProvider serviceProvider = services.BuildServiceProvider();
         ISecretManagerService secretManagerService = serviceProvider.GetRequiredService<ISecretManagerService>();
 
-        await LoadSecretToConfigurationAsync(configuration, secretManagerService, "ConnectionStrings:Postgres");
+        await LoadSecretToConfigurationAsync(configuration, secretManagerService, "ConnectionStrings:Postgres1");
         await LoadSecretToConfigurationAsync(configuration, secretManagerService, "RabbitMQ:Password");
         await LoadSecretToConfigurationAsync(configuration, secretManagerService, "RabbitMQ:User");
         // await LoadSecretToConfigurationAsync(configuration, secretManagerService, "RabbitMQ:Host");
