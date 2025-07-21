@@ -1,38 +1,54 @@
+mod api_response;
 mod generate_oauth_url;
-mod lambda_handler;
 mod load_env;
+mod oauth_controller;
 mod oauth_provider;
 mod oauth_tokens_data;
+mod openapi;
 mod tokens_getter;
 
 extern crate dotenv;
 
-use std::error::Error;
-
+use actix_web::{get, App, HttpServer, Responder};
 use dotenv::dotenv;
-use lambda_runtime::service_fn;
 use load_env::{load_env_variables, EnvVariables};
 use oauth2::basic::BasicClient;
 use oauth_provider::{OAuthProvider, OAuthProviderFactory};
 use once_cell::sync::Lazy;
-use tracing::{error, Level};
+use openapi::swagger_config;
+use std::error::Error;
+use tracing::{info, Level};
 
 static ENV_CONFIG: Lazy<EnvVariables> = Lazy::new(|| load_env_variables());
 
-#[tokio::main]
-async fn main() {
+#[get("/")]
+async fn index() -> impl Responder {
+    "Friday OAuth API - OK"
+}
+
+#[actix_web::main]
+async fn main() -> std::io::Result<()> {
     dotenv().ok();
     logging_init();
 
-    let func = service_fn(lambda_handler::handler);
-    let res = lambda_runtime::run(func).await;
+    info!("Iniciando servidor OAuth HTTP API na porta 3000");
 
-    if res.is_ok() {
-        return;
-    }
-
-    let err = res.err().unwrap();
-    error!("Error: {}", err.to_string());
+    HttpServer::new(|| {
+        App::new()
+            .service(index)
+            .service(oauth_controller::generate_access_token)
+            .service(oauth_controller::refresh_access_token)
+            .service(oauth_controller::generate_oauth_url_endpoint)
+            .service(oauth_controller::generate_google_oauth_url)
+            .service(oauth_controller::generate_microsoft_oauth_url)
+            .service(oauth_controller::get_oauth_tokens)
+            .service(oauth_controller::health_check)
+            .service(swagger_config())
+    })
+    .workers(4)
+    .bind(("0.0.0.0", 3000))?
+    .run()
+    .await
 }
 
 fn logging_init() {
@@ -56,7 +72,7 @@ pub fn get_oauth_client(provider: OAuthProvider) -> Result<BasicClient, Box<dyn 
         &provider,
         ENV_CONFIG.oauth_client_id.clone(),
         ENV_CONFIG.oauth_client_secret.clone(),
-        "http://localhost/".to_string(),
+        "http://localhost:5000/callback".to_string(),
     );
 
     oauth_provider.create_client()

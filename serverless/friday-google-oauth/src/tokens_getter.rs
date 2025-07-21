@@ -7,8 +7,8 @@ use serde_json::json;
 use tracing::{debug, error, info, warn};
 
 use crate::{
+    api_response::ApiResponse,
     get_oauth_client,
-    lambda_handler::lambda_response::LambdaResponse,
     oauth_provider::{OAuthProvider, OAuthProviderFactory},
     oauth_tokens_data,
 };
@@ -24,7 +24,7 @@ pub mod refresh_access_token_request;
 
 pub async fn get_oauth_tokens(
     request: GetOAuthTokensRequest,
-) -> Result<LambdaResponse, Box<dyn std::error::Error>> {
+) -> Result<ApiResponse, Box<dyn std::error::Error>> {
     let client = get_oauth_client(request.provider.clone())?;
 
     let code = AuthorizationCode::new(extract_code_from_url(&request.url)?);
@@ -51,7 +51,7 @@ pub async fn get_oauth_tokens(
     let oauth_tokens = extract_oauth_tokens(tokens_response, request.provider);
     oauth_tokens_data::insert_oauth_token(&oauth_tokens).await?;
 
-    Ok(LambdaResponse {
+    Ok(ApiResponse {
         status_code: 200,
         data: json!({ "oauth_tokens": oauth_tokens }),
         errors: None,
@@ -115,7 +115,7 @@ fn extract_code_from_url(url: &str) -> Result<String, Box<dyn std::error::Error>
 
 pub async fn refresh_access_token(
     request: RefreshAccessTokenRequest,
-) -> Result<LambdaResponse, Box<dyn std::error::Error>> {
+) -> Result<ApiResponse, Box<dyn std::error::Error>> {
     let client = get_oauth_client(request.provider.clone())?;
 
     // Create the provider to get scopes and params
@@ -160,7 +160,7 @@ pub async fn refresh_access_token(
 
             info!("Access Token gerado com sucesso");
 
-            Ok(LambdaResponse {
+            Ok(ApiResponse {
                 status_code: 200,
                 data: json!({ "oauth_tokens": oauth_tokens }),
                 errors: None,
@@ -173,7 +173,7 @@ pub async fn refresh_access_token(
     }
 }
 
-pub async fn generate_access_token() -> Result<LambdaResponse, Box<dyn std::error::Error>> {
+pub async fn generate_access_token() -> Result<ApiResponse, Box<dyn std::error::Error>> {
     let response_oauth_tokens = oauth_tokens_data::get_first_oauth_token_by_refresh_token().await?;
 
     match response_oauth_tokens {
@@ -187,7 +187,7 @@ pub async fn generate_access_token() -> Result<LambdaResponse, Box<dyn std::erro
             response
         }
         None => {
-            let response = LambdaResponse {
+            let response = ApiResponse {
                 status_code: 500,
                 data: serde_json::Value::Null,
                 errors: Some(vec![String::from(

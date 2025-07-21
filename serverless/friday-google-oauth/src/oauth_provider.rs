@@ -1,11 +1,12 @@
 use oauth2::{basic::BasicClient, AuthUrl, ClientId, ClientSecret, RedirectUrl, Scope, TokenUrl};
 use serde::{Deserialize, Serialize};
 use std::error::Error;
+use utoipa::ToSchema;
 
 #[cfg(test)]
 mod tests;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum OAuthProvider {
     Google,

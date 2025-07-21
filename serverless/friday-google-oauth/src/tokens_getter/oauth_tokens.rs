@@ -1,16 +1,25 @@
 use chrono::{DateTime, Utc};
 use serde_derive::{Deserialize, Serialize};
 use sqlx::{postgres::PgRow, Row};
+use utoipa::ToSchema;
 use uuid::Uuid;
 
 use crate::oauth_provider::OAuthProvider;
 
-#[derive(Debug, Deserialize, Serialize)]
+/// OAuth tokens with expiry information
+#[derive(Debug, Deserialize, Serialize, ToSchema)]
 pub struct OAuthTokens {
+    /// Unique identifier for the token record
     pub id_oauth_tokens: Option<Uuid>,
+    /// OAuth access token
+    #[schema(example = "ya29.a0AfH6SMC...")]
     pub access_token: String,
+    /// OAuth refresh token
+    #[schema(example = "1//0GWthWtnM1YzzCgYIARAAGAwSNwF-L9IrqcH...")]
     pub refresh_token: String,
+    /// Token expiry date and time in UTC
     pub expiry_date: DateTime<Utc>,
+    /// OAuth provider that issued the tokens
     pub provider: OAuthProvider,
 }
 
