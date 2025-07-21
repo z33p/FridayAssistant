@@ -3,12 +3,15 @@ use serde_derive::{Deserialize, Serialize};
 use sqlx::{postgres::PgRow, Row};
 use uuid::Uuid;
 
+use crate::oauth_provider::OAuthProvider;
+
 #[derive(Debug, Deserialize, Serialize)]
 pub struct OAuthTokens {
     pub id_oauth_tokens: Option<Uuid>,
     pub access_token: String,
     pub refresh_token: String,
     pub expiry_date: DateTime<Utc>,
+    pub provider: OAuthProvider,
 }
 
 impl OAuthTokens {
@@ -29,11 +32,21 @@ impl OAuthTokens {
             .try_get("expiry_date")
             .expect("Failed to parse expiry_date");
 
+        let provider_str: String = row
+            .try_get("provider")
+            .unwrap_or_else(|_| "google".to_string()); // Default to google for backward compatibility
+
+        let provider = match provider_str.as_str() {
+            "microsoft" => OAuthProvider::Microsoft,
+            _ => OAuthProvider::Google,
+        };
+
         let oauth_token = OAuthTokens {
             id_oauth_tokens: Some(id_oauth_tokens),
             access_token,
             refresh_token,
             expiry_date,
+            provider,
         };
 
         Ok(Some(oauth_token))

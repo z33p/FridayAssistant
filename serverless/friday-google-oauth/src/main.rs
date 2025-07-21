@@ -1,6 +1,7 @@
 mod generate_oauth_url;
 mod lambda_handler;
 mod load_env;
+mod oauth_provider;
 mod oauth_tokens_data;
 mod tokens_getter;
 
@@ -11,7 +12,8 @@ use std::error::Error;
 use dotenv::dotenv;
 use lambda_runtime::service_fn;
 use load_env::{load_env_variables, EnvVariables};
-use oauth2::{basic::BasicClient, AuthUrl, ClientId, ClientSecret, RedirectUrl, TokenUrl};
+use oauth2::basic::BasicClient;
+use oauth_provider::{OAuthProvider, OAuthProviderFactory};
 use once_cell::sync::Lazy;
 use tracing::{error, Level};
 
@@ -49,27 +51,13 @@ fn logging_init() {
         .init();
 }
 
-pub fn get_gmail_oauth_client() -> Result<
-    oauth2::Client<
-        oauth2::StandardErrorResponse<oauth2::basic::BasicErrorResponseType>,
-        oauth2::StandardTokenResponse<oauth2::EmptyExtraTokenFields, oauth2::basic::BasicTokenType>,
-        oauth2::basic::BasicTokenType,
-        oauth2::StandardTokenIntrospectionResponse<
-            oauth2::EmptyExtraTokenFields,
-            oauth2::basic::BasicTokenType,
-        >,
-        oauth2::StandardRevocableToken,
-        oauth2::StandardErrorResponse<oauth2::RevocationErrorResponseType>,
-    >,
-    Box<dyn Error>,
-> {
-    let client_id = ClientId::new(ENV_CONFIG.oauth_client_id.to_string());
-    let client_secret = ClientSecret::new(ENV_CONFIG.oauth_client_secret.to_string());
-    let auth_url = AuthUrl::new("https://accounts.google.com/o/oauth2/v2/auth".to_string())?;
-    let token_url = TokenUrl::new("https://oauth2.googleapis.com/token".to_string())?;
-    let redirect_url = RedirectUrl::new("http://localhost/".to_string())?;
-    let client = BasicClient::new(client_id, Some(client_secret), auth_url, Some(token_url))
-        .set_redirect_uri(redirect_url);
+pub fn get_oauth_client(provider: OAuthProvider) -> Result<BasicClient, Box<dyn Error>> {
+    let oauth_provider = OAuthProviderFactory::create_provider(
+        &provider,
+        ENV_CONFIG.oauth_client_id.clone(),
+        ENV_CONFIG.oauth_client_secret.clone(),
+        "http://localhost/".to_string(),
+    );
 
-    Ok(client)
+    oauth_provider.create_client()
 }

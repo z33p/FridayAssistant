@@ -1,13 +1,15 @@
 use std::time::Duration;
 
 use chrono::Utc;
-use oauth2::{AuthorizationCode, RefreshToken, Scope, TokenResponse};
+use oauth2::{AuthorizationCode, RefreshToken, TokenResponse};
 
 use serde_json::json;
 use tracing::{debug, error, info, warn};
 
 use crate::{
-    get_gmail_oauth_client, lambda_handler::lambda_response::LambdaResponse,
+    get_oauth_client,
+    lambda_handler::lambda_response::LambdaResponse,
+    oauth_provider::{OAuthProvider, OAuthProviderFactory},
     oauth_tokens_data,
 };
 
@@ -23,16 +25,30 @@ pub mod refresh_access_token_request;
 pub async fn get_oauth_tokens(
     request: GetOAuthTokensRequest,
 ) -> Result<LambdaResponse, Box<dyn std::error::Error>> {
-    let client = get_gmail_oauth_client()?;
+    let client = get_oauth_client(request.provider.clone())?;
 
     let code = AuthorizationCode::new(extract_code_from_url(&request.url)?);
-    let tokens_response = client
-        .exchange_code(code)
-        .add_extra_param("access_type", "offline")
+
+    // Create the provider to get additional params
+    let oauth_provider = OAuthProviderFactory::create_provider(
+        &request.provider,
+        String::new(),
+        String::new(),
+        String::new(),
+    );
+
+    let mut token_request = client.exchange_code(code);
+
+    // Add provider-specific parameters
+    for (key, value) in oauth_provider.get_additional_token_params() {
+        token_request = token_request.add_extra_param(key, value);
+    }
+
+    let tokens_response = token_request
         .request_async(oauth2::reqwest::async_http_client)
         .await?;
 
-    let oauth_tokens = extract_oauth_tokens(tokens_response);
+    let oauth_tokens = extract_oauth_tokens(tokens_response, request.provider);
     oauth_tokens_data::insert_oauth_token(&oauth_tokens).await?;
 
     Ok(LambdaResponse {
@@ -64,6 +80,7 @@ fn extract_oauth_tokens(
         oauth2::EmptyExtraTokenFields,
         oauth2::basic::BasicTokenType,
     >,
+    provider: OAuthProvider,
 ) -> OAuthTokens {
     let now = Utc::now();
     let access_token = tokens_response.access_token().secret().to_string();
@@ -79,6 +96,7 @@ fn extract_oauth_tokens(
         access_token,
         refresh_token,
         expiry_date,
+        provider,
     };
 
     oauth_tokens
@@ -98,17 +116,35 @@ fn extract_code_from_url(url: &str) -> Result<String, Box<dyn std::error::Error>
 pub async fn refresh_access_token(
     request: RefreshAccessTokenRequest,
 ) -> Result<LambdaResponse, Box<dyn std::error::Error>> {
-    let client = get_gmail_oauth_client()?;
+    let client = get_oauth_client(request.provider.clone())?;
 
-    match client
-        .exchange_refresh_token(&RefreshToken::new(request.refresh_token.to_owned()))
-        .add_extra_param("access_type", "offline")
-        .add_scope(Scope::new("https://mail.google.com/".to_string()))
+    // Create the provider to get scopes and params
+    let oauth_provider = OAuthProviderFactory::create_provider(
+        &request.provider,
+        String::new(),
+        String::new(),
+        String::new(),
+    );
+
+    let refresh_token = RefreshToken::new(request.refresh_token.to_owned());
+    let mut refresh_request = client.exchange_refresh_token(&refresh_token);
+
+    // Add provider-specific scopes
+    for scope in oauth_provider.get_auth_scopes() {
+        refresh_request = refresh_request.add_scope(scope);
+    }
+
+    // Add provider-specific parameters
+    for (key, value) in oauth_provider.get_additional_token_params() {
+        refresh_request = refresh_request.add_extra_param(key, value);
+    }
+
+    match refresh_request
         .request_async(oauth2::reqwest::async_http_client)
         .await
     {
         Ok(tokens_response) => {
-            let mut oauth_tokens = extract_oauth_tokens(tokens_response);
+            let mut oauth_tokens = extract_oauth_tokens(tokens_response, request.provider.clone());
             oauth_tokens.refresh_token = request.refresh_token;
 
             if let Some(on_update_exception) =
@@ -144,6 +180,7 @@ pub async fn generate_access_token() -> Result<LambdaResponse, Box<dyn std::erro
         Some(oauth_tokens) => {
             let response = refresh_access_token(RefreshAccessTokenRequest {
                 refresh_token: oauth_tokens.refresh_token,
+                provider: oauth_tokens.provider,
             })
             .await;
 
