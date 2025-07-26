@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, ToSchema)]
 pub struct Response<T> {
     pub success: bool,
     pub data: Option<T>,
@@ -9,6 +10,10 @@ pub struct Response<T> {
 
 impl<T> Response<T> {
     pub fn new(success: bool, data: Option<T>, errors: Vec<String>) -> Self {
-        Response { success, data, errors }
+        Response {
+            success,
+            data,
+            errors,
+        }
     }
 }

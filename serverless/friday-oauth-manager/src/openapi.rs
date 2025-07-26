@@ -16,10 +16,6 @@ use crate::{
         title = "Friday OAuth API",
         description = "OAuth 2.0 authentication service supporting Google and Microsoft providers",
         version = "1.0.0",
-        contact(
-            name = "Friday Assistant",
-            email = "contact@friday-assistant.com"
-        )
     ),
     paths(
         crate::oauth_controller::generate_access_token,
