@@ -3,11 +3,12 @@ use load_env::{load_env_variables, EnvVariables};
 use once_cell::sync::Lazy;
 use tracing::Level;
 
+use crate::secrets_mod::secrets_controller;
+
 mod business_response;
 mod friday_redis_client;
 mod load_env;
 mod openapi;
-mod secrets_controller;
 mod secrets_mod;
 
 extern crate dotenv;
