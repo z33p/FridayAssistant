@@ -4,9 +4,12 @@ use utoipa_swagger_ui::SwaggerUi;
 use crate::{
     api_response::ApiResponse,
     oauth_provider::OAuthProvider,
-    tokens_getter::{
-        get_oauth_tokens_request::GetOAuthTokensRequest, oauth_tokens::OAuthTokens,
-        refresh_access_token_request::RefreshAccessTokenRequest,
+    oauth_tokens_mod::{
+        oauth_tokens::OAuthTokens,
+        oauth_tokens_controller::{
+            get_oauth_tokens_request::GetOAuthTokensRequest,
+            refresh_access_token_request::RefreshAccessTokenRequest,
+        },
     },
 };
 
@@ -18,13 +21,13 @@ use crate::{
         version = "1.0.0",
     ),
     paths(
-        crate::oauth_controller::generate_access_token,
-        crate::oauth_controller::refresh_access_token,
-        crate::oauth_controller::generate_oauth_url_endpoint,
-        crate::oauth_controller::generate_google_oauth_url,
-        crate::oauth_controller::generate_microsoft_oauth_url,
-        crate::oauth_controller::get_oauth_tokens,
-        crate::oauth_controller::health_check,
+        crate::oauth_tokens_mod::oauth_tokens_controller::generate_access_token,
+        crate::oauth_tokens_mod::oauth_tokens_controller::refresh_access_token,
+        crate::oauth_tokens_mod::oauth_tokens_controller::generate_oauth_url_endpoint,
+        crate::oauth_tokens_mod::oauth_tokens_controller::generate_google_oauth_url,
+        crate::oauth_tokens_mod::oauth_tokens_controller::generate_microsoft_oauth_url,
+        crate::oauth_tokens_mod::oauth_tokens_controller::get_oauth_tokens,
+        crate::oauth_tokens_mod::oauth_tokens_controller::health_check,
     ),
     components(schemas(
         ApiResponse,

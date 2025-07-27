@@ -1,7 +1,7 @@
 use sqlx::{postgres::PgPoolOptions, PgPool};
 use tracing::{debug, error};
 
-use crate::{tokens_getter::oauth_tokens::OAuthTokens, ENV_CONFIG};
+use crate::{oauth_tokens_mod::oauth_tokens::OAuthTokens, ENV_CONFIG};
 
 async fn create_database_pool() -> Result<PgPool, sqlx::Error> {
     let pool = PgPoolOptions::new()
@@ -48,7 +48,8 @@ pub async fn update_oauth_token_by_refresh_token(
     Ok(())
 }
 
-pub async fn get_first_oauth_token_by_refresh_token() -> Result<Option<OAuthTokens>, sqlx::Error> {
+pub async fn fn_get_first_oauth_tokens_by_last_expiry_date(
+) -> Result<Option<OAuthTokens>, sqlx::Error> {
     let pool = create_database_pool().await?;
 
     let query = "SELECT * FROM fn_get_first_oauth_tokens_by_last_expiry_date()";

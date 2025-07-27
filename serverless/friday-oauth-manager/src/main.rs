@@ -1,11 +1,8 @@
 mod api_response;
-mod generate_oauth_url;
 mod load_env;
-mod oauth_controller;
 mod oauth_provider;
-mod oauth_tokens_data;
+mod oauth_tokens_mod;
 mod openapi;
-mod tokens_getter;
 
 extern crate dotenv;
 
@@ -17,6 +14,8 @@ use oauth_provider::{OAuthProvider, OAuthProviderFactory};
 use once_cell::sync::Lazy;
 use std::error::Error;
 use tracing::{info, Level};
+
+use crate::oauth_tokens_mod::oauth_tokens_controller;
 
 static ENV_CONFIG: Lazy<EnvVariables> = Lazy::new(|| load_env_variables());
 
@@ -35,13 +34,13 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(|| {
         App::new()
             .service(index)
-            .service(oauth_controller::generate_access_token)
-            .service(oauth_controller::refresh_access_token)
-            .service(oauth_controller::generate_oauth_url_endpoint)
-            .service(oauth_controller::generate_google_oauth_url)
-            .service(oauth_controller::generate_microsoft_oauth_url)
-            .service(oauth_controller::get_oauth_tokens)
-            .service(oauth_controller::health_check)
+            .service(oauth_tokens_controller::generate_access_token)
+            .service(oauth_tokens_controller::refresh_access_token)
+            .service(oauth_tokens_controller::generate_oauth_url_endpoint)
+            .service(oauth_tokens_controller::generate_google_oauth_url)
+            .service(oauth_tokens_controller::generate_microsoft_oauth_url)
+            .service(oauth_tokens_controller::get_oauth_tokens)
+            .service(oauth_tokens_controller::health_check)
             .service(openapi::swagger_config())
     })
     .workers(4)

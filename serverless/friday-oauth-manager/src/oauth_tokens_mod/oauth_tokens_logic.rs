@@ -1,7 +1,7 @@
 use std::time::Duration;
 
 use chrono::Utc;
-use oauth2::{AuthorizationCode, RefreshToken, TokenResponse};
+use oauth2::{AuthorizationCode, CsrfToken, RefreshToken, TokenResponse};
 
 use serde_json::json;
 use tracing::{debug, error, info, warn};
@@ -9,19 +9,10 @@ use tracing::{debug, error, info, warn};
 use crate::{
     api_response::ApiResponse,
     get_oauth_client,
-    oauth_provider::{OAuthProvider, OAuthProviderFactory},
-    oauth_tokens_data,
+    oauth_provider::{OAuthProvider, OAuthProviderFactory}, oauth_tokens_mod::{oauth_tokens::OAuthTokens, oauth_tokens_controller::{get_oauth_tokens_request::GetOAuthTokensRequest, refresh_access_token_request::RefreshAccessTokenRequest}, oauth_tokens_data},
 };
 
-use self::{
-    get_oauth_tokens_request::GetOAuthTokensRequest, oauth_tokens::OAuthTokens,
-    refresh_access_token_request::RefreshAccessTokenRequest,
-};
-
-pub mod get_oauth_tokens_request;
-pub mod oauth_tokens;
-pub mod refresh_access_token_request;
-
+/// Business logic for obtaining OAuth tokens from authorization code
 pub async fn get_oauth_tokens(
     request: GetOAuthTokensRequest,
 ) -> Result<ApiResponse, Box<dyn std::error::Error>> {
@@ -113,6 +104,7 @@ fn extract_code_from_url(url: &str) -> Result<String, Box<dyn std::error::Error>
     Ok(code.unwrap())
 }
 
+/// Business logic for refreshing an OAuth access token
 pub async fn refresh_access_token(
     request: RefreshAccessTokenRequest,
 ) -> Result<ApiResponse, Box<dyn std::error::Error>> {
@@ -173,8 +165,10 @@ pub async fn refresh_access_token(
     }
 }
 
+/// Business logic for generating access token using stored refresh tokens
 pub async fn generate_access_token() -> Result<ApiResponse, Box<dyn std::error::Error>> {
-    let response_oauth_tokens = oauth_tokens_data::get_first_oauth_token_by_refresh_token().await?;
+    let response_oauth_tokens =
+        oauth_tokens_data::fn_get_first_oauth_tokens_by_last_expiry_date().await?;
 
     match response_oauth_tokens {
         Some(oauth_tokens) => {
@@ -198,4 +192,50 @@ pub async fn generate_access_token() -> Result<ApiResponse, Box<dyn std::error::
             Ok(response)
         }
     }
+}
+
+
+/// Business logic for generating OAuth authorization URL for default provider (Microsoft)
+pub async fn generate_oauth_url() -> Result<ApiResponse, Box<dyn std::error::Error>> {
+    generate_oauth_url_for_provider(OAuthProvider::Microsoft).await
+}
+
+/// Business logic for generating OAuth authorization URL for specific provider
+pub async fn generate_oauth_url_for_provider(
+    provider: OAuthProvider,
+) -> Result<ApiResponse, Box<dyn std::error::Error>> {
+    let client = get_oauth_client(provider.clone())?;
+
+    // Create the provider to get scopes and params
+    let oauth_provider = OAuthProviderFactory::create_provider(
+        &provider,
+        String::new(), // We don't need credentials for just getting scopes
+        String::new(),
+        String::new(),
+    );
+
+    let mut auth_url_builder = client.authorize_url(CsrfToken::new_random);
+
+    // Add provider-specific scopes
+    for scope in oauth_provider.get_auth_scopes() {
+        auth_url_builder = auth_url_builder.add_scope(scope);
+    }
+
+    // Add provider-specific parameters
+    for (key, value) in oauth_provider.get_additional_auth_params() {
+        auth_url_builder = auth_url_builder.add_extra_param(key, value);
+    }
+
+    let (auth_url, _) = auth_url_builder.url();
+
+    debug!("Generated {} OAuth URL: {}", provider, auth_url.to_string());
+
+    Ok(ApiResponse {
+        status_code: 200,
+        data: json!({
+            "url": auth_url.to_string(),
+            "provider": provider.to_string()
+        }),
+        errors: None,
+    })
 }

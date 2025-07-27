@@ -4,13 +4,15 @@ use tracing::{error, info};
 use utoipa;
 
 use crate::{
-    api_response::ApiResponse,
-    generate_oauth_url::{self, generate_oauth_url_for_provider},
-    oauth_provider::OAuthProvider,
-    tokens_getter::{
-        self, get_oauth_tokens_request::GetOAuthTokensRequest,
-        refresh_access_token_request::RefreshAccessTokenRequest,
-    },
+    api_response::ApiResponse, 
+    oauth_provider::OAuthProvider, 
+    oauth_tokens_mod::{
+        oauth_tokens_logic,
+        oauth_tokens_controller::{
+            refresh_access_token_request::RefreshAccessTokenRequest,
+            get_oauth_tokens_request::GetOAuthTokensRequest
+        }
+    }
 };
 
 extern crate dotenv;
@@ -32,7 +34,7 @@ extern crate dotenv;
 pub async fn generate_access_token() -> impl Responder {
     info!("Gerando access token");
 
-    match tokens_getter::generate_access_token().await {
+    match oauth_tokens_logic::generate_access_token().await {
         Ok(response) => actix_web::web::Json(response),
         Err(e) => {
             error!("Erro ao gerar access token: {}", e);
@@ -65,7 +67,7 @@ pub async fn refresh_access_token(
 ) -> impl Responder {
     info!("Fazendo refresh do access token");
 
-    match tokens_getter::refresh_access_token(request.into_inner()).await {
+    match oauth_tokens_logic::refresh_access_token(request.into_inner()).await {
         Ok(response) => actix_web::web::Json(response),
         Err(e) => {
             error!("Erro ao fazer refresh do access token: {}", e);
@@ -95,7 +97,7 @@ pub async fn refresh_access_token(
 pub async fn generate_oauth_url_endpoint() -> impl Responder {
     info!("Gerando URL OAuth padrão (Microsoft)");
 
-    match generate_oauth_url::generate_oauth_url().await {
+    match oauth_tokens_logic::generate_oauth_url().await {
         Ok(response) => actix_web::web::Json(response),
         Err(e) => {
             error!("Erro ao gerar URL OAuth: {}", e);
@@ -125,7 +127,7 @@ pub async fn generate_oauth_url_endpoint() -> impl Responder {
 pub async fn generate_google_oauth_url() -> impl Responder {
     info!("Gerando URL OAuth do Google");
 
-    match generate_oauth_url_for_provider(OAuthProvider::Google).await {
+    match oauth_tokens_logic::generate_oauth_url_for_provider(OAuthProvider::Google).await {
         Ok(response) => actix_web::web::Json(response),
         Err(e) => {
             error!("Erro ao gerar URL OAuth do Google: {}", e);
@@ -155,7 +157,7 @@ pub async fn generate_google_oauth_url() -> impl Responder {
 pub async fn generate_microsoft_oauth_url() -> impl Responder {
     info!("Gerando URL OAuth da Microsoft");
 
-    match generate_oauth_url_for_provider(OAuthProvider::Microsoft).await {
+    match oauth_tokens_logic::generate_oauth_url_for_provider(OAuthProvider::Microsoft).await {
         Ok(response) => actix_web::web::Json(response),
         Err(e) => {
             error!("Erro ao gerar URL OAuth da Microsoft: {}", e);
@@ -188,7 +190,7 @@ pub async fn get_oauth_tokens(
 ) -> impl Responder {
     info!("Fazendo exchange de tokens OAuth");
 
-    match tokens_getter::get_oauth_tokens(request.into_inner()).await {
+    match oauth_tokens_logic::get_oauth_tokens(request.into_inner()).await {
         Ok(response) => actix_web::web::Json(response),
         Err(e) => {
             error!("Erro ao fazer exchange de tokens OAuth: {}", e);
