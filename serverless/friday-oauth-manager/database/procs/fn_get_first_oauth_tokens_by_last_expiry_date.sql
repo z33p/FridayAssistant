@@ -1,9 +1,9 @@
--- DROP FUNCTION fn_get_first_oauth_token_by_refresh_token;
+-- DROP FUNCTION fn_get_first_oauth_tokens_by_last_expiry_date;
 CREATE OR REPLACE FUNCTION fn_get_first_oauth_tokens_by_last_expiry_date()
 RETURNS TABLE (
     id_oauth_tokens UUID,
-    access_token VARCHAR(2048),
-    refresh_token VARCHAR(255),
+    access_token TEXT,
+    refresh_token TEXT,
     expiry_date TIMESTAMP WITH TIME ZONE
 )
 AS $$
