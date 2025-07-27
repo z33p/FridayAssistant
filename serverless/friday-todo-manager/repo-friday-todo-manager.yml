@@ -1,0 +1,12 @@
+apiVersion: fleet.cattle.io/v1alpha1
+kind: GitRepo
+metadata:
+  name: repo-friday-todo-manager
+  # This namespace is special and auto-wired to deploy to the local cluster
+  namespace: fleet-local
+spec:
+  repo: "https://github.com/z33p/FridayAssistant"
+  paths:
+  - "serverless/friday-todo-manager/src"
+  - "serverless/friday-todo-manager/Cargo.toml"
+  - "serverless/friday-todo-manager/k8s"
