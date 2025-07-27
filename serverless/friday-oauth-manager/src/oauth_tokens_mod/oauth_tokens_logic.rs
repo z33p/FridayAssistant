@@ -179,7 +179,7 @@ pub async fn generate_access_token() -> Result<ApiResponse, Box<dyn std::error::
                 // Token is still valid
                 let response = ApiResponse {
                     status_code: 200,
-                    data: json!({ "access_token": oauth_tokens.access_token }),
+                    data: json!(oauth_tokens.access_token),
                     errors: None,
                 };
                 Ok(response)
