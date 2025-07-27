@@ -20,5 +20,4 @@ fn release_mode() -> bool {
 pub struct EnvVariables {
     pub is_prod: bool,
     pub redis_url: String,
-    pub microsoft_access_token: Option<String>,
 }

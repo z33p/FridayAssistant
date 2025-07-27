@@ -9,8 +9,8 @@ use crate::oauth_provider::OAuthProvider;
 impl From<i32> for OAuthProvider {
     fn from(id: i32) -> Self {
         match id {
-            1 => OAuthProvider::Google,
-            2 => OAuthProvider::Microsoft,
+            1 => OAuthProvider::Microsoft,
+            2 => OAuthProvider::Google,
             _ => panic!("Unknown OAuthProvider id: {}", id),
         }
     }

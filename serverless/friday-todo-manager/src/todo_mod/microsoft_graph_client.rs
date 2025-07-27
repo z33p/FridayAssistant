@@ -20,39 +20,17 @@ impl MicrosoftGraphClient {
         }
     }
 
-    #[instrument(name = "get_access_token")]
-    async fn get_access_token(&self) -> Result<String, Box<dyn std::error::Error>> {
-        info!("Data layer: Retrieving Microsoft Graph access token");
-
-        match std::env::var("MICROSOFT_ACCESS_TOKEN") {
-            Ok(token) => {
-                if token.trim().is_empty() {
-                    error!("Data layer: MICROSOFT_ACCESS_TOKEN environment variable is empty");
-                    return Err("Microsoft Graph access token is not configured".into());
-                }
-                info!("Data layer: Successfully retrieved access token");
-                Ok(token)
-            }
-            Err(_) => {
-                error!("Data layer: MICROSOFT_ACCESS_TOKEN environment variable is not set");
-                Err("Microsoft Graph access token is not configured".into())
-            }
-        }
-    }
-
-    #[instrument(name = "data_get_todo_lists")]
+    #[instrument(name = "data_get_todo_lists", fields(access_token_len = access_token.len()))]
     pub async fn get_todo_lists(
         &self,
+        access_token: &str,
     ) -> Result<Response<Vec<TodoList>>, Box<dyn std::error::Error>> {
         info!("Data layer: Fetching all todo lists from Microsoft Graph");
 
-        let access_token = match self.get_access_token().await {
-            Ok(token) => token,
-            Err(e) => {
-                error!("Data layer: Failed to get access token: {}", e);
-                return Ok(Response::error("Authentication failed"));
-            }
-        };
+        if access_token.trim().is_empty() {
+            error!("Data layer: Access token is empty");
+            return Ok(Response::error("Access token is required"));
+        }
 
         let url = format!("{}/me/todo/lists", self.base_url);
         info!("Data layer: Making GET request to: {}", url);
@@ -135,20 +113,18 @@ impl MicrosoftGraphClient {
         }
     }
 
-    #[instrument(name = "data_get_todo_list", fields(list_id = %list_id))]
+    #[instrument(name = "data_get_todo_list", fields(list_id = %list_id, access_token_len = access_token.len()))]
     pub async fn get_todo_list(
         &self,
         list_id: &str,
+        access_token: &str,
     ) -> Result<Response<TodoList>, Box<dyn std::error::Error>> {
         info!("Data layer: Fetching todo list with ID: {}", list_id);
 
-        let access_token = match self.get_access_token().await {
-            Ok(token) => token,
-            Err(e) => {
-                error!("Data layer: Failed to get access token: {}", e);
-                return Ok(Response::error("Authentication failed"));
-            }
-        };
+        if access_token.trim().is_empty() {
+            error!("Data layer: Access token is empty");
+            return Ok(Response::error("Access token is required"));
+        }
 
         let url = format!("{}/me/todo/lists/{}", self.base_url, list_id);
         info!("Data layer: Making GET request to: {}", url);
@@ -227,23 +203,21 @@ impl MicrosoftGraphClient {
         }
     }
 
-    #[instrument(name = "data_create_todo_list", fields(display_name = %request.display_name))]
+    #[instrument(name = "data_create_todo_list", fields(display_name = %request.display_name, access_token_len = access_token.len()))]
     pub async fn create_todo_list(
         &self,
         request: CreateTodoListRequest,
+        access_token: &str,
     ) -> Result<Response<TodoList>, Box<dyn std::error::Error>> {
         info!(
             "Data layer: Creating todo list with name: {}",
             request.display_name
         );
 
-        let access_token = match self.get_access_token().await {
-            Ok(token) => token,
-            Err(e) => {
-                error!("Data layer: Failed to get access token: {}", e);
-                return Ok(Response::error("Authentication failed"));
-            }
-        };
+        if access_token.trim().is_empty() {
+            error!("Data layer: Access token is empty");
+            return Ok(Response::error("Access token is required"));
+        }
 
         let body = json!({
             "displayName": request.display_name
@@ -327,23 +301,21 @@ impl MicrosoftGraphClient {
         }
     }
 
-    #[instrument(name = "data_update_todo_list", fields(id = %request.id, display_name = %request.display_name))]
+    #[instrument(name = "data_update_todo_list", fields(id = %request.id, display_name = %request.display_name, access_token_len = access_token.len()))]
     pub async fn update_todo_list(
         &self,
         request: UpdateTodoListRequest,
+        access_token: &str,
     ) -> Result<Response<TodoList>, Box<dyn std::error::Error>> {
         info!(
             "Data layer: Updating todo list with ID: {} and name: {}",
             request.id, request.display_name
         );
 
-        let access_token = match self.get_access_token().await {
-            Ok(token) => token,
-            Err(e) => {
-                error!("Data layer: Failed to get access token: {}", e);
-                return Ok(Response::error("Authentication failed"));
-            }
-        };
+        if access_token.trim().is_empty() {
+            error!("Data layer: Access token is empty");
+            return Ok(Response::error("Access token is required"));
+        }
 
         let body = json!({
             "displayName": request.display_name
@@ -433,20 +405,18 @@ impl MicrosoftGraphClient {
         }
     }
 
-    #[instrument(name = "data_delete_todo_list", fields(list_id = %list_id))]
+    #[instrument(name = "data_delete_todo_list", fields(list_id = %list_id, access_token_len = access_token.len()))]
     pub async fn delete_todo_list(
         &self,
         list_id: &str,
+        access_token: &str,
     ) -> Result<Response<String>, Box<dyn std::error::Error>> {
         info!("Data layer: Deleting todo list with ID: {}", list_id);
 
-        let access_token = match self.get_access_token().await {
-            Ok(token) => token,
-            Err(e) => {
-                error!("Data layer: Failed to get access token: {}", e);
-                return Ok(Response::error("Authentication failed"));
-            }
-        };
+        if access_token.trim().is_empty() {
+            error!("Data layer: Access token is empty");
+            return Ok(Response::error("Access token is required"));
+        }
 
         let url = format!("{}/me/todo/lists/{}", self.base_url, list_id);
         info!("Data layer: Making DELETE request to: {}", url);

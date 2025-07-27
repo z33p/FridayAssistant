@@ -1,6 +1,6 @@
 use crate::business_response::Response;
 use crate::todo_mod::microsoft_graph_client::MicrosoftGraphClient;
-use crate::todo_mod::todo_data::TodoData;
+use crate::todo_mod::oauth_client::OAuthClient;
 use crate::todo_mod::todo_list::{CreateTodoListRequest, TodoList, UpdateTodoListRequest};
 use tracing::{debug, error, info, instrument, warn};
 
@@ -8,8 +8,23 @@ use tracing::{debug, error, info, instrument, warn};
 pub async fn get_all_todo_lists() -> Result<Response<Vec<TodoList>>, Box<dyn std::error::Error>> {
     info!("Logic layer: Getting all todo lists");
 
+    // Get access token from OAuth manager
+    let oauth_client = OAuthClient::new();
+    let access_token = match oauth_client.generate_access_token().await {
+        Ok(token) => token,
+        Err(e) => {
+            error!(
+                "Logic layer: Failed to get access token from OAuth manager: {}",
+                e
+            );
+            return Ok(Response::error(
+                "Failed to authenticate with Microsoft Graph",
+            ));
+        }
+    };
+
     let graph_client = MicrosoftGraphClient::new();
-    match graph_client.get_todo_lists().await {
+    match graph_client.get_todo_lists(&access_token).await {
         Ok(response) => {
             if response.success {
                 info!(
@@ -45,8 +60,23 @@ pub async fn get_todo_list(
         return Ok(Response::error("List ID cannot be empty"));
     }
 
+    // Get access token from OAuth manager
+    let oauth_client = OAuthClient::new();
+    let access_token = match oauth_client.generate_access_token().await {
+        Ok(token) => token,
+        Err(e) => {
+            error!(
+                "Logic layer: Failed to get access token from OAuth manager: {}",
+                e
+            );
+            return Ok(Response::error(
+                "Failed to authenticate with Microsoft Graph",
+            ));
+        }
+    };
+
     let graph_client = MicrosoftGraphClient::new();
-    match graph_client.get_todo_list(list_id).await {
+    match graph_client.get_todo_list(list_id, &access_token).await {
         Ok(response) => {
             if response.success {
                 info!(
@@ -94,8 +124,23 @@ pub async fn create_todo_list(
         return Ok(Response::error("Display name cannot exceed 255 characters"));
     }
 
+    // Get access token from OAuth manager
+    let oauth_client = OAuthClient::new();
+    let access_token = match oauth_client.generate_access_token().await {
+        Ok(token) => token,
+        Err(e) => {
+            error!(
+                "Logic layer: Failed to get access token from OAuth manager: {}",
+                e
+            );
+            return Ok(Response::error(
+                "Failed to authenticate with Microsoft Graph",
+            ));
+        }
+    };
+
     let graph_client = MicrosoftGraphClient::new();
-    match graph_client.create_todo_list(request).await {
+    match graph_client.create_todo_list(request, &access_token).await {
         Ok(result) => {
             if result.success {
                 debug!("Logic layer: Successfully created todo list");
@@ -142,8 +187,23 @@ pub async fn update_todo_list(
         return Ok(Response::error("Display name cannot exceed 255 characters"));
     }
 
+    // Get access token from OAuth manager
+    let oauth_client = OAuthClient::new();
+    let access_token = match oauth_client.generate_access_token().await {
+        Ok(token) => token,
+        Err(e) => {
+            error!(
+                "Logic layer: Failed to get access token from OAuth manager: {}",
+                e
+            );
+            return Ok(Response::error(
+                "Failed to authenticate with Microsoft Graph",
+            ));
+        }
+    };
+
     let graph_client = MicrosoftGraphClient::new();
-    match graph_client.update_todo_list(request).await {
+    match graph_client.update_todo_list(request, &access_token).await {
         Ok(result) => {
             if result.success {
                 debug!("Logic layer: Successfully updated todo list");
@@ -173,8 +233,23 @@ pub async fn delete_todo_list(
         return Ok(Response::error("List ID cannot be empty"));
     }
 
+    // Get access token from OAuth manager
+    let oauth_client = OAuthClient::new();
+    let access_token = match oauth_client.generate_access_token().await {
+        Ok(token) => token,
+        Err(e) => {
+            error!(
+                "Logic layer: Failed to get access token from OAuth manager: {}",
+                e
+            );
+            return Ok(Response::error(
+                "Failed to authenticate with Microsoft Graph",
+            ));
+        }
+    };
+
     let graph_client = MicrosoftGraphClient::new();
-    match graph_client.delete_todo_list(list_id).await {
+    match graph_client.delete_todo_list(list_id, &access_token).await {
         Ok(response) => {
             if response.success {
                 info!(
