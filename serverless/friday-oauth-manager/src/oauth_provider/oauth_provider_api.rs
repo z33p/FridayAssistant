@@ -6,8 +6,8 @@ use utoipa::ToSchema;
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum OAuthProvider {
-    Google,
-    Microsoft,
+    Microsoft = 1,
+    Google = 2,
 }
 
 impl std::fmt::Display for OAuthProvider {

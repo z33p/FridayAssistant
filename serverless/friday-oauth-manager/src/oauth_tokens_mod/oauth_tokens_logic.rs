@@ -9,7 +9,15 @@ use tracing::{debug, error, info, warn};
 use crate::{
     api_response::ApiResponse,
     get_oauth_client,
-    oauth_provider::{OAuthProvider, OAuthProviderFactory}, oauth_tokens_mod::{oauth_tokens::OAuthTokens, oauth_tokens_controller::{get_oauth_tokens_request::GetOAuthTokensRequest, refresh_access_token_request::RefreshAccessTokenRequest}, oauth_tokens_data},
+    oauth_provider::{OAuthProvider, OAuthProviderFactory},
+    oauth_tokens_mod::{
+        oauth_tokens::OAuthTokens,
+        oauth_tokens_controller::{
+            get_oauth_tokens_request::GetOAuthTokensRequest,
+            refresh_access_token_request::RefreshAccessTokenRequest,
+        },
+        oauth_tokens_data,
+    },
 };
 
 /// Business logic for obtaining OAuth tokens from authorization code
@@ -87,7 +95,7 @@ fn extract_oauth_tokens(
         access_token,
         refresh_token,
         expiry_date,
-        provider,
+        id_provider: provider,
     };
 
     oauth_tokens
@@ -187,7 +195,7 @@ pub async fn generate_access_token() -> Result<ApiResponse, Box<dyn std::error::
                 // Token expired or about to expire, refresh it
                 let response = refresh_access_token(RefreshAccessTokenRequest {
                     refresh_token: oauth_tokens.refresh_token,
-                    provider: oauth_tokens.provider,
+                    provider: oauth_tokens.id_provider,
                 })
                 .await;
 
@@ -207,7 +215,6 @@ pub async fn generate_access_token() -> Result<ApiResponse, Box<dyn std::error::
         }
     }
 }
-
 
 /// Business logic for generating OAuth authorization URL for default provider (Microsoft)
 pub async fn generate_oauth_url() -> Result<ApiResponse, Box<dyn std::error::Error>> {
