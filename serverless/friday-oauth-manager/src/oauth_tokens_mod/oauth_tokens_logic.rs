@@ -172,13 +172,27 @@ pub async fn generate_access_token() -> Result<ApiResponse, Box<dyn std::error::
 
     match response_oauth_tokens {
         Some(oauth_tokens) => {
-            let response = refresh_access_token(RefreshAccessTokenRequest {
-                refresh_token: oauth_tokens.refresh_token,
-                provider: oauth_tokens.provider,
-            })
-            .await;
+            // Consider token expired if it will expire in the next 60 seconds
+            let now = chrono::Utc::now();
+            let expiry_buffer = chrono::Duration::seconds(60);
+            if oauth_tokens.expiry_date > now + expiry_buffer {
+                // Token is still valid
+                let response = ApiResponse {
+                    status_code: 200,
+                    data: json!({ "access_token": oauth_tokens.access_token }),
+                    errors: None,
+                };
+                Ok(response)
+            } else {
+                // Token expired or about to expire, refresh it
+                let response = refresh_access_token(RefreshAccessTokenRequest {
+                    refresh_token: oauth_tokens.refresh_token,
+                    provider: oauth_tokens.provider,
+                })
+                .await;
 
-            response
+                response
+            }
         }
         None => {
             let response = ApiResponse {
