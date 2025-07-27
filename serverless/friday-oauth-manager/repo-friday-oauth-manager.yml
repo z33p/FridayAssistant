@@ -1,0 +1,12 @@
+apiVersion: fleet.cattle.io/v1alpha1
+kind: GitRepo
+metadata:
+  name: repo-friday-oauth-manager
+  # This namespace is special and auto-wired to deploy to the local cluster
+  namespace: fleet-local
+spec:
+  repo: "https://github.com/z33p/FridayAssistant"
+  paths:
+  - "serverless/friday-oauth-manager/src"
+  - "serverless/friday-oauth-manager/Cargo.toml"
+  - "serverless/friday-oauth-manager/k8s"
