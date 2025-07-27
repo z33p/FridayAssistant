@@ -2,8 +2,10 @@ use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
 
 use crate::{
-    business_response::Response, 
-    todo_mod::todo_list::{TodoList, CreateTodoListRequest, UpdateTodoListRequest, DeleteTodoListRequest},
+    business_response::Response,
+    todo_mod::todo_list::{
+        CreateTodoListRequest, DeleteTodoListRequest, TodoList, UpdateTodoListRequest,
+    },
 };
 
 #[derive(OpenApi)]
