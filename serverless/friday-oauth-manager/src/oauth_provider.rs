@@ -96,7 +96,7 @@ impl OAuthClientProvider for MicrosoftOAuthProvider {
     fn get_auth_scopes(&self) -> Vec<Scope> {
         vec![
             Scope::new("offline_access".to_string()),
-            Scope::new("https://graph.microsoft.com/Mail.ReadWrite".to_string()),
+            Scope::new("https://graph.microsoft.com/Tasks.ReadWrite".to_string()),
         ]
     }
 

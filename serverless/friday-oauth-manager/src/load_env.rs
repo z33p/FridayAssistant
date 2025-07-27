@@ -6,7 +6,7 @@ pub fn load_env_variables() -> EnvVariables {
     } else {
         dotenv::dotenv().ok();
     }
-    
+
     let config = envy::from_env::<EnvVariables>().unwrap();
 
     config
@@ -20,6 +20,6 @@ fn release_mode() -> bool {
 pub struct EnvVariables {
     pub is_prod: bool,
     pub oauth_client_id: String,
-    pub oauth_client_secret: String,
-    pub database_url: String
+    pub oauth_secret_value: String,
+    pub database_url: String,
 }

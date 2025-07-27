@@ -50,7 +50,7 @@ mod tests {
         // Verify specific scopes
         assert!(google_scopes[0].to_string().contains("mail.google.com"));
         assert!(microsoft_scopes.iter().any(|scope| scope.to_string().contains("offline_access")));
-        assert!(microsoft_scopes.iter().any(|scope| scope.to_string().contains("Mail.ReadWrite")));
+        assert!(microsoft_scopes.iter().any(|scope| scope.to_string().contains("Tasks.ReadWrite")));
     }
 
     #[test]

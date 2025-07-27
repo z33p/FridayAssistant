@@ -15,7 +15,6 @@ use load_env::{load_env_variables, EnvVariables};
 use oauth2::basic::BasicClient;
 use oauth_provider::{OAuthProvider, OAuthProviderFactory};
 use once_cell::sync::Lazy;
-use openapi::swagger_config;
 use std::error::Error;
 use tracing::{info, Level};
 
@@ -43,7 +42,7 @@ async fn main() -> std::io::Result<()> {
             .service(oauth_controller::generate_microsoft_oauth_url)
             .service(oauth_controller::get_oauth_tokens)
             .service(oauth_controller::health_check)
-            .service(swagger_config())
+            .service(openapi::swagger_config())
     })
     .workers(4)
     .bind(("0.0.0.0", 3000))?
@@ -71,7 +70,7 @@ pub fn get_oauth_client(provider: OAuthProvider) -> Result<BasicClient, Box<dyn 
     let oauth_provider = OAuthProviderFactory::create_provider(
         &provider,
         ENV_CONFIG.oauth_client_id.clone(),
-        ENV_CONFIG.oauth_client_secret.clone(),
+        ENV_CONFIG.oauth_secret_value.clone(),
         "http://localhost:5000/callback".to_string(),
     );
 
