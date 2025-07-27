@@ -2,6 +2,7 @@
 CREATE OR REPLACE FUNCTION fn_get_first_oauth_tokens_by_last_expiry_date()
 RETURNS TABLE (
     id_oauth_tokens UUID,
+    id_provider INT,
     access_token TEXT,
     refresh_token TEXT,
     expiry_date TIMESTAMP WITH TIME ZONE
@@ -11,6 +12,7 @@ BEGIN
     RETURN QUERY
     SELECT
         tb_oauth_tokens.id_oauth_tokens,
+        tb_oauth_tokens.id_provider,
         tb_oauth_tokens.access_token,
         tb_oauth_tokens.refresh_token,
         tb_oauth_tokens.expiry_date
