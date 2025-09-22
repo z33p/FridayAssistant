@@ -78,9 +78,21 @@ pub async fn delete_secret(
     ))
 }
 
-pub async fn refresh_secrets() -> Result<business_response::Response<String>, Box<dyn std::error::Error>>
-{
-    let secrets_list = get_all_secrets().await?.data.unwrap_or_default();
+pub async fn refresh_secrets(
+) -> Result<business_response::Response<String>, Box<dyn std::error::Error>> {
+    let secrets_result = get_all_secrets().await?;
+
+    let secrets_list = match secrets_result.data {
+        Some(secrets) => secrets,
+        None => {
+            return Ok(business_response::Response::new(
+                false,
+                None,
+                vec!["No secrets data available to refresh".to_string()],
+            ));
+        }
+    };
+
     for secret_option in secrets_list {
         if let Some(secret) = secret_option {
             friday_redis_client::set_value(&secret.key, &secret.value).await?;

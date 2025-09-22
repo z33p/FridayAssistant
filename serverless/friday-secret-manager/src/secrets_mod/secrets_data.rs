@@ -8,10 +8,16 @@ async fn create_database_pool() -> Result<PgPool, sqlx::Error> {
     let database_connection =
         friday_redis_client::get_value_in_memory("ConnectionStrings:Postgres")
             .await
-            .unwrap();
+            .map_err(|e| {
+                sqlx::Error::Configuration(
+                    format!("Failed to get database connection string from Redis: {}", e).into(),
+                )
+            })?;
 
     let pool = PgPoolOptions::new()
-        .connect(&database_connection.unwrap())
+        .connect(&database_connection.ok_or_else(|| {
+            sqlx::Error::Configuration("Database connection string not found in Redis".into())
+        })?)
         .await?;
 
     Ok(pool)

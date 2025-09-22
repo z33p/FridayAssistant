@@ -6,8 +6,9 @@ pub fn load_env_variables() -> EnvVariables {
     } else {
         dotenv::dotenv().ok();
     }
-    
-    let config = envy::from_env::<EnvVariables>().unwrap();
+
+    let config = envy::from_env::<EnvVariables>()
+        .expect("Failed to load environment variables. Please ensure IS_PROD and REDIS_URL are properly configured.");
 
     config
 }
@@ -19,5 +20,5 @@ fn release_mode() -> bool {
 #[derive(Debug, Deserialize)]
 pub struct EnvVariables {
     pub is_prod: bool,
-    pub redis_url: String
+    pub redis_url: String,
 }

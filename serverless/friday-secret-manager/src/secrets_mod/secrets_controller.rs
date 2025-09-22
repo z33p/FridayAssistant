@@ -1,10 +1,11 @@
-use actix_web::{delete, get, post, put, web, Responder};
+use actix_web::{delete, get, post, put, web, HttpResponse, Responder};
 
 extern crate dotenv;
 
 use serde::Deserialize;
 use utoipa::ToSchema;
 
+use crate::business_response;
 use crate::secrets_mod::{secret::Secret, secrets_logic};
 
 #[utoipa::path(
@@ -21,8 +22,17 @@ use crate::secrets_mod::{secret::Secret, secrets_logic};
 )]
 #[get("/api/secrets/get_secret_value/{key}")]
 pub async fn get_secret_value(key: web::Path<String>) -> impl Responder {
-    let result = secrets_logic::get_secret_value(&key).await.unwrap();
-    actix_web::web::Json(result)
+    match secrets_logic::get_secret_value(&key).await {
+        Ok(result) => HttpResponse::Ok().json(result),
+        Err(e) => {
+            let error_response = business_response::Response::<String>::new(
+                false,
+                None,
+                vec![format!("Failed to get secret: {}", e)],
+            );
+            HttpResponse::InternalServerError().json(error_response)
+        }
+    }
 }
 
 #[utoipa::path(
@@ -35,8 +45,17 @@ pub async fn get_secret_value(key: web::Path<String>) -> impl Responder {
 )]
 #[get("/api/secrets/get_all_secrets")]
 pub async fn get_all_secrets() -> impl Responder {
-    let secrets = secrets_logic::get_all_secrets().await.unwrap();
-    actix_web::web::Json(secrets)
+    match secrets_logic::get_all_secrets().await {
+        Ok(secrets) => HttpResponse::Ok().json(secrets),
+        Err(e) => {
+            let error_response = business_response::Response::<Vec<Option<Secret>>>::new(
+                false,
+                None,
+                vec![format!("Failed to get all secrets: {}", e)],
+            );
+            HttpResponse::InternalServerError().json(error_response)
+        }
+    }
 }
 
 #[utoipa::path(
@@ -51,10 +70,17 @@ pub async fn get_all_secrets() -> impl Responder {
 )]
 #[post("/api/secrets/insert_secret")]
 pub async fn insert_secret(secret: actix_web::web::Json<Secret>) -> impl Responder {
-    let result = secrets_logic::insert_secret(secret.into_inner())
-        .await
-        .unwrap();
-    actix_web::web::Json(result)
+    match secrets_logic::insert_secret(secret.into_inner()).await {
+        Ok(result) => HttpResponse::Ok().json(result),
+        Err(e) => {
+            let error_response = business_response::Response::<String>::new(
+                false,
+                None,
+                vec![format!("Failed to insert secret: {}", e)],
+            );
+            HttpResponse::InternalServerError().json(error_response)
+        }
+    }
 }
 
 #[utoipa::path(
@@ -70,10 +96,17 @@ pub async fn insert_secret(secret: actix_web::web::Json<Secret>) -> impl Respond
 )]
 #[put("/api/secrets/update_secret")]
 pub async fn update_secret(secret: actix_web::web::Json<Secret>) -> impl Responder {
-    let result = secrets_logic::update_secret(secret.into_inner())
-        .await
-        .unwrap();
-    actix_web::web::Json(result)
+    match secrets_logic::update_secret(secret.into_inner()).await {
+        Ok(result) => HttpResponse::Ok().json(result),
+        Err(e) => {
+            let error_response = business_response::Response::<String>::new(
+                false,
+                None,
+                vec![format!("Failed to update secret: {}", e)],
+            );
+            HttpResponse::InternalServerError().json(error_response)
+        }
+    }
 }
 
 #[utoipa::path(
@@ -88,8 +121,17 @@ pub async fn update_secret(secret: actix_web::web::Json<Secret>) -> impl Respond
 )]
 #[delete("/api/secrets/delete_secret")]
 pub async fn delete_secret(secret: actix_web::web::Json<DeleteSecretRequest>) -> impl Responder {
-    let result = secrets_logic::delete_secret(&secret.key).await.unwrap();
-    actix_web::web::Json(result)
+    match secrets_logic::delete_secret(&secret.key).await {
+        Ok(result) => HttpResponse::Ok().json(result),
+        Err(e) => {
+            let error_response = business_response::Response::<String>::new(
+                false,
+                None,
+                vec![format!("Failed to delete secret: {}", e)],
+            );
+            HttpResponse::InternalServerError().json(error_response)
+        }
+    }
 }
 
 #[utoipa::path(
@@ -102,8 +144,17 @@ pub async fn delete_secret(secret: actix_web::web::Json<DeleteSecretRequest>) ->
 )]
 #[post("/api/secrets/refresh_secrets")]
 pub async fn refresh_secrets() -> impl Responder {
-    let result = secrets_logic::refresh_secrets().await.unwrap();
-    actix_web::web::Json(result)
+    match secrets_logic::refresh_secrets().await {
+        Ok(result) => HttpResponse::Ok().json(result),
+        Err(e) => {
+            let error_response = business_response::Response::<String>::new(
+                false,
+                None,
+                vec![format!("Failed to refresh secrets: {}", e)],
+            );
+            HttpResponse::InternalServerError().json(error_response)
+        }
+    }
 }
 
 #[derive(Deserialize, ToSchema)]
