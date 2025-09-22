@@ -7,7 +7,6 @@ use tracing::Level;
 use crate::todo_mod::todo_controller;
 
 mod business_response;
-mod friday_redis_client;
 mod load_env;
 mod openapi;
 mod todo_mod;
