@@ -1,13 +1,10 @@
 use serde_derive::Deserialize;
 
 pub fn load_env_variables() -> EnvVariables {
-    if release_mode() {
-        dotenv::from_filename(".env.prod").ok();
-    } else {
-        dotenv::dotenv().ok();
-    }
-    
-    let config = envy::from_env::<EnvVariables>().unwrap();
+    dotenv::dotenv().ok();
+
+    let mut config = envy::from_env::<EnvVariables>().unwrap();
+    config.is_prod = release_mode();
 
     config
 }
@@ -18,5 +15,6 @@ fn release_mode() -> bool {
 
 #[derive(Debug, Deserialize)]
 pub struct EnvVariables {
-    pub is_prod: bool
+    pub is_prod: bool,
+    // pub secret_manager_url: String,
 }
