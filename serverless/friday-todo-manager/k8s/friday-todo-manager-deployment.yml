@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: friday-todo-manager
-        image: z33p/friday-todo-manager:2024-12-22.v2
+        image: z33p/friday-todo-manager:2025-09-23.v1
         resources:
           requests:
             cpu: "10m"

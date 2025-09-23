@@ -2,6 +2,8 @@ apiVersion: v1
 kind: Service
 metadata:
   name: friday-todo-manager-service
+  labels:
+    app: friday-todo-manager
 spec:
   selector:
     app: friday-todo-manager
@@ -9,4 +11,4 @@ spec:
     - protocol: TCP
       port: 5000
       targetPort: 5000
-  type: LoadBalancer
+  type: ClusterIP

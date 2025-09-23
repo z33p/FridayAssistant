@@ -1,3 +1,6 @@
+---
+applyTo: '**/*.rs'
+---
 # Rust Microservices Architecture Guide - FridayAssistant
 
 This document defines the mandatory patterns, conventions, and architectural rules for Rust microservices in the FridayAssistant ecosystem.

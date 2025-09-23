@@ -11,7 +11,7 @@ use crate::todo_mod::{
 
 #[utoipa::path(
     get,
-    path = "/api/todo-lists/{list_id}",
+    path = "/api/friday-todo-manager/todo-lists/{list_id}",
     tag = "Todo Lists",
     params(
         ("list_id", Path, description = "Todo list ID to retrieve")
@@ -22,7 +22,7 @@ use crate::todo_mod::{
         (status = 500, description = "Internal server error")
     )
 )]
-#[get("/api/todo-lists/{list_id}")]
+#[get("/api/friday-todo-manager/todo-lists/{list_id}")]
 #[instrument(name = "get_todo_list", skip_all, fields(list_id = %list_id.as_ref()))]
 pub async fn get_todo_list(list_id: web::Path<String>) -> impl Responder {
     info!(
@@ -62,14 +62,14 @@ pub async fn get_todo_list(list_id: web::Path<String>) -> impl Responder {
 
 #[utoipa::path(
     get,
-    path = "/api/todo-lists",
+    path = "/api/friday-todo-manager/todo-lists",
     tag = "Todo Lists",
     responses(
         (status = 200, description = "All todo lists retrieved successfully", body = Vec<TodoList>),
         (status = 500, description = "Internal server error")
     )
 )]
-#[get("/api/todo-lists")]
+#[get("/api/friday-todo-manager/todo-lists")]
 #[instrument(name = "get_all_todo_lists")]
 pub async fn get_all_todo_lists() -> impl Responder {
     info!("Attempting to retrieve all todo lists");
@@ -101,7 +101,7 @@ pub async fn get_all_todo_lists() -> impl Responder {
 
 #[utoipa::path(
     post,
-    path = "/api/todo-lists",
+    path = "/api/friday-todo-manager/todo-lists",
     tag = "Todo Lists",
     request_body = CreateTodoListRequest,
     responses(
@@ -110,7 +110,7 @@ pub async fn get_all_todo_lists() -> impl Responder {
         (status = 500, description = "Internal server error")
     )
 )]
-#[post("/api/todo-lists")]
+#[post("/api/friday-todo-manager/todo-lists")]
 #[instrument(name = "create_todo_list", skip_all, fields(display_name = %request.display_name))]
 pub async fn create_todo_list(
     request: actix_web::web::Json<CreateTodoListRequest>,
@@ -142,7 +142,7 @@ pub async fn create_todo_list(
 
 #[utoipa::path(
     put,
-    path = "/api/todo-lists",
+    path = "/api/friday-todo-manager/todo-lists",
     tag = "Todo Lists",
     request_body = UpdateTodoListRequest,
     responses(
@@ -152,7 +152,7 @@ pub async fn create_todo_list(
         (status = 500, description = "Internal server error")
     )
 )]
-#[put("/api/todo-lists")]
+#[put("/api/friday-todo-manager/todo-lists")]
 #[instrument(name = "update_todo_list", skip_all, fields(id = %request.id, display_name = %request.display_name))]
 pub async fn update_todo_list(
     request: actix_web::web::Json<UpdateTodoListRequest>,
@@ -193,7 +193,7 @@ pub async fn update_todo_list(
 
 #[utoipa::path(
     delete,
-    path = "/api/todo-lists",
+    path = "/api/friday-todo-manager/todo-lists",
     tag = "Todo Lists",
     request_body = DeleteTodoListRequest,
     responses(
@@ -202,7 +202,7 @@ pub async fn update_todo_list(
         (status = 500, description = "Internal server error")
     )
 )]
-#[delete("/api/todo-lists")]
+#[delete("/api/friday-todo-manager/todo-lists")]
 #[instrument(name = "delete_todo_list", skip_all, fields(id = %request.id))]
 pub async fn delete_todo_list(
     request: actix_web::web::Json<DeleteTodoListRequest>,

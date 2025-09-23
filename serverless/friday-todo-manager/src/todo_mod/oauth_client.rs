@@ -19,8 +19,8 @@ impl OAuthClient {
     pub fn new() -> Self {
         // You can configure this URL via environment variable or config
         let oauth_base_url = std::env::var("OAUTH_MANAGER_URL")
-            .unwrap_or_else(|_| "http://localhost:3000".to_string());
-        
+            .unwrap_or_else(|_| "http://localhost:5000".to_string());
+
         Self {
             client: Client::new(),
             oauth_base_url,
@@ -77,7 +77,9 @@ impl OAuthClient {
                 }
             }
         } else {
-            let error_text = response.text().await
+            let error_text = response
+                .text()
+                .await
                 .unwrap_or_else(|_| "Unknown error".to_string());
             error!("OAuth layer: HTTP error ({}): {}", status, error_text);
             Err(format!("OAuth service HTTP error: {} - {}", status, error_text).into())
