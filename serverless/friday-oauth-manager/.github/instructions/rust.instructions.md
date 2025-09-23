@@ -10,7 +10,7 @@ This document defines the mandatory patterns, conventions, and architectural rul
 **LAW 1: Domain Module Organization**
 - Every service SHALL have a single domain module named `{domain}_mod/`
 - The domain module SHALL contain exactly these files: `mod.rs`, `{domain}_controller.rs`, `{domain}_logic.rs`, `{domain}_list.rs`
-- External service integrations SHALL be named `{service_name}_client.rs` within the domain module
+- External service integrations SHALL be named `{service_name}_api.rs` within the domain module
 
 **LAW 2: Root Module Requirements** 
 - Every service SHALL have these root modules: `main.rs`, `load_env.rs`, `openapi.rs`, `business_response.rs`
@@ -21,7 +21,9 @@ This document defines the mandatory patterns, conventions, and architectural rul
 - Controller files SHALL end with `_controller.rs`
 - Business logic files SHALL end with `_logic.rs`
 - Domain model files SHALL end with `_list.rs`
-- External client files SHALL end with `_client.rs`
+- External HTTP API clients SHALL end with `_api.rs`
+- DTO files SHALL be named `{dto_name}.rs` and placed in appropriate module folders
+- Each DTO SHALL have its own file for maintainability
 
 ## Naming Convention Laws
 
@@ -34,7 +36,7 @@ This document defines the mandatory patterns, conventions, and architectural rul
 - ALL structs SHALL use PascalCase
 - Request DTOs SHALL end with `Request`
 - Response DTOs SHALL end with `Response`
-- Client structs SHALL end with `Client`
+- HTTP API client structs SHALL end with `Api`
 
 **LAW 6: Instrumentation Naming**
 - Tracing instrument names SHALL include layer prefix: `logic_`, `data_`, `oauth_`
@@ -117,8 +119,8 @@ This document defines the mandatory patterns, conventions, and architectural rul
 
 ## Data Layer Laws
 
-**LAW 18: External Client Structure**
-- External service clients SHALL be structs with `client` and `base_url` fields
+**LAW 18: External HTTP API Client Structure**
+- External HTTP API clients SHALL be structs with `client` and `base_url` fields
 - HTTP client SHALL be `reqwest::Client`
 - Base URLs SHALL be configurable through environment variables with defaults
 
