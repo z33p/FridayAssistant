@@ -1,13 +1,10 @@
 use serde_derive::Deserialize;
 
 pub fn load_env_variables() -> EnvVariables {
-    if release_mode() {
-        dotenv::from_filename(".env.prod").ok();
-    } else {
-        dotenv::dotenv().ok();
-    }
+    dotenv::dotenv().ok();
 
-    let config = envy::from_env::<EnvVariables>().unwrap();
+    let mut config = envy::from_env::<EnvVariables>().unwrap();
+    config.is_prod = release_mode();
 
     config
 }
