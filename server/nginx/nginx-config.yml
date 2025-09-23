@@ -50,11 +50,6 @@ data:
             server friday-todo-manager-service.default.svc.cluster.local:5000;
         }
         
-        # Upstream para o Friday MCP Manager
-        upstream friday-mcp-manager {
-            server friday-mcp-manager-service.default.svc.cluster.local:5000;
-        }
-        
         server {
             listen 80;
             listen 443 ssl;
@@ -142,7 +137,7 @@ data:
             
             # APIs e serviços principais
             location /api/friday-secret-manager/ {
-                proxy_pass http://friday-secret-manager/;
+                proxy_pass http://friday-secret-manager/api/friday-secret-manager/;
                 proxy_set_header Host $host;
                 proxy_set_header X-Real-IP $remote_addr;
                 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -160,7 +155,7 @@ data:
             }
             
             location /api/friday-oauth-manager/ {
-                proxy_pass http://friday-oauth-manager/;
+                proxy_pass http://friday-oauth-manager/api/friday-oauth-manager/;
                 proxy_set_header Host $host;
                 proxy_set_header X-Real-IP $remote_addr;
                 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -178,7 +173,7 @@ data:
             }
             
             location /api/friday-todo-manager/ {
-                proxy_pass http://friday-todo-manager/;
+                proxy_pass http://friday-todo-manager/api/friday-todo-manager/;
                 proxy_set_header Host $host;
                 proxy_set_header X-Real-IP $remote_addr;
                 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -194,28 +189,10 @@ data:
                 proxy_buffering off;
                 proxy_request_buffering off;
             }
-            
-            location /mcp/friday-mcp-manager/ {
-                proxy_pass http://friday-mcp-manager/;
-                proxy_set_header Host $host;
-                proxy_set_header X-Real-IP $remote_addr;
-                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-                proxy_set_header X-Forwarded-Proto $scheme;
-                proxy_set_header X-Forwarded-Host $host;
-                proxy_set_header X-Forwarded-Port $server_port;
-                
-                # Headers específicos para MCP Protocol
-                proxy_set_header X-Original-URI $request_uri;
-                proxy_set_header X-Original-Method $request_method;
-                
-                # Configurações para JSON-RPC/MCP
-                proxy_buffering off;
-                proxy_request_buffering off;
-            }
-            
+
             location /api/ {
                 # Outras futuras APIs aqui
-                return 200 'APIs endpoint - Available: /api/friday-secret-manager/ | /api/friday-oauth-manager/ | /api/friday-todo-manager/ | MCP: /mcp/friday-mcp-manager/';
+                return 200 'APIs endpoint - Available: /api/friday-secret-manager/ | /api/friday-oauth-manager/ | /api/friday-todo-manager/';
                 add_header Content-Type text/plain;
             }
             
