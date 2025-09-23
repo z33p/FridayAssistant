@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: friday-mcp-manager-service
+  labels:
+    app: friday-mcp-manager
+spec:
+  selector:
+    app: friday-mcp-manager
+  ports:
+    - protocol: TCP
+      port: 5000
+      targetPort: 5000
+  type: ClusterIP

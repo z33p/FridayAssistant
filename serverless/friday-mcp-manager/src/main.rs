@@ -19,7 +19,7 @@ async fn main() {
     info!("Configuration: {:?}", config);
 
     // Create the HTTP router
-    let app = server::create_router();
+    let app = server::create_router(&config);
 
     // Bind to the configured address
     let bind_addr = format!("{}:{}", config.host, config.port);

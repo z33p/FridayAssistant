@@ -3,18 +3,19 @@ use std::sync::Arc;
 use tower_http::cors::CorsLayer;
 
 use crate::mcp_protocol::*;
-use crate::todo_mod::todo_controller::{get_todo_tools, handle_todo_tool};
-use crate::todo_mod::todo_logic::TodoClient;
+use crate::todo_mod::todo_controller::{get_todo_list_tools, handle_todo_list_tool};
+use crate::todo_mod::todo_logic::TodoListClient;
+use crate::load_env::Config;
 
 /// Shared application state
 #[derive(Clone)]
 pub struct AppState {
-    pub todo_client: Arc<TodoClient>,
+    pub todo_client: Arc<TodoListClient>,
 }
 
 /// Create the HTTP router for MCP endpoints
-pub fn create_router() -> Router {
-    let todo_client = Arc::new(TodoClient::new());
+pub fn create_router(config: &Config) -> Router {
+    let todo_client = Arc::new(TodoListClient::new(config.todo_api_base_url.clone()));
     let state = AppState { todo_client };
 
     Router::new()
@@ -31,7 +32,7 @@ async fn handle_mcp_request(
     let response = match request.method.as_str() {
         "initialize" => handle_initialize(request),
         "tools/list" => handle_list_tools(request),
-        "tools/call" => handle_call_tool(state, request),
+        "tools/call" => handle_call_tool(state, request).await,
         _ => JsonRpcResponse {
             jsonrpc: "2.0".to_string(),
             id: request.id,
@@ -72,7 +73,7 @@ fn handle_initialize(request: JsonRpcRequest) -> JsonRpcResponse {
 
 /// Handle tools/list request
 fn handle_list_tools(request: JsonRpcRequest) -> JsonRpcResponse {
-    let tools = get_todo_tools();
+    let tools = get_todo_list_tools();
     let response = ToolsListResponse { tools };
 
     JsonRpcResponse {
@@ -84,11 +85,11 @@ fn handle_list_tools(request: JsonRpcRequest) -> JsonRpcResponse {
 }
 
 /// Handle tools/call request
-fn handle_call_tool(state: AppState, request: JsonRpcRequest) -> JsonRpcResponse {
+async fn handle_call_tool(state: AppState, request: JsonRpcRequest) -> JsonRpcResponse {
     match request.params {
         Some(params) => match serde_json::from_value::<CallToolRequest>(params) {
             Ok(call_request) => {
-                let response = handle_todo_tool(&state.todo_client, call_request);
+                let response = handle_todo_list_tool(&state.todo_client, call_request).await;
                 JsonRpcResponse {
                     jsonrpc: "2.0".to_string(),
                     id: request.id,
