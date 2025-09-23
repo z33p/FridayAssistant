@@ -15,17 +15,14 @@ RUN cargo install --path .
 # Stage 2: Create the final image
 FROM debian:bookworm
 
-# Install OpenSSL runtime dependency
-RUN apt-get update && apt-get install -y libssl3 && rm -rf /var/lib/apt/lists/*
+# Instalar dependências necessárias para o binário Rust
+RUN apt-get update && apt-get install -y libssl3 ca-certificates && rm -rf /var/lib/apt/lists/*
 
 # Copy the .env file to the working directory
 COPY .env .
 
 # Copy the built application binary from the builder stage to the final image
 COPY --from=builder /usr/local/cargo/bin/friday-oauth-manager /usr/local/bin/friday-oauth-manager
-
-# Expose port 3000
-EXPOSE 3000
 
 # Set the command to run when the container starts
 CMD ["friday-oauth-manager"]

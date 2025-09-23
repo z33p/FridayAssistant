@@ -15,6 +15,7 @@ fn release_mode() -> bool {
 
 #[derive(Debug, Deserialize)]
 pub struct EnvVariables {
+    #[serde(skip)]
     pub is_prod: bool,
     pub secret_manager_url: String,
 }
