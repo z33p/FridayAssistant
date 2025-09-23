@@ -22,7 +22,7 @@ impl OAuthApi {
         info!("OAuth layer: Generating Microsoft access token");
 
         let url = format!(
-            "{}/api/friday-oauth-manager/oauth/generate-access-token",
+            "{}/oauth/generate-access-token",
             self.base_url
         );
         info!("OAuth layer: Making GET request to: {}", url);
