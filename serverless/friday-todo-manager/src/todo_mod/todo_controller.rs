@@ -23,7 +23,6 @@ use crate::todo_mod::{
     )
 )]
 #[get("/api/friday-todo-manager/todo-lists/{list_id}")]
-#[instrument(name = "get_todo_list", skip_all, fields(list_id = %list_id.as_ref()))]
 pub async fn get_todo_list(list_id: web::Path<String>) -> impl Responder {
     info!(
         "Attempting to retrieve todo list with ID: {}",
@@ -70,7 +69,6 @@ pub async fn get_todo_list(list_id: web::Path<String>) -> impl Responder {
     )
 )]
 #[get("/api/friday-todo-manager/todo-lists")]
-#[instrument(name = "get_all_todo_lists")]
 pub async fn get_all_todo_lists() -> impl Responder {
     info!("Attempting to retrieve all todo lists");
 
@@ -111,7 +109,6 @@ pub async fn get_all_todo_lists() -> impl Responder {
     )
 )]
 #[post("/api/friday-todo-manager/todo-lists")]
-#[instrument(name = "create_todo_list", skip_all, fields(display_name = %request.display_name))]
 pub async fn create_todo_list(
     request: actix_web::web::Json<CreateTodoListRequest>,
 ) -> impl Responder {
@@ -153,7 +150,6 @@ pub async fn create_todo_list(
     )
 )]
 #[put("/api/friday-todo-manager/todo-lists")]
-#[instrument(name = "update_todo_list", skip_all, fields(id = %request.id, display_name = %request.display_name))]
 pub async fn update_todo_list(
     request: actix_web::web::Json<UpdateTodoListRequest>,
 ) -> impl Responder {
@@ -203,7 +199,6 @@ pub async fn update_todo_list(
     )
 )]
 #[delete("/api/friday-todo-manager/todo-lists")]
-#[instrument(name = "delete_todo_list", skip_all, fields(id = %request.id))]
 pub async fn delete_todo_list(
     request: actix_web::web::Json<DeleteTodoListRequest>,
 ) -> impl Responder {

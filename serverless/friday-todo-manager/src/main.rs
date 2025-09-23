@@ -8,7 +8,9 @@ use crate::todo_mod::todo_controller;
 
 mod business_response;
 mod load_env;
+mod oauth_mod;
 mod openapi;
+mod secret_manager_mod;
 mod todo_mod;
 
 extern crate dotenv;

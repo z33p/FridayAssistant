@@ -1,15 +1,14 @@
 use crate::business_response::Response;
+use crate::oauth_mod::oauth_api::OAuthApi;
 use crate::todo_mod::microsoft_graph_client::MicrosoftGraphClient;
-use crate::todo_mod::oauth_client::OAuthClient;
 use crate::todo_mod::todo_list::{CreateTodoListRequest, TodoList, UpdateTodoListRequest};
 use tracing::{debug, error, info, instrument, warn};
 
-#[instrument(name = "logic_get_all_todo_lists")]
 pub async fn get_all_todo_lists() -> Result<Response<Vec<TodoList>>, Box<dyn std::error::Error>> {
     info!("Logic layer: Getting all todo lists");
 
     // Get access token from OAuth manager
-    let oauth_client = OAuthClient::new();
+    let oauth_client = OAuthApi::new();
     let access_token = match oauth_client.generate_access_token().await {
         Ok(token) => token,
         Err(e) => {
@@ -49,7 +48,6 @@ pub async fn get_all_todo_lists() -> Result<Response<Vec<TodoList>>, Box<dyn std
     }
 }
 
-#[instrument(name = "logic_get_todo_list", fields(list_id = %list_id))]
 pub async fn get_todo_list(
     list_id: &str,
 ) -> Result<Response<TodoList>, Box<dyn std::error::Error>> {
@@ -61,7 +59,7 @@ pub async fn get_todo_list(
     }
 
     // Get access token from OAuth manager
-    let oauth_client = OAuthClient::new();
+    let oauth_client = OAuthApi::new();
     let access_token = match oauth_client.generate_access_token().await {
         Ok(token) => token,
         Err(e) => {
@@ -101,7 +99,6 @@ pub async fn get_todo_list(
     }
 }
 
-#[instrument(name = "logic_create_todo_list", fields(display_name = %request.display_name))]
 pub async fn create_todo_list(
     request: CreateTodoListRequest,
 ) -> Result<Response<TodoList>, Box<dyn std::error::Error>> {
@@ -125,7 +122,7 @@ pub async fn create_todo_list(
     }
 
     // Get access token from OAuth manager
-    let oauth_client = OAuthClient::new();
+    let oauth_client = OAuthApi::new();
     let access_token = match oauth_client.generate_access_token().await {
         Ok(token) => token,
         Err(e) => {
@@ -159,7 +156,6 @@ pub async fn create_todo_list(
     }
 }
 
-#[instrument(name = "logic_update_todo_list", fields(id = %request.id, display_name = %request.display_name))]
 pub async fn update_todo_list(
     request: UpdateTodoListRequest,
 ) -> Result<Response<TodoList>, Box<dyn std::error::Error>> {
@@ -188,7 +184,7 @@ pub async fn update_todo_list(
     }
 
     // Get access token from OAuth manager
-    let oauth_client = OAuthClient::new();
+    let oauth_client = OAuthApi::new();
     let access_token = match oauth_client.generate_access_token().await {
         Ok(token) => token,
         Err(e) => {
@@ -222,7 +218,6 @@ pub async fn update_todo_list(
     }
 }
 
-#[instrument(name = "logic_delete_todo_list", fields(list_id = %list_id))]
 pub async fn delete_todo_list(
     list_id: &str,
 ) -> Result<Response<String>, Box<dyn std::error::Error>> {
@@ -234,7 +229,7 @@ pub async fn delete_todo_list(
     }
 
     // Get access token from OAuth manager
-    let oauth_client = OAuthClient::new();
+    let oauth_client = OAuthApi::new();
     let access_token = match oauth_client.generate_access_token().await {
         Ok(token) => token,
         Err(e) => {

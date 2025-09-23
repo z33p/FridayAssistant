@@ -1,37 +1,28 @@
 use reqwest::Client;
-use serde::{Deserialize, Serialize};
 use tracing::{error, info, instrument};
 
-#[derive(Debug, Deserialize, Serialize)]
-pub struct AccessTokenResponse {
-    pub status_code: i32,
-    pub data: Option<String>, // The access token
-    pub errors: Option<Vec<String>>,
-}
+use super::oauth_response::AccessTokenResponse;
+use crate::ENV_CONFIG;
 
 #[derive(Debug)]
-pub struct OAuthClient {
+pub struct OAuthApi {
     client: Client,
-    oauth_base_url: String,
+    base_url: String,
 }
 
-impl OAuthClient {
+impl OAuthApi {
     pub fn new() -> Self {
-        // You can configure this URL via environment variable or config
-        let oauth_base_url = std::env::var("OAUTH_MANAGER_URL")
-            .unwrap_or_else(|_| "http://localhost:5000".to_string());
-
         Self {
             client: Client::new(),
-            oauth_base_url,
+            base_url: ENV_CONFIG.oauth_manager_url.clone(),
         }
     }
 
-    #[instrument(name = "oauth_generate_access_token")]
+
     pub async fn generate_access_token(&self) -> Result<String, Box<dyn std::error::Error>> {
         info!("OAuth layer: Generating Microsoft access token");
 
-        let url = format!("{}/api/oauth/generate-access-token", self.oauth_base_url);
+        let url = format!("{}/api/oauth/generate-access-token", self.base_url);
         info!("OAuth layer: Making GET request to: {}", url);
 
         let response = match self
@@ -54,7 +45,7 @@ impl OAuthClient {
         if response.status().is_success() {
             match response.json::<AccessTokenResponse>().await {
                 Ok(oauth_response) => {
-                    if oauth_response.status_code == 200 {
+                    if oauth_response.success {
                         if let Some(access_token) = oauth_response.data {
                             info!("OAuth layer: Successfully generated access token");
                             Ok(access_token)
@@ -63,10 +54,7 @@ impl OAuthClient {
                             Err("No access token in OAuth response".into())
                         }
                     } else {
-                        let error_msg = oauth_response
-                            .errors
-                            .unwrap_or_else(|| vec!["Unknown OAuth error".to_string()])
-                            .join(", ");
+                        let error_msg = oauth_response.errors.join(", ");
                         error!("OAuth layer: OAuth service error: {}", error_msg);
                         Err(format!("OAuth service error: {}", error_msg).into())
                     }

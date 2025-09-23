@@ -20,7 +20,6 @@ impl MicrosoftGraphClient {
         }
     }
 
-    #[instrument(name = "data_get_todo_lists", fields(access_token_len = access_token.len()))]
     pub async fn get_todo_lists(
         &self,
         access_token: &str,
@@ -113,7 +112,6 @@ impl MicrosoftGraphClient {
         }
     }
 
-    #[instrument(name = "data_get_todo_list", fields(list_id = %list_id, access_token_len = access_token.len()))]
     pub async fn get_todo_list(
         &self,
         list_id: &str,
@@ -203,7 +201,6 @@ impl MicrosoftGraphClient {
         }
     }
 
-    #[instrument(name = "data_create_todo_list", fields(display_name = %request.display_name, access_token_len = access_token.len()))]
     pub async fn create_todo_list(
         &self,
         request: CreateTodoListRequest,
@@ -301,7 +298,6 @@ impl MicrosoftGraphClient {
         }
     }
 
-    #[instrument(name = "data_update_todo_list", fields(id = %request.id, display_name = %request.display_name, access_token_len = access_token.len()))]
     pub async fn update_todo_list(
         &self,
         request: UpdateTodoListRequest,
@@ -405,7 +401,6 @@ impl MicrosoftGraphClient {
         }
     }
 
-    #[instrument(name = "data_delete_todo_list", fields(list_id = %list_id, access_token_len = access_token.len()))]
     pub async fn delete_todo_list(
         &self,
         list_id: &str,

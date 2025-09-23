@@ -17,5 +17,6 @@ fn release_mode() -> bool {
 pub struct EnvVariables {
     #[serde(skip)]
     pub is_prod: bool,
-    // pub secret_manager_url: String,
+    pub secret_manager_url: String,
+    pub oauth_manager_url: String,
 }
