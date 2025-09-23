@@ -24,7 +24,7 @@ use crate::{
 pub async fn get_oauth_tokens(
     request: GetOAuthTokensRequest,
 ) -> Result<ApiResponse, Box<dyn std::error::Error>> {
-    let client = get_oauth_client(request.provider.clone())?;
+    let client = get_oauth_client(request.provider.clone()).await?;
 
     let code = AuthorizationCode::new(extract_code_from_url(&request.url)?);
 
@@ -116,7 +116,7 @@ fn extract_code_from_url(url: &str) -> Result<String, Box<dyn std::error::Error>
 pub async fn refresh_access_token(
     request: RefreshAccessTokenRequest,
 ) -> Result<ApiResponse, Box<dyn std::error::Error>> {
-    let client = get_oauth_client(request.provider.clone())?;
+    let client = get_oauth_client(request.provider.clone()).await?;
 
     // Create the provider to get scopes and params
     let oauth_provider = OAuthProviderFactory::create_provider(
@@ -225,7 +225,7 @@ pub async fn generate_oauth_url() -> Result<ApiResponse, Box<dyn std::error::Err
 pub async fn generate_oauth_url_for_provider(
     provider: OAuthProvider,
 ) -> Result<ApiResponse, Box<dyn std::error::Error>> {
-    let client = get_oauth_client(provider.clone())?;
+    let client = get_oauth_client(provider.clone()).await?;
 
     // Create the provider to get scopes and params
     let oauth_provider = OAuthProviderFactory::create_provider(

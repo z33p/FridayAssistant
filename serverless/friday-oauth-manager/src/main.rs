@@ -3,6 +3,7 @@ mod load_env;
 mod oauth_provider;
 mod oauth_tokens_mod;
 mod openapi;
+mod secret_manager_mod;
 
 extern crate dotenv;
 
@@ -65,11 +66,13 @@ fn logging_init() {
         .init();
 }
 
-pub fn get_oauth_client(provider: OAuthProvider) -> Result<BasicClient, Box<dyn Error>> {
+pub async fn get_oauth_client(provider: OAuthProvider) -> Result<BasicClient, Box<dyn Error>> {
+    let (client_id, secret_value) = secret_manager_mod::get_oauth_credentials().await?;
+
     let oauth_provider = OAuthProviderFactory::create_provider(
         &provider,
-        ENV_CONFIG.oauth_client_id.clone(),
-        ENV_CONFIG.oauth_secret_value.clone(),
+        client_id,
+        secret_value,
         "http://localhost:5000/callback".to_string(),
     );
 

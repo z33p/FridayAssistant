@@ -19,7 +19,5 @@ fn release_mode() -> bool {
 #[derive(Debug, Deserialize)]
 pub struct EnvVariables {
     pub is_prod: bool,
-    pub oauth_client_id: String,
-    pub oauth_secret_value: String,
-    pub database_url: String,
+    pub secret_manager_url: String,
 }

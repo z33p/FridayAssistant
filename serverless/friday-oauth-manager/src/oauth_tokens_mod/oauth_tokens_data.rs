@@ -1,17 +1,18 @@
 use sqlx::{postgres::PgPoolOptions, PgPool};
 use tracing::{debug, error};
 
-use crate::{oauth_tokens_mod::oauth_tokens::OAuthTokens, ENV_CONFIG};
+use crate::{oauth_tokens_mod::oauth_tokens::OAuthTokens, secret_manager_mod};
 
-async fn create_database_pool() -> Result<PgPool, sqlx::Error> {
-    let pool = PgPoolOptions::new()
-        .connect(ENV_CONFIG.database_url.as_str())
-        .await?;
+async fn create_database_pool() -> Result<PgPool, Box<dyn std::error::Error>> {
+    let database_url = secret_manager_mod::get_database_url().await?;
+    let pool = PgPoolOptions::new().connect(&database_url).await?;
 
     Ok(pool)
 }
 
-pub async fn insert_oauth_token(oauth_tokens: &OAuthTokens) -> Result<(), sqlx::Error> {
+pub async fn insert_oauth_token(
+    oauth_tokens: &OAuthTokens,
+) -> Result<(), Box<dyn std::error::Error>> {
     let pool = create_database_pool().await?;
 
     let result = sqlx::query("CALL pr_ins_oauth_tokens($1, $2, $3)")
@@ -23,7 +24,7 @@ pub async fn insert_oauth_token(oauth_tokens: &OAuthTokens) -> Result<(), sqlx::
 
     if let Err(e) = result {
         error!("Erro ao inserir oauth_tokens: {:?}", e);
-        return Err(e);
+        return Err(Box::new(e));
     }
 
     debug!("Registro inserido com sucesso");
@@ -33,7 +34,7 @@ pub async fn insert_oauth_token(oauth_tokens: &OAuthTokens) -> Result<(), sqlx::
 
 pub async fn update_oauth_token_by_refresh_token(
     oauth_tokens: &OAuthTokens,
-) -> Result<(), sqlx::Error> {
+) -> Result<(), Box<dyn std::error::Error>> {
     let pool = create_database_pool().await?;
 
     sqlx::query("CALL pr_upd_oauth_tokens_by_refresh_token($1, $2, $3)")
@@ -49,7 +50,7 @@ pub async fn update_oauth_token_by_refresh_token(
 }
 
 pub async fn fn_get_first_oauth_tokens_by_last_expiry_date(
-) -> Result<Option<OAuthTokens>, sqlx::Error> {
+) -> Result<Option<OAuthTokens>, Box<dyn std::error::Error>> {
     let pool = create_database_pool().await?;
 
     let query = "SELECT * FROM fn_get_first_oauth_tokens_by_last_expiry_date()";
