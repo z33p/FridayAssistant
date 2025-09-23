@@ -27,7 +27,7 @@ sed -i "s|image: z33p/friday-oauth-manager:.*|image: z33p/friday-oauth-manager:$
 echo "Image tag updated successfully!"
 
 # Create Docker image from Dockerfile
-docker build --pull --rm -f "FridaySecretManager.Dockerfile" -t friday-oauth-manager:$dockerTag "."
+docker build --pull --rm -f "FridayOAuthManager.Dockerfile" -t friday-oauth-manager:$dockerTag "."
 
 # Tag the image for Docker Hub
 docker tag friday-oauth-manager:$dockerTag docker.io/z33p/friday-oauth-manager:$dockerTag
