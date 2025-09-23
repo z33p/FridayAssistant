@@ -1,5 +1,5 @@
 # Stage 1: Build the application
-FROM rust:1.81-bookworm as builder
+FROM rust:1.88-bookworm AS builder
 
 # Set the working directory inside the container
 WORKDIR /usr/src/friday-secret-manager
