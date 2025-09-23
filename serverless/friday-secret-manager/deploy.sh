@@ -1,42 +1,50 @@
-# Ask user for Docker tag version
-echo "Enter Docker tag version (e.g. 2024-12-22.v1):"
+#!/bin/bash
 
-# Check if dockerTag was passed as argument and if it wasn't ask the user for it
-if [ -z "$1" ]; then
-    read dockerTag
+# Caminho do arquivo de deployment
+DEPLOYMENT_FILE="k8s/friday-secret-manager-deployment.yml"
+
+# Extrai a tag atual do arquivo de deployment
+currentTag=$(grep -oP 'image: z33p/friday-secret-manager:\K[0-9]{4}-[0-9]{2}-[0-9]{2}.v[0-9]+' "$DEPLOYMENT_FILE")
+
+# Obtém a data de hoje
+today=$(date +%Y-%m-%d)
+
+if [[ $currentTag =~ ^([0-9]{4}-[0-9]{2}-[0-9]{2})\.v([0-9]+)$ ]]; then
+    currentDate="${BASH_REMATCH[1]}"
+    currentVersion="${BASH_REMATCH[2]}"
+    if [[ "$currentDate" == "$today" ]]; then
+        # Se a data for igual à de hoje, incrementa a versão
+        newVersion=$((currentVersion + 1))
+    else
+        # Se a data mudou, começa do 1
+        newVersion=1
+    fi
 else
-    dockerTag=$1
+    # Se não encontrar tag, começa do zero
+    newVersion=1
 fi
 
-while true; do
-    # Check if dockerTag is in the correct format
-    if [[ ! $dockerTag =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}.v[0-9]+$ ]]; then
-        echo "Invalid Docker tag version. Please enter a valid version (e.g. 2024-12-22.v1):"
-        read dockerTag
-        continue
-    fi
+dockerTag="${today}.v${newVersion}"
 
-    # If checks pass, break the loop
-    break
-done
+echo "Gerando nova tag: $dockerTag"
 
-# Update the image tag in the deployment file
-echo "Updating image tag in k8s/friday-secret-manager-deployment.yml to $dockerTag..."
-sed -i "s|image: z33p/friday-secret-manager:.*|image: z33p/friday-secret-manager:$dockerTag|g" k8s/friday-secret-manager-deployment.yml
+# Atualiza a imagem no arquivo de deployment
+echo "Atualizando image tag em $DEPLOYMENT_FILE para $dockerTag..."
+sed -i "s|image: z33p/friday-secret-manager:.*|image: z33p/friday-secret-manager:$dockerTag|g" "$DEPLOYMENT_FILE"
 
-echo "Image tag updated successfully!"
+echo "Image tag atualizada com sucesso!"
 
-# Create Docker image from Dockerfile
+# Build da imagem
 docker build --pull --rm -f "FridaySecretManager.Dockerfile" -t friday-secret-manager:$dockerTag "."
 
-# Tag the image for Docker Hub
+# Tag para Docker Hub
 docker tag friday-secret-manager:$dockerTag docker.io/z33p/friday-secret-manager:$dockerTag
 
-# Push Docker image to Docker Hub
+# Push para Docker Hub
 docker image push docker.io/z33p/friday-secret-manager:$dockerTag 
 
-# Apply service
+# Aplica service
 kubectl apply -f k8s/friday-secret-manager-service.yml
 
-# Apply deployment
+# Aplica deployment
 kubectl apply -f k8s/friday-secret-manager-deployment.yml
