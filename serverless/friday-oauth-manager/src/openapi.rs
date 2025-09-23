@@ -45,5 +45,8 @@ use crate::{
 pub struct ApiDoc;
 
 pub fn swagger_config() -> SwaggerUi {
-    SwaggerUi::new("/swagger/{_:.*}").url("/api-docs/openapi.json", ApiDoc::openapi())
+    SwaggerUi::new("/api/friday-oauth-manager/swagger/{_:.*}").url(
+        "/api/friday-oauth-manager/api-docs/openapi.json",
+        ApiDoc::openapi(),
+    )
 }

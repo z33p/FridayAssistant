@@ -4,15 +4,15 @@ use tracing::{error, info};
 use utoipa;
 
 use crate::{
-    api_response::ApiResponse, 
-    oauth_provider::OAuthProvider, 
+    api_response::ApiResponse,
+    oauth_provider::OAuthProvider,
     oauth_tokens_mod::{
-        oauth_tokens_logic,
         oauth_tokens_controller::{
+            get_oauth_tokens_request::GetOAuthTokensRequest,
             refresh_access_token_request::RefreshAccessTokenRequest,
-            get_oauth_tokens_request::GetOAuthTokensRequest
-        }
-    }
+        },
+        oauth_tokens_logic,
+    },
 };
 
 extern crate dotenv;
@@ -23,14 +23,14 @@ extern crate dotenv;
 /// This is a legacy endpoint maintained for backward compatibility.
 #[utoipa::path(
     get,
-    path = "/api/oauth/generate-access-token",
+    path = "/api/friday-oauth-manager/oauth/generate-access-token",
     responses(
         (status = 200, description = "Access token generated successfully", body = ApiResponse),
         (status = 500, description = "Internal server error", body = ApiResponse)
     ),
     tag = "OAuth"
 )]
-#[get("/api/oauth/generate-access-token")]
+#[get("/api/friday-oauth-manager/oauth/generate-access-token")]
 pub async fn generate_access_token() -> impl Responder {
     info!("Gerando access token");
 
@@ -53,7 +53,7 @@ pub async fn generate_access_token() -> impl Responder {
 /// Supports both Google and Microsoft OAuth providers.
 #[utoipa::path(
     post,
-    path = "/api/oauth/refresh-access-token",
+    path = "/api/friday-oauth-manager/oauth/refresh-access-token",
     request_body = RefreshAccessTokenRequest,
     responses(
         (status = 200, description = "Access token refreshed successfully", body = ApiResponse),
@@ -61,7 +61,7 @@ pub async fn generate_access_token() -> impl Responder {
     ),
     tag = "OAuth"
 )]
-#[post("/api/oauth/refresh-access-token")]
+#[post("/api/friday-oauth-manager/oauth/refresh-access-token")]
 pub async fn refresh_access_token(
     request: actix_web::web::Json<RefreshAccessTokenRequest>,
 ) -> impl Responder {
@@ -86,14 +86,14 @@ pub async fn refresh_access_token(
 /// Users should be redirected to this URL to start the OAuth flow.
 #[utoipa::path(
     get,
-    path = "/api/oauth/url",
+    path = "/api/friday-oauth-manager/oauth/url",
     responses(
         (status = 200, description = "OAuth URL generated successfully", body = ApiResponse),
         (status = 500, description = "Internal server error", body = ApiResponse)
     ),
     tag = "OAuth URLs"
 )]
-#[get("/api/oauth/url")]
+#[get("/api/friday-oauth-manager/oauth/url")]
 pub async fn generate_oauth_url_endpoint() -> impl Responder {
     info!("Gerando URL OAuth padrão (Microsoft)");
 
@@ -116,14 +116,14 @@ pub async fn generate_oauth_url_endpoint() -> impl Responder {
 /// Users should be redirected to this URL to start the Google OAuth flow.
 #[utoipa::path(
     get,
-    path = "/api/oauth/url/google",
+    path = "/api/friday-oauth-manager/oauth/url/google",
     responses(
         (status = 200, description = "Google OAuth URL generated successfully", body = ApiResponse),
         (status = 500, description = "Internal server error", body = ApiResponse)
     ),
     tag = "OAuth URLs"
 )]
-#[get("/api/oauth/url/google")]
+#[get("/api/friday-oauth-manager/oauth/url/google")]
 pub async fn generate_google_oauth_url() -> impl Responder {
     info!("Gerando URL OAuth do Google");
 
@@ -146,14 +146,14 @@ pub async fn generate_google_oauth_url() -> impl Responder {
 /// Users should be redirected to this URL to start the Microsoft OAuth flow.
 #[utoipa::path(
     get,
-    path = "/api/oauth/url/microsoft",
+    path = "/api/friday-oauth-manager/oauth/url/microsoft",
     responses(
         (status = 200, description = "Microsoft OAuth URL generated successfully", body = ApiResponse),
         (status = 500, description = "Internal server error", body = ApiResponse)
     ),
     tag = "OAuth URLs"
 )]
-#[get("/api/oauth/url/microsoft")]
+#[get("/api/friday-oauth-manager/oauth/url/microsoft")]
 pub async fn generate_microsoft_oauth_url() -> impl Responder {
     info!("Gerando URL OAuth da Microsoft");
 
@@ -176,7 +176,7 @@ pub async fn generate_microsoft_oauth_url() -> impl Responder {
 /// for access and refresh tokens. Supports both Google and Microsoft OAuth providers.
 #[utoipa::path(
     post,
-    path = "/api/oauth/tokens",
+    path = "/api/friday-oauth-manager/oauth/tokens",
     request_body = GetOAuthTokensRequest,
     responses(
         (status = 200, description = "Tokens exchanged successfully", body = ApiResponse),
@@ -184,7 +184,7 @@ pub async fn generate_microsoft_oauth_url() -> impl Responder {
     ),
     tag = "OAuth"
 )]
-#[post("/api/oauth/tokens")]
+#[post("/api/friday-oauth-manager/oauth/tokens")]
 pub async fn get_oauth_tokens(
     request: actix_web::web::Json<GetOAuthTokensRequest>,
 ) -> impl Responder {
@@ -208,13 +208,13 @@ pub async fn get_oauth_tokens(
 /// This endpoint provides basic health status information for the OAuth service.
 #[utoipa::path(
     get,
-    path = "/api/health",
+    path = "/api/friday-oauth-manager/health",
     responses(
         (status = 200, description = "Service is healthy", body = serde_json::Value)
     ),
     tag = "Health"
 )]
-#[get("/api/health")]
+#[get("/api/friday-oauth-manager/health")]
 pub async fn health_check() -> impl Responder {
     actix_web::web::Json(json!({
         "status": "healthy",

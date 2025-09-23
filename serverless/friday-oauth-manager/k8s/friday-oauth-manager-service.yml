@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: friday-oauth-manager-service
+  labels:
+    app: friday-oauth-manager
+spec:
+  selector:
+    app: friday-oauth-manager
+  ports:
+    - protocol: TCP
+      port: 5000
+      targetPort: 5000
+  type: ClusterIP

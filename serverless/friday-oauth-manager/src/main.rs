@@ -29,7 +29,7 @@ async fn main() -> std::io::Result<()> {
     dotenv().ok();
     logging_init();
 
-    info!("Iniciando servidor OAuth HTTP API na porta 3000");
+    info!("Iniciando servidor OAuth HTTP API na porta 5000");
 
     HttpServer::new(|| {
         App::new()
@@ -44,7 +44,7 @@ async fn main() -> std::io::Result<()> {
             .service(openapi::swagger_config())
     })
     .workers(4)
-    .bind(("0.0.0.0", 3000))?
+    .bind(("0.0.0.0", 5000))?
     .run()
     .await
 }
