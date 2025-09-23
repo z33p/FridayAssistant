@@ -1,4 +1,4 @@
-use actix_web::{get, App, HttpServer, Responder};
+use actix_web::{get, web, App, HttpServer, Responder};
 use load_env::{load_env_variables, EnvVariables};
 use once_cell::sync::Lazy;
 use tracing::Level;
@@ -27,16 +27,16 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(|| {
         App::new()
             .service(index)
+            .service(openapi::swagger_config())
             .service(secrets_controller::get_secret_value)
             .service(secrets_controller::get_all_secrets)
             .service(secrets_controller::insert_secret)
             .service(secrets_controller::update_secret)
             .service(secrets_controller::delete_secret)
             .service(secrets_controller::refresh_secrets)
-            .service(openapi::swagger_config())
     })
     .workers(4)
-    .bind(("127.0.0.1", 5000))?
+    .bind(("0.0.0.0", 5000))?
     .run()
     .await
 }

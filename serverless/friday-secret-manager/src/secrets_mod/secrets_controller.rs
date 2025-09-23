@@ -10,7 +10,7 @@ use crate::secrets_mod::{secret::Secret, secrets_logic};
 
 #[utoipa::path(
     get,
-    path = "/api/secrets/get_secret_value/{key}",
+    path = "/api/friday-secret-manager/secrets/get_secret_value/{key}",
     tag = "Secrets",
     params(
         ("key", Path, description = "Secret key to retrieve")
@@ -20,7 +20,7 @@ use crate::secrets_mod::{secret::Secret, secrets_logic};
         (status = 404, description = "Secret not found")
     )
 )]
-#[get("/api/secrets/get_secret_value/{key}")]
+#[get("/api/friday-secret-manager/secrets/get_secret_value/{key}")]
 pub async fn get_secret_value(key: web::Path<String>) -> impl Responder {
     match secrets_logic::get_secret_value(&key).await {
         Ok(result) => HttpResponse::Ok().json(result),
@@ -37,13 +37,13 @@ pub async fn get_secret_value(key: web::Path<String>) -> impl Responder {
 
 #[utoipa::path(
     get,
-    path = "/api/secrets/get_all_secrets",
+    path = "/api/friday-secret-manager/secrets/get_all_secrets",
     tag = "Secrets",
     responses(
         (status = 200, description = "All secrets retrieved successfully", body = Vec<Secret>),
     )
 )]
-#[get("/api/secrets/get_all_secrets")]
+#[get("/api/friday-secret-manager/secrets/get_all_secrets")]
 pub async fn get_all_secrets() -> impl Responder {
     match secrets_logic::get_all_secrets().await {
         Ok(secrets) => HttpResponse::Ok().json(secrets),
@@ -60,7 +60,7 @@ pub async fn get_all_secrets() -> impl Responder {
 
 #[utoipa::path(
     post,
-    path = "/api/secrets/insert_secret",
+    path = "/api/friday-secret-manager/secrets/insert_secret",
     tag = "Secrets",
     request_body = Secret,
     responses(
@@ -68,7 +68,7 @@ pub async fn get_all_secrets() -> impl Responder {
         (status = 400, description = "Invalid secret data")
     )
 )]
-#[post("/api/secrets/insert_secret")]
+#[post("/api/friday-secret-manager/secrets/insert_secret")]
 pub async fn insert_secret(secret: actix_web::web::Json<Secret>) -> impl Responder {
     match secrets_logic::insert_secret(secret.into_inner()).await {
         Ok(result) => HttpResponse::Ok().json(result),
@@ -85,7 +85,7 @@ pub async fn insert_secret(secret: actix_web::web::Json<Secret>) -> impl Respond
 
 #[utoipa::path(
     put,
-    path = "/api/secrets/update_secret",
+    path = "/api/friday-secret-manager/secrets/update_secret",
     tag = "Secrets",
     request_body = Secret,
     responses(
@@ -94,7 +94,7 @@ pub async fn insert_secret(secret: actix_web::web::Json<Secret>) -> impl Respond
         (status = 400, description = "Invalid secret data")
     )
 )]
-#[put("/api/secrets/update_secret")]
+#[put("/api/friday-secret-manager/secrets/update_secret")]
 pub async fn update_secret(secret: actix_web::web::Json<Secret>) -> impl Responder {
     match secrets_logic::update_secret(secret.into_inner()).await {
         Ok(result) => HttpResponse::Ok().json(result),
@@ -111,7 +111,7 @@ pub async fn update_secret(secret: actix_web::web::Json<Secret>) -> impl Respond
 
 #[utoipa::path(
     delete,
-    path = "/api/secrets/delete_secret",
+    path = "/api/friday-secret-manager/secrets/delete_secret",
     tag = "Secrets",
     request_body = DeleteSecretRequest,
     responses(
@@ -119,7 +119,7 @@ pub async fn update_secret(secret: actix_web::web::Json<Secret>) -> impl Respond
         (status = 404, description = "Secret not found")
     )
 )]
-#[delete("/api/secrets/delete_secret")]
+#[delete("/api/friday-secret-manager/secrets/delete_secret")]
 pub async fn delete_secret(secret: actix_web::web::Json<DeleteSecretRequest>) -> impl Responder {
     match secrets_logic::delete_secret(&secret.key).await {
         Ok(result) => HttpResponse::Ok().json(result),
@@ -136,13 +136,13 @@ pub async fn delete_secret(secret: actix_web::web::Json<DeleteSecretRequest>) ->
 
 #[utoipa::path(
     post,
-    path = "/api/secrets/refresh_secrets",
+    path = "/api/friday-secret-manager/secrets/refresh_secrets",
     tag = "Operations",
     responses(
         (status = 200, description = "Secrets refreshed successfully", body = String),
     )
 )]
-#[post("/api/secrets/refresh_secrets")]
+#[post("/api/friday-secret-manager/secrets/refresh_secrets")]
 pub async fn refresh_secrets() -> impl Responder {
     match secrets_logic::refresh_secrets().await {
         Ok(result) => HttpResponse::Ok().json(result),
