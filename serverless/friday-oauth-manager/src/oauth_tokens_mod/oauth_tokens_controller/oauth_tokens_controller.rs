@@ -4,7 +4,7 @@ use tracing::{error, info};
 use utoipa;
 
 use crate::{
-    api_response::ApiResponse,
+    business_response::BusinessResponse,
     oauth_provider::OAuthProvider,
     oauth_tokens_mod::{
         oauth_tokens_controller::{
@@ -25,8 +25,8 @@ extern crate dotenv;
     get,
     path = "/api/friday-oauth-manager/oauth/generate-access-token",
     responses(
-        (status = 200, description = "Access token generated successfully", body = ApiResponse),
-        (status = 500, description = "Internal server error", body = ApiResponse)
+        (status = 200, description = "Access token generated successfully", body = BusinessResponse),
+        (status = 500, description = "Internal server error", body = BusinessResponse)
     ),
     tag = "OAuth"
 )]
@@ -38,10 +38,10 @@ pub async fn generate_access_token() -> impl Responder {
         Ok(response) => actix_web::web::Json(response),
         Err(e) => {
             error!("Erro ao gerar access token: {}", e);
-            actix_web::web::Json(ApiResponse {
-                status_code: 500,
-                data: serde_json::Value::Null,
-                errors: Some(vec![format!("Erro interno: {}", e)]),
+            actix_web::web::Json(BusinessResponse {
+                success: false,
+                data: Some(serde_json::Value::Null),
+                errors: vec![format!("Erro interno: {}", e)],
             })
         }
     }
@@ -56,8 +56,8 @@ pub async fn generate_access_token() -> impl Responder {
     path = "/api/friday-oauth-manager/oauth/refresh-access-token",
     request_body = RefreshAccessTokenRequest,
     responses(
-        (status = 200, description = "Access token refreshed successfully", body = ApiResponse),
-        (status = 500, description = "Internal server error", body = ApiResponse)
+        (status = 200, description = "Access token refreshed successfully", body = BusinessResponse),
+        (status = 500, description = "Internal server error", body = BusinessResponse)
     ),
     tag = "OAuth"
 )]
@@ -71,10 +71,10 @@ pub async fn refresh_access_token(
         Ok(response) => actix_web::web::Json(response),
         Err(e) => {
             error!("Erro ao fazer refresh do access token: {}", e);
-            actix_web::web::Json(ApiResponse {
-                status_code: 500,
-                data: serde_json::Value::Null,
-                errors: Some(vec![format!("Erro interno: {}", e)]),
+            actix_web::web::Json(BusinessResponse {
+                success: false,
+                data: Some(serde_json::Value::Null),
+                errors: vec![format!("Erro interno: {}", e)],
             })
         }
     }
@@ -88,8 +88,8 @@ pub async fn refresh_access_token(
     get,
     path = "/api/friday-oauth-manager/oauth/url",
     responses(
-        (status = 200, description = "OAuth URL generated successfully", body = ApiResponse),
-        (status = 500, description = "Internal server error", body = ApiResponse)
+        (status = 200, description = "OAuth URL generated successfully", body = BusinessResponse),
+        (status = 500, description = "Internal server error", body = BusinessResponse)
     ),
     tag = "OAuth URLs"
 )]
@@ -101,10 +101,10 @@ pub async fn generate_oauth_url_endpoint() -> impl Responder {
         Ok(response) => actix_web::web::Json(response),
         Err(e) => {
             error!("Erro ao gerar URL OAuth: {}", e);
-            actix_web::web::Json(ApiResponse {
-                status_code: 500,
-                data: serde_json::Value::Null,
-                errors: Some(vec![format!("Erro interno: {}", e)]),
+            actix_web::web::Json(BusinessResponse {
+                success: false,
+                data: Some(serde_json::Value::Null),
+                errors: vec![format!("Erro interno: {}", e)],
             })
         }
     }
@@ -118,8 +118,8 @@ pub async fn generate_oauth_url_endpoint() -> impl Responder {
     get,
     path = "/api/friday-oauth-manager/oauth/url/google",
     responses(
-        (status = 200, description = "Google OAuth URL generated successfully", body = ApiResponse),
-        (status = 500, description = "Internal server error", body = ApiResponse)
+        (status = 200, description = "Google OAuth URL generated successfully", body = BusinessResponse),
+        (status = 500, description = "Internal server error", body = BusinessResponse)
     ),
     tag = "OAuth URLs"
 )]
@@ -131,10 +131,10 @@ pub async fn generate_google_oauth_url() -> impl Responder {
         Ok(response) => actix_web::web::Json(response),
         Err(e) => {
             error!("Erro ao gerar URL OAuth do Google: {}", e);
-            actix_web::web::Json(ApiResponse {
-                status_code: 500,
-                data: serde_json::Value::Null,
-                errors: Some(vec![format!("Erro interno: {}", e)]),
+            actix_web::web::Json(BusinessResponse {
+                success: false,
+                data: Some(serde_json::Value::Null),
+                errors: vec![format!("Erro interno: {}", e)],
             })
         }
     }
@@ -148,8 +148,8 @@ pub async fn generate_google_oauth_url() -> impl Responder {
     get,
     path = "/api/friday-oauth-manager/oauth/url/microsoft",
     responses(
-        (status = 200, description = "Microsoft OAuth URL generated successfully", body = ApiResponse),
-        (status = 500, description = "Internal server error", body = ApiResponse)
+        (status = 200, description = "Microsoft OAuth URL generated successfully", body = BusinessResponse),
+        (status = 500, description = "Internal server error", body = BusinessResponse)
     ),
     tag = "OAuth URLs"
 )]
@@ -161,10 +161,10 @@ pub async fn generate_microsoft_oauth_url() -> impl Responder {
         Ok(response) => actix_web::web::Json(response),
         Err(e) => {
             error!("Erro ao gerar URL OAuth da Microsoft: {}", e);
-            actix_web::web::Json(ApiResponse {
-                status_code: 500,
-                data: serde_json::Value::Null,
-                errors: Some(vec![format!("Erro interno: {}", e)]),
+            actix_web::web::Json(BusinessResponse {
+                success: false,
+                data: Some(serde_json::Value::Null),
+                errors: vec![format!("Erro interno: {}", e)],
             })
         }
     }
@@ -179,8 +179,8 @@ pub async fn generate_microsoft_oauth_url() -> impl Responder {
     path = "/api/friday-oauth-manager/oauth/tokens",
     request_body = GetOAuthTokensRequest,
     responses(
-        (status = 200, description = "Tokens exchanged successfully", body = ApiResponse),
-        (status = 500, description = "Internal server error", body = ApiResponse)
+        (status = 200, description = "Tokens exchanged successfully", body = BusinessResponse),
+        (status = 500, description = "Internal server error", body = BusinessResponse)
     ),
     tag = "OAuth"
 )]
@@ -194,10 +194,10 @@ pub async fn get_oauth_tokens(
         Ok(response) => actix_web::web::Json(response),
         Err(e) => {
             error!("Erro ao fazer exchange de tokens OAuth: {}", e);
-            actix_web::web::Json(ApiResponse {
-                status_code: 500,
-                data: serde_json::Value::Null,
-                errors: Some(vec![format!("Erro interno: {}", e)]),
+            actix_web::web::Json(BusinessResponse {
+                success: false,
+                data: Some(serde_json::Value::Null),
+                errors: vec![format!("Erro interno: {}", e)],
             })
         }
     }

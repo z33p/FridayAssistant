@@ -23,7 +23,7 @@ use crate::{
 /// Business logic for obtaining OAuth tokens from authorization code
 pub async fn get_oauth_tokens(
     request: GetOAuthTokensRequest,
-) -> Result<BusinessResponse<serde_json::Value>, Box<dyn std::error::Error>> {
+) -> Result<BusinessResponse, Box<dyn std::error::Error>> {
     let client = get_oauth_client(request.provider.clone()).await?;
 
     let code = AuthorizationCode::new(extract_code_from_url(&request.url)?);
@@ -51,9 +51,9 @@ pub async fn get_oauth_tokens(
     oauth_tokens_data::insert_oauth_token(&oauth_tokens).await?;
 
     Ok(BusinessResponse {
-        success: true,
-        data: Some(json!({ "oauth_tokens": oauth_tokens })),
-        errors: vec![],
+        status_code: 200,
+        data: json!({ "oauth_tokens": oauth_tokens }),
+        errors: None,
     })
 }
 
@@ -115,7 +115,7 @@ fn extract_code_from_url(url: &str) -> Result<String, Box<dyn std::error::Error>
 /// Business logic for refreshing an OAuth access token
 pub async fn refresh_access_token(
     request: RefreshAccessTokenRequest,
-) -> Result<BusinessResponse<serde_json::Value>, Box<dyn std::error::Error>> {
+) -> Result<BusinessResponse, Box<dyn std::error::Error>> {
     let client = get_oauth_client(request.provider.clone()).await?;
 
     // Create the provider to get scopes and params
@@ -161,9 +161,9 @@ pub async fn refresh_access_token(
             info!("Access Token gerado com sucesso");
 
             Ok(BusinessResponse {
-                success: true,
-                data: Some(json!({ "oauth_tokens": oauth_tokens })),
-                errors: vec![],
+                status_code: 200,
+                data: json!({ "oauth_tokens": oauth_tokens }),
+                errors: None,
             })
         }
         Err(e) => {
@@ -174,8 +174,7 @@ pub async fn refresh_access_token(
 }
 
 /// Business logic for generating access token using stored refresh tokens
-pub async fn generate_access_token(
-) -> Result<BusinessResponse<serde_json::Value>, Box<dyn std::error::Error>> {
+pub async fn generate_access_token() -> Result<BusinessResponse, Box<dyn std::error::Error>> {
     let response_oauth_tokens =
         oauth_tokens_data::fn_get_first_oauth_tokens_by_last_expiry_date().await?;
 
@@ -187,9 +186,9 @@ pub async fn generate_access_token(
             if oauth_tokens.expiry_date > now + expiry_buffer {
                 // Token is still valid
                 let response = BusinessResponse {
-                    success: true,
-                    data: Some(json!(oauth_tokens.access_token)),
-                    errors: vec![],
+                    status_code: 200,
+                    data: json!(oauth_tokens.access_token),
+                    errors: None,
                 };
                 Ok(response)
             } else {
@@ -205,11 +204,11 @@ pub async fn generate_access_token(
         }
         None => {
             let response = BusinessResponse {
-                success: false,
-                data: Some(serde_json::Value::Null),
-                errors: vec![String::from(
+                status_code: 500,
+                data: serde_json::Value::Null,
+                errors: Some(vec![String::from(
                     "Não foram encontrados refresh_token disponíveis para geração do access_token",
-                )],
+                )]),
             };
 
             Ok(response)
@@ -218,15 +217,14 @@ pub async fn generate_access_token(
 }
 
 /// Business logic for generating OAuth authorization URL for default provider (Microsoft)
-pub async fn generate_oauth_url(
-) -> Result<BusinessResponse<serde_json::Value>, Box<dyn std::error::Error>> {
+pub async fn generate_oauth_url() -> Result<BusinessResponse, Box<dyn std::error::Error>> {
     generate_oauth_url_for_provider(OAuthProvider::Microsoft).await
 }
 
 /// Business logic for generating OAuth authorization URL for specific provider
 pub async fn generate_oauth_url_for_provider(
     provider: OAuthProvider,
-) -> Result<BusinessResponse<serde_json::Value>, Box<dyn std::error::Error>> {
+) -> Result<BusinessResponse, Box<dyn std::error::Error>> {
     let client = get_oauth_client(provider.clone()).await?;
 
     // Create the provider to get scopes and params
@@ -254,11 +252,11 @@ pub async fn generate_oauth_url_for_provider(
     debug!("Generated {} OAuth URL: {}", provider, auth_url.to_string());
 
     Ok(BusinessResponse {
-        success: true,
-        data: Some(json!({
+        status_code: 200,
+        data: json!({
             "url": auth_url.to_string(),
             "provider": provider.to_string()
-        })),
-        errors: vec![],
+        }),
+        errors: None,
     })
 }

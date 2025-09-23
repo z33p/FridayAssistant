@@ -2,7 +2,7 @@ use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
 
 use crate::{
-    api_response::ApiResponse,
+    business_response::BusinessResponse,
     oauth_provider::OAuthProvider,
     oauth_tokens_mod::{
         oauth_tokens::OAuthTokens,
@@ -30,7 +30,7 @@ use crate::{
         crate::oauth_tokens_mod::oauth_tokens_controller::health_check,
     ),
     components(schemas(
-        ApiResponse,
+        BusinessResponse<serde_json::Value>,
         OAuthProvider,
         GetOAuthTokensRequest,
         RefreshAccessTokenRequest,
