@@ -1,0 +1,158 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+  namespace: default
+data:
+  nginx.conf: |
+    events {
+        worker_connections 1024;
+    }
+    
+    http {
+        # Configurações gerais
+        sendfile on;
+        tcp_nopush on;
+        tcp_nodelay on;
+        keepalive_timeout 65;
+        types_hash_max_size 2048;
+        
+        # Logs
+        access_log /var/log/nginx/access.log;
+        error_log /var/log/nginx/error.log;
+        
+        # MIME types
+        include /etc/nginx/mime.types;
+        default_type application/octet-stream;
+        
+        # Upstream para o Dashboard do Kubernetes
+        upstream kubernetes-dashboard {
+            server kubernetes-dashboard-kong-proxy.kubernetes-dashboard.svc.cluster.local:443;
+        }
+        
+        # Upstream para o RabbitMQ Management
+        upstream rabbitmq-management {
+            server friday-rabbitmq.default.svc.cluster.local:15672;
+        }
+        
+        server {
+            listen 80;
+            listen 443 ssl;
+            server_name k8s-dashboard.z33p.com;
+            
+            # Certificados SSL
+            ssl_certificate /etc/letsencrypt/live/k8s.z33p.com/fullchain.pem;
+            ssl_certificate_key /etc/letsencrypt/live/k8s.z33p.com/privkey.pem;
+            
+            # Redirect HTTP to HTTPS
+            if ($scheme != "https") {
+                return 301 https://$host$request_uri;
+            }
+            
+            # Dashboard do Kubernetes
+            location / {
+                proxy_pass https://kubernetes-dashboard/;
+                proxy_ssl_verify off;
+                proxy_ssl_server_name on;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+                proxy_set_header X-Forwarded-Host $host;
+                proxy_set_header X-Forwarded-Port $server_port;
+                
+                # Headers específicos para Kong
+                proxy_set_header X-Original-URI $request_uri;
+                proxy_set_header X-Original-Method $request_method;
+                
+                # Headers para WebSocket
+                proxy_set_header Upgrade $http_upgrade;
+                proxy_set_header Connection "upgrade";
+                
+                # Configurações específicas para SPA
+                proxy_buffering off;
+                proxy_request_buffering off;
+            }
+        }
+        
+        server {
+            listen 80;
+            listen 443 ssl;
+            server_name rabbitmq.z33p.com;
+            
+            # Certificados SSL
+            ssl_certificate /etc/letsencrypt/live/k8s.z33p.com/fullchain.pem;
+            ssl_certificate_key /etc/letsencrypt/live/k8s.z33p.com/privkey.pem;
+            
+            # Redirect HTTP to HTTPS
+            if ($scheme != "https") {
+                return 301 https://$host$request_uri;
+            }
+            
+            # RabbitMQ Management Interface
+            location / {
+                proxy_pass http://rabbitmq-management/;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+                proxy_set_header X-Forwarded-Host $host;
+                proxy_set_header X-Forwarded-Port $server_port;
+                
+                # Headers para WebSocket (RabbitMQ Management)
+                proxy_set_header Upgrade $http_upgrade;
+                proxy_set_header Connection "upgrade";
+                proxy_redirect off;
+            }
+        }
+
+        server {
+            listen 80;
+            listen 443 ssl;
+            server_name k8s.z33p.com;
+            
+            # Certificados SSL
+            ssl_certificate /etc/letsencrypt/live/k8s.z33p.com/fullchain.pem;
+            ssl_certificate_key /etc/letsencrypt/live/k8s.z33p.com/privkey.pem;
+            
+            # Redirect HTTP to HTTPS
+            if ($scheme != "https") {
+                return 301 https://$host$request_uri;
+            }
+            
+            # APIs e serviços principais
+            location /api/ {
+                # Futuras APIs aqui
+                return 200 'APIs endpoint - Coming soon';
+                add_header Content-Type text/plain;
+            }
+            
+            # RabbitMQ Management Interface (legacy path)
+            location /rabbitmq/ {
+                proxy_pass http://rabbitmq-management/;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+                proxy_set_header X-Forwarded-Host $host;
+                proxy_set_header X-Forwarded-Port $server_port;
+                
+                # Headers para WebSocket (RabbitMQ Management)
+                proxy_set_header Upgrade $http_upgrade;
+                proxy_set_header Connection "upgrade";
+                proxy_redirect off;
+            }
+            
+            # Landing page principal
+            location / {
+                return 200 'Kubernetes Platform - Services: k8s-dashboard.z33p.com | rabbitmq.z33p.com | APIs: /api/';
+                add_header Content-Type text/plain;
+            }
+            
+            # Health check
+            location /health {
+                return 200 'OK';
+                add_header Content-Type text/plain;
+            }
+        }
+    }

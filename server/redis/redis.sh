@@ -1,11 +1,35 @@
-# Add the Bitnami charts repository to Helm
+#!/bin/bash
+# =============================================================================
+# REDIS CLUSTER INSTALLATION SCRIPT
+# =============================================================================
+# Este script instala Redis no cluster Kubernetes usando Helm
+# Execução: DA MÁQUINA LOCAL (com kubectl configurado)
+# Pré-requisitos: Cluster K3s funcionando + Helm instalado
+# =============================================================================
+
+echo "🚀 Instalando Redis no cluster..."
+
+# Adicionar repositório oficial da Bitnami ao Helm
+echo "📦 Adicionando repositório Bitnami..."
 helm repo add bitnami https://charts.bitnami.com/bitnami
 
-# Update your Helm chart repositories
+# Atualizar repositórios do Helm para versões mais recentes
+echo "🔄 Atualizando repositórios Helm..."
 helm repo update
 
-# Install Redis
+# Instalar Redis usando configurações personalizadas
+echo "⚙️ Instalando Redis com configurações customizadas..."
 helm install friday-redis bitnami/redis -f friday-redis.yml
+
+echo "✅ Redis instalado com sucesso!"
+echo ""
+echo "📋 Informações de acesso:"
+echo "   - Interno: friday-redis-master.default.svc.cluster.local:6379"
+echo "   - Port-forward: kubectl port-forward svc/friday-redis-master 6379:6379"
+echo ""
+echo "🧪 Para testar:"
+echo "   kubectl run redis-client --restart='Never' --image docker.io/bitnami/redis:8.2.1-debian-12-r0 --command -- sleep infinity"
+echo "   kubectl exec -it redis-client -- redis-cli -h friday-redis-master ping"
 
 # Redis can be accessed on the following DNS names from within your cluster:
 
