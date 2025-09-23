@@ -1,4 +1,3 @@
-/// LAW 1: Domain module organization
 pub mod secret;
 pub mod secret_manager_api;
 pub mod secret_manager_logic;

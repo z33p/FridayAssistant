@@ -5,8 +5,6 @@ use super::todo_list::{CreateTodoListRequest, UpdateTodoListRequest, DeleteTodoL
 use super::todo_logic::{self, TodoListClient};
 use crate::mcp_protocol::{CallToolRequest, CallToolResponse, Tool, ToolContent, ToolInputSchema};
 
-/// LAW 6: Controller instruments SHALL use endpoint names without prefix
-#[instrument(name = "handle_todo_list_tool")]
 pub async fn handle_todo_list_tool(client: &TodoListClient, request: CallToolRequest) -> CallToolResponse {
     match request.name.as_str() {
         "create_todo_list" => handle_create_todo_list(client, request.arguments).await,

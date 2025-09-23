@@ -1,8 +1,6 @@
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-/// LAW 5: Struct naming standards - PascalCase
-/// TodoList entity matching OpenAPI schema
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TodoList {
     pub id: String,
@@ -55,7 +53,6 @@ pub struct ApiResponse<T> {
 }
 
 impl TodoList {
-    /// LAW 4: Function naming - descriptive verbs
     pub fn create_new(display_name: String) -> Self {
         let now = chrono::Utc::now().timestamp_millis();
         Self {

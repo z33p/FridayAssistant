@@ -4,8 +4,6 @@ use tracing::{error, info};
 use super::secret_response::SecretResponse;
 use crate::ENV_CONFIG;
 
-/// LAW 5: HTTP API client structs SHALL end with Api
-/// LAW 18: External HTTP API clients SHALL be structs with `client` and `base_url` fields
 pub struct SecretManagerApi {
     client: reqwest::Client,
     base_url: String,

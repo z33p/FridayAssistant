@@ -1,7 +1,5 @@
 use serde::{Deserialize, Serialize};
 
-/// Universal response structure for all endpoints
-/// LAW 7: ALL endpoints SHALL return Response<T>
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Response<T> {
     pub success: bool,

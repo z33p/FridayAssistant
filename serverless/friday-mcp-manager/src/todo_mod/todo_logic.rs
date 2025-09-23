@@ -7,7 +7,6 @@ use super::todo_list::{
 };
 use crate::business_response::Response;
 
-/// LAW 5: Client structs SHALL end with Client
 #[derive(Debug, Clone)]
 pub struct TodoListClient {
     client: reqwest::Client,
@@ -27,8 +26,6 @@ impl TodoListClient {
     }
 }
 
-/// LAW 6: Instrumentation naming - business layer
-#[instrument(name = "logic_create_todo_list")]
 pub async fn create_todo_list(
     client: &TodoListClient,
     request: CreateTodoListRequest,
@@ -63,7 +60,6 @@ pub async fn create_todo_list(
     }
 }
 
-#[instrument(name = "logic_get_todo_lists")]
 pub async fn get_todo_lists(client: &TodoListClient) -> Response<TodoListsResponse> {
     let url = client.get_api_url("/todo-lists");
 
@@ -96,7 +92,6 @@ pub async fn get_todo_lists(client: &TodoListClient) -> Response<TodoListsRespon
     }
 }
 
-#[instrument(name = "logic_get_todo_list")]
 pub async fn get_todo_list(client: &TodoListClient, list_id: String) -> Response<TodoListResponse> {
     let url = client.get_api_url(&format!("/todo-lists/{}", list_id));
 
@@ -130,7 +125,6 @@ pub async fn get_todo_list(client: &TodoListClient, list_id: String) -> Response
     }
 }
 
-#[instrument(name = "logic_update_todo_list")]
 pub async fn update_todo_list(
     client: &TodoListClient,
     request: UpdateTodoListRequest,
@@ -167,7 +161,6 @@ pub async fn update_todo_list(
     }
 }
 
-#[instrument(name = "logic_delete_todo_list")]
 pub async fn delete_todo_list(
     client: &TodoListClient,
     request: DeleteTodoListRequest,
