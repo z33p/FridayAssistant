@@ -1,9 +1,9 @@
 use actix_web::{delete, get, post, put, web, HttpResponse, Responder};
-use tracing::{error, info, instrument, warn};
+use tracing::{error, info, warn};
 
 extern crate dotenv;
 
-use crate::business_response::Response;
+use crate::business_response::BusinessResponse;
 use crate::todo_mod::{
     todo_list::{CreateTodoListRequest, DeleteTodoListRequest, UpdateTodoListRequest},
     todo_logic,
@@ -52,8 +52,8 @@ pub async fn get_todo_list(list_id: web::Path<String>) -> impl Responder {
                 list_id.as_ref(),
                 e
             );
-            let error_response: Response<String> =
-                Response::error(&format!("Internal server error: {}", e));
+            let error_response: BusinessResponse<String> =
+                BusinessResponse::error(&format!("Internal server error: {}", e));
             HttpResponse::InternalServerError().json(error_response)
         }
     }
@@ -90,8 +90,8 @@ pub async fn get_all_todo_lists() -> impl Responder {
         }
         Err(e) => {
             error!("Error retrieving all todo lists: {}", e);
-            let error_response: Response<String> =
-                Response::error(&format!("Internal server error: {}", e));
+            let error_response: BusinessResponse<String> =
+                BusinessResponse::error(&format!("Internal server error: {}", e));
             HttpResponse::InternalServerError().json(error_response)
         }
     }
@@ -130,8 +130,8 @@ pub async fn create_todo_list(
         }
         Err(e) => {
             error!("Error creating todo list: {}", e);
-            let error_response: Response<String> =
-                Response::error(&format!("Internal server error: {}", e));
+            let error_response: BusinessResponse<String> =
+                BusinessResponse::error(&format!("Internal server error: {}", e));
             HttpResponse::InternalServerError().json(error_response)
         }
     }
@@ -180,8 +180,8 @@ pub async fn update_todo_list(
         }
         Err(e) => {
             error!("Error updating todo list: {}", e);
-            let error_response: Response<String> =
-                Response::error(&format!("Internal server error: {}", e));
+            let error_response: BusinessResponse<String> =
+                BusinessResponse::error(&format!("Internal server error: {}", e));
             HttpResponse::InternalServerError().json(error_response)
         }
     }
@@ -232,8 +232,8 @@ pub async fn delete_todo_list(
                 "Error deleting todo list with ID: {}, error: {}",
                 list_id, e
             );
-            let error_response: Response<String> =
-                Response::error(&format!("Internal server error: {}", e));
+            let error_response: BusinessResponse<String> =
+                BusinessResponse::error(&format!("Internal server error: {}", e));
             HttpResponse::InternalServerError().json(error_response)
         }
     }

@@ -1,10 +1,10 @@
-use crate::business_response::Response;
+use crate::business_response::BusinessResponse;
 use crate::todo_mod::todo_list::{
     CreateTodoListRequest, TodoList, TodoListResponse, TodoListsResponse, UpdateTodoListRequest,
 };
 use reqwest::Client;
 use serde_json::json;
-use tracing::{error, info, instrument};
+use tracing::{error, info};
 
 #[derive(Debug)]
 pub struct MicrosoftGraphClient {
@@ -23,12 +23,12 @@ impl MicrosoftGraphClient {
     pub async fn get_todo_lists(
         &self,
         access_token: &str,
-    ) -> Result<Response<Vec<TodoList>>, Box<dyn std::error::Error>> {
+    ) -> Result<BusinessResponse<Vec<TodoList>>, Box<dyn std::error::Error>> {
         info!("Data layer: Fetching all todo lists from Microsoft Graph");
 
         if access_token.trim().is_empty() {
             error!("Data layer: Access token is empty");
-            return Ok(Response::error("Access token is required"));
+            return Ok(BusinessResponse::error("Access token is required"));
         }
 
         let url = format!("{}/me/todo/lists", self.base_url);
@@ -58,7 +58,9 @@ impl MicrosoftGraphClient {
                 Ok(text) => text,
                 Err(e) => {
                     error!("Data layer: Failed to read response body: {}", e);
-                    return Ok(Response::error("Failed to read Microsoft Graph response"));
+                    return Ok(BusinessResponse::error(
+                        "Failed to read Microsoft Graph response",
+                    ));
                 }
             };
 
@@ -79,14 +81,16 @@ impl MicrosoftGraphClient {
                         "Data layer: Successfully parsed {} todo lists",
                         todo_lists.len()
                     );
-                    Ok(Response::success(todo_lists))
+                    Ok(BusinessResponse::success(todo_lists))
                 }
-                Err(e) => {
+                Err(_e) => {
                     error!(
                         "Data layer: Response that failed to parse: {}",
                         response_text
                     );
-                    Ok(Response::error("Failed to parse Microsoft Graph response"))
+                    Ok(BusinessResponse::error(
+                        "Failed to parse Microsoft Graph response",
+                    ))
                 }
             }
         } else {
@@ -96,14 +100,14 @@ impl MicrosoftGraphClient {
                         "Data layer: Microsoft Graph API error ({}): {}",
                         status, error_text
                     );
-                    Ok(Response::error(&format!(
+                    Ok(BusinessResponse::error(&format!(
                         "Failed to get todo lists: {} - {}",
                         status, error_text
                     )))
                 }
                 Err(e) => {
                     error!("Data layer: Failed to read error response: {}", e);
-                    Ok(Response::error(&format!(
+                    Ok(BusinessResponse::error(&format!(
                         "Failed to get todo lists: HTTP {}",
                         status
                     )))
@@ -116,12 +120,12 @@ impl MicrosoftGraphClient {
         &self,
         list_id: &str,
         access_token: &str,
-    ) -> Result<Response<TodoList>, Box<dyn std::error::Error>> {
+    ) -> Result<BusinessResponse<TodoList>, Box<dyn std::error::Error>> {
         info!("Data layer: Fetching todo list with ID: {}", list_id);
 
         if access_token.trim().is_empty() {
             error!("Data layer: Access token is empty");
-            return Ok(Response::error("Access token is required"));
+            return Ok(BusinessResponse::error("Access token is required"));
         }
 
         let url = format!("{}/me/todo/lists/{}", self.base_url, list_id);
@@ -151,7 +155,9 @@ impl MicrosoftGraphClient {
                 Ok(text) => text,
                 Err(e) => {
                     error!("Data layer: Failed to read response body: {}", e);
-                    return Ok(Response::error("Failed to read Microsoft Graph response"));
+                    return Ok(BusinessResponse::error(
+                        "Failed to read Microsoft Graph response",
+                    ));
                 }
             };
 
@@ -164,7 +170,7 @@ impl MicrosoftGraphClient {
                 Ok(list_response) => {
                     let todo_list = TodoList::from(list_response);
                     info!("Data layer: Successfully parsed todo list");
-                    Ok(Response::success(todo_list))
+                    Ok(BusinessResponse::success(todo_list))
                 }
                 Err(e) => {
                     error!("Data layer: Failed to parse todo list response: {}", e);
@@ -172,12 +178,14 @@ impl MicrosoftGraphClient {
                         "Data layer: Response that failed to parse: {}",
                         response_text
                     );
-                    Ok(Response::error("Failed to parse Microsoft Graph response"))
+                    Ok(BusinessResponse::error(
+                        "Failed to parse Microsoft Graph response",
+                    ))
                 }
             }
         } else if status == 404 {
             info!("Data layer: Todo list not found with ID: {}", list_id);
-            Ok(Response::error("Todo list not found"))
+            Ok(BusinessResponse::error("Todo list not found"))
         } else {
             match response.text().await {
                 Ok(error_text) => {
@@ -185,14 +193,14 @@ impl MicrosoftGraphClient {
                         "Data layer: Microsoft Graph API error ({}): {}",
                         status, error_text
                     );
-                    Ok(Response::error(&format!(
+                    Ok(BusinessResponse::error(&format!(
                         "Failed to get todo list: {} - {}",
                         status, error_text
                     )))
                 }
                 Err(e) => {
                     error!("Data layer: Failed to read error response: {}", e);
-                    Ok(Response::error(&format!(
+                    Ok(BusinessResponse::error(&format!(
                         "Failed to get todo list: HTTP {}",
                         status
                     )))
@@ -205,7 +213,7 @@ impl MicrosoftGraphClient {
         &self,
         request: CreateTodoListRequest,
         access_token: &str,
-    ) -> Result<Response<TodoList>, Box<dyn std::error::Error>> {
+    ) -> Result<BusinessResponse<TodoList>, Box<dyn std::error::Error>> {
         info!(
             "Data layer: Creating todo list with name: {}",
             request.display_name
@@ -213,7 +221,7 @@ impl MicrosoftGraphClient {
 
         if access_token.trim().is_empty() {
             error!("Data layer: Access token is empty");
-            return Ok(Response::error("Access token is required"));
+            return Ok(BusinessResponse::error("Access token is required"));
         }
 
         let body = json!({
@@ -248,7 +256,9 @@ impl MicrosoftGraphClient {
                 Ok(text) => text,
                 Err(e) => {
                     error!("Data layer: Failed to read response body: {}", e);
-                    return Ok(Response::error("Failed to read Microsoft Graph response"));
+                    return Ok(BusinessResponse::error(
+                        "Failed to read Microsoft Graph response",
+                    ));
                 }
             };
 
@@ -261,7 +271,7 @@ impl MicrosoftGraphClient {
                 Ok(list_response) => {
                     let todo_list = TodoList::from(list_response);
                     info!("Data layer: Successfully created todo list");
-                    Ok(Response::success(todo_list))
+                    Ok(BusinessResponse::success(todo_list))
                 }
                 Err(e) => {
                     error!(
@@ -272,7 +282,9 @@ impl MicrosoftGraphClient {
                         "Data layer: Response that failed to parse: {}",
                         response_text
                     );
-                    Ok(Response::error("Failed to parse Microsoft Graph response"))
+                    Ok(BusinessResponse::error(
+                        "Failed to parse Microsoft Graph response",
+                    ))
                 }
             }
         } else {
@@ -282,14 +294,14 @@ impl MicrosoftGraphClient {
                         "Data layer: Microsoft Graph API error ({}): {}",
                         status, error_text
                     );
-                    Ok(Response::error(&format!(
+                    Ok(BusinessResponse::error(&format!(
                         "Failed to create todo list: {} - {}",
                         status, error_text
                     )))
                 }
                 Err(e) => {
                     error!("Data layer: Failed to read error response: {}", e);
-                    Ok(Response::error(&format!(
+                    Ok(BusinessResponse::error(&format!(
                         "Failed to create todo list: HTTP {}",
                         status
                     )))
@@ -302,7 +314,7 @@ impl MicrosoftGraphClient {
         &self,
         request: UpdateTodoListRequest,
         access_token: &str,
-    ) -> Result<Response<TodoList>, Box<dyn std::error::Error>> {
+    ) -> Result<BusinessResponse<TodoList>, Box<dyn std::error::Error>> {
         info!(
             "Data layer: Updating todo list with ID: {} and name: {}",
             request.id, request.display_name
@@ -310,7 +322,7 @@ impl MicrosoftGraphClient {
 
         if access_token.trim().is_empty() {
             error!("Data layer: Access token is empty");
-            return Ok(Response::error("Access token is required"));
+            return Ok(BusinessResponse::error("Access token is required"));
         }
 
         let body = json!({
@@ -345,7 +357,9 @@ impl MicrosoftGraphClient {
                 Ok(text) => text,
                 Err(e) => {
                     error!("Data layer: Failed to read response body: {}", e);
-                    return Ok(Response::error("Failed to read Microsoft Graph response"));
+                    return Ok(BusinessResponse::error(
+                        "Failed to read Microsoft Graph response",
+                    ));
                 }
             };
 
@@ -358,7 +372,7 @@ impl MicrosoftGraphClient {
                 Ok(list_response) => {
                     let todo_list = TodoList::from(list_response);
                     info!("Data layer: Successfully updated todo list");
-                    Ok(Response::success(todo_list))
+                    Ok(BusinessResponse::success(todo_list))
                 }
                 Err(e) => {
                     error!(
@@ -369,7 +383,9 @@ impl MicrosoftGraphClient {
                         "Data layer: Response that failed to parse: {}",
                         response_text
                     );
-                    Ok(Response::error("Failed to parse Microsoft Graph response"))
+                    Ok(BusinessResponse::error(
+                        "Failed to parse Microsoft Graph response",
+                    ))
                 }
             }
         } else if status == 404 {
@@ -377,7 +393,7 @@ impl MicrosoftGraphClient {
                 "Data layer: Todo list not found for update with ID: {}",
                 request.id
             );
-            Ok(Response::error("Todo list not found"))
+            Ok(BusinessResponse::error("Todo list not found"))
         } else {
             match response.text().await {
                 Ok(error_text) => {
@@ -385,14 +401,14 @@ impl MicrosoftGraphClient {
                         "Data layer: Microsoft Graph API error ({}): {}",
                         status, error_text
                     );
-                    Ok(Response::error(&format!(
+                    Ok(BusinessResponse::error(&format!(
                         "Failed to update todo list: {} - {}",
                         status, error_text
                     )))
                 }
                 Err(e) => {
                     error!("Data layer: Failed to read error response: {}", e);
-                    Ok(Response::error(&format!(
+                    Ok(BusinessResponse::error(&format!(
                         "Failed to update todo list: HTTP {}",
                         status
                     )))
@@ -405,12 +421,12 @@ impl MicrosoftGraphClient {
         &self,
         list_id: &str,
         access_token: &str,
-    ) -> Result<Response<String>, Box<dyn std::error::Error>> {
+    ) -> Result<BusinessResponse<String>, Box<dyn std::error::Error>> {
         info!("Data layer: Deleting todo list with ID: {}", list_id);
 
         if access_token.trim().is_empty() {
             error!("Data layer: Access token is empty");
-            return Ok(Response::error("Access token is required"));
+            return Ok(BusinessResponse::error("Access token is required"));
         }
 
         let url = format!("{}/me/todo/lists/{}", self.base_url, list_id);
@@ -435,7 +451,7 @@ impl MicrosoftGraphClient {
 
         if response.status().is_success() {
             info!("Data layer: Successfully deleted todo list");
-            Ok(Response::success(
+            Ok(BusinessResponse::success(
                 "Todo list deleted successfully".to_string(),
             ))
         } else if status == 404 {
@@ -443,7 +459,7 @@ impl MicrosoftGraphClient {
                 "Data layer: Todo list not found for deletion with ID: {}",
                 list_id
             );
-            Ok(Response::error("Todo list not found"))
+            Ok(BusinessResponse::error("Todo list not found"))
         } else {
             match response.text().await {
                 Ok(error_text) => {
@@ -451,14 +467,14 @@ impl MicrosoftGraphClient {
                         "Data layer: Microsoft Graph API error ({}): {}",
                         status, error_text
                     );
-                    Ok(Response::error(&format!(
+                    Ok(BusinessResponse::error(&format!(
                         "Failed to delete todo list: {} - {}",
                         status, error_text
                     )))
                 }
                 Err(e) => {
                     error!("Data layer: Failed to read error response: {}", e);
-                    Ok(Response::error(&format!(
+                    Ok(BusinessResponse::error(&format!(
                         "Failed to delete todo list: HTTP {}",
                         status
                     )))

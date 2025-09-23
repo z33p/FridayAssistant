@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-/// Response structure for OAuth access token requests
+/// Response structure for OAuth access token requests from OAuth Manager API
 #[derive(Debug, Deserialize, Serialize)]
 pub struct AccessTokenResponse {
     pub success: bool,

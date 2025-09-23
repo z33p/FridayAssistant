@@ -1,5 +1,5 @@
 use reqwest::Client;
-use tracing::{error, info, instrument};
+use tracing::{error, info};
 
 use super::oauth_response::AccessTokenResponse;
 use crate::ENV_CONFIG;
@@ -18,11 +18,13 @@ impl OAuthApi {
         }
     }
 
-
     pub async fn generate_access_token(&self) -> Result<String, Box<dyn std::error::Error>> {
         info!("OAuth layer: Generating Microsoft access token");
 
-        let url = format!("{}/api/oauth/generate-access-token", self.base_url);
+        let url = format!(
+            "{}/api/friday-oauth-manager/oauth/generate-access-token",
+            self.base_url
+        );
         info!("OAuth layer: Making GET request to: {}", url);
 
         let response = match self
@@ -46,9 +48,9 @@ impl OAuthApi {
             match response.json::<AccessTokenResponse>().await {
                 Ok(oauth_response) => {
                     if oauth_response.success {
-                        if let Some(access_token) = oauth_response.data {
+                        if let Some(access_token) = oauth_response.data.as_ref() {
                             info!("OAuth layer: Successfully generated access token");
-                            Ok(access_token)
+                            Ok(access_token.clone())
                         } else {
                             error!("OAuth layer: OAuth response contained no access token");
                             Err("No access token in OAuth response".into())

@@ -1,10 +1,11 @@
-use crate::business_response::Response;
+use crate::business_response::BusinessResponse;
 use crate::oauth_mod::oauth_api::OAuthApi;
 use crate::todo_mod::microsoft_graph_client::MicrosoftGraphClient;
 use crate::todo_mod::todo_list::{CreateTodoListRequest, TodoList, UpdateTodoListRequest};
-use tracing::{debug, error, info, instrument, warn};
+use tracing::{debug, error, info, warn};
 
-pub async fn get_all_todo_lists() -> Result<Response<Vec<TodoList>>, Box<dyn std::error::Error>> {
+pub async fn get_all_todo_lists(
+) -> Result<BusinessResponse<Vec<TodoList>>, Box<dyn std::error::Error>> {
     info!("Logic layer: Getting all todo lists");
 
     // Get access token from OAuth manager
@@ -16,7 +17,7 @@ pub async fn get_all_todo_lists() -> Result<Response<Vec<TodoList>>, Box<dyn std
                 "Logic layer: Failed to get access token from OAuth manager: {}",
                 e
             );
-            return Ok(Response::error(
+            return Ok(BusinessResponse::error(
                 "Failed to authenticate with Microsoft Graph",
             ));
         }
@@ -50,12 +51,12 @@ pub async fn get_all_todo_lists() -> Result<Response<Vec<TodoList>>, Box<dyn std
 
 pub async fn get_todo_list(
     list_id: &str,
-) -> Result<Response<TodoList>, Box<dyn std::error::Error>> {
+) -> Result<BusinessResponse<TodoList>, Box<dyn std::error::Error>> {
     info!("Logic layer: Getting todo list with ID: {}", list_id);
 
     if list_id.trim().is_empty() {
         warn!("Logic layer: Invalid list_id provided (empty or whitespace)");
-        return Ok(Response::error("List ID cannot be empty"));
+        return Ok(BusinessResponse::error("List ID cannot be empty"));
     }
 
     // Get access token from OAuth manager
@@ -67,7 +68,7 @@ pub async fn get_todo_list(
                 "Logic layer: Failed to get access token from OAuth manager: {}",
                 e
             );
-            return Ok(Response::error(
+            return Ok(BusinessResponse::error(
                 "Failed to authenticate with Microsoft Graph",
             ));
         }
@@ -101,7 +102,7 @@ pub async fn get_todo_list(
 
 pub async fn create_todo_list(
     request: CreateTodoListRequest,
-) -> Result<Response<TodoList>, Box<dyn std::error::Error>> {
+) -> Result<BusinessResponse<TodoList>, Box<dyn std::error::Error>> {
     info!(
         "Logic layer: Creating todo list with name: {}",
         request.display_name
@@ -110,7 +111,7 @@ pub async fn create_todo_list(
     // Validate request
     if request.display_name.trim().is_empty() {
         warn!("Logic layer: Invalid display_name provided (empty or whitespace)");
-        return Ok(Response::error("Display name cannot be empty"));
+        return Ok(BusinessResponse::error("Display name cannot be empty"));
     }
 
     if request.display_name.len() > 255 {
@@ -118,7 +119,9 @@ pub async fn create_todo_list(
             "Logic layer: Display name too long: {} characters",
             request.display_name.len()
         );
-        return Ok(Response::error("Display name cannot exceed 255 characters"));
+        return Ok(BusinessResponse::error(
+            "Display name cannot exceed 255 characters",
+        ));
     }
 
     // Get access token from OAuth manager
@@ -130,7 +133,7 @@ pub async fn create_todo_list(
                 "Logic layer: Failed to get access token from OAuth manager: {}",
                 e
             );
-            return Ok(Response::error(
+            return Ok(BusinessResponse::error(
                 "Failed to authenticate with Microsoft Graph",
             ));
         }
@@ -158,7 +161,7 @@ pub async fn create_todo_list(
 
 pub async fn update_todo_list(
     request: UpdateTodoListRequest,
-) -> Result<Response<TodoList>, Box<dyn std::error::Error>> {
+) -> Result<BusinessResponse<TodoList>, Box<dyn std::error::Error>> {
     info!(
         "Logic layer: Updating todo list with ID: {} and name: {}",
         request.id, request.display_name
@@ -167,12 +170,12 @@ pub async fn update_todo_list(
     // Validate request
     if request.id.trim().is_empty() {
         warn!("Logic layer: Invalid ID provided (empty or whitespace)");
-        return Ok(Response::error("List ID cannot be empty"));
+        return Ok(BusinessResponse::error("List ID cannot be empty"));
     }
 
     if request.display_name.trim().is_empty() {
         warn!("Logic layer: Invalid display_name provided (empty or whitespace)");
-        return Ok(Response::error("Display name cannot be empty"));
+        return Ok(BusinessResponse::error("Display name cannot be empty"));
     }
 
     if request.display_name.len() > 255 {
@@ -180,7 +183,9 @@ pub async fn update_todo_list(
             "Logic layer: Display name too long: {} characters",
             request.display_name.len()
         );
-        return Ok(Response::error("Display name cannot exceed 255 characters"));
+        return Ok(BusinessResponse::error(
+            "Display name cannot exceed 255 characters",
+        ));
     }
 
     // Get access token from OAuth manager
@@ -192,7 +197,7 @@ pub async fn update_todo_list(
                 "Logic layer: Failed to get access token from OAuth manager: {}",
                 e
             );
-            return Ok(Response::error(
+            return Ok(BusinessResponse::error(
                 "Failed to authenticate with Microsoft Graph",
             ));
         }
@@ -220,12 +225,12 @@ pub async fn update_todo_list(
 
 pub async fn delete_todo_list(
     list_id: &str,
-) -> Result<Response<String>, Box<dyn std::error::Error>> {
+) -> Result<BusinessResponse<String>, Box<dyn std::error::Error>> {
     info!("Logic layer: Deleting todo list with ID: {}", list_id);
 
     if list_id.trim().is_empty() {
         warn!("Logic layer: Invalid list_id provided (empty or whitespace)");
-        return Ok(Response::error("List ID cannot be empty"));
+        return Ok(BusinessResponse::error("List ID cannot be empty"));
     }
 
     // Get access token from OAuth manager
@@ -237,7 +242,7 @@ pub async fn delete_todo_list(
                 "Logic layer: Failed to get access token from OAuth manager: {}",
                 e
             );
-            return Ok(Response::error(
+            return Ok(BusinessResponse::error(
                 "Failed to authenticate with Microsoft Graph",
             ));
         }

@@ -2,7 +2,7 @@ use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
 
 use crate::{
-    business_response::Response,
+    business_response::BusinessResponse,
     todo_mod::todo_list::{
         CreateTodoListRequest, DeleteTodoListRequest, TodoList, UpdateTodoListRequest,
     },
@@ -23,9 +23,9 @@ use crate::{
         crate::todo_controller::delete_todo_list,
     ),
     components(schemas(
-        Response<TodoList>,
-        Response<Vec<TodoList>>,
-        Response<String>,
+        BusinessResponse<TodoList>,
+        BusinessResponse<Vec<TodoList>>,
+        BusinessResponse<String>,
         TodoList,
         CreateTodoListRequest,
         UpdateTodoListRequest,
