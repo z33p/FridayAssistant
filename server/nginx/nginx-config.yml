@@ -37,17 +37,17 @@ data:
         
         # Upstream para o Friday Secret Manager
         upstream friday-secret-manager {
-            server friday-secret-manager-service.default.svc.cluster.local:5000;
+            server friday-secret-manager-service.default.svc.cluster.local:80;
         }
         
         # Upstream para o Friday OAuth Manager
         upstream friday-oauth-manager {
-            server friday-oauth-manager-service.default.svc.cluster.local:5000;
+            server friday-oauth-manager-service.default.svc.cluster.local:80;
         }
         
         # Upstream para o Friday Todo Manager
         upstream friday-todo-manager {
-            server friday-todo-manager-service.default.svc.cluster.local:5000;
+            server friday-todo-manager-service.default.svc.cluster.local:80;
         }
         
         server {

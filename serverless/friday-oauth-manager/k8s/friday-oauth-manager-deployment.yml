@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: friday-oauth-manager
-        image: z33p/friday-oauth-manager:2025-09-23.v4
+        image: z33p/friday-oauth-manager:2025-09-23.v10
         resources:
           requests:
             cpu: "10m"
