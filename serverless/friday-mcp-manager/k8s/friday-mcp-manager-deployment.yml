@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: friday-mcp-manager
-        image: z33p/friday-mcp-manager:2025-09-23.v1
+        image: z33p/friday-mcp-manager:2025-09-23.v11
         resources:
           requests:
             cpu: "10m"

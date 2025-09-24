@@ -14,15 +14,17 @@ async fn main() {
     tracing_subscriber::fmt().with_max_level(Level::INFO).init();
 
     // Load configuration
-    let config = load_env::load_env();
+    let config = load_env::load_env_variables();
     info!("Starting Friday MCP Todo Server");
     info!("Configuration: {:?}", config);
 
     // Create the HTTP router
     let app = server::create_router(&config);
 
-    // Bind to the configured address
-    let bind_addr = format!("{}:{}", config.host, config.port);
+    // Bind to the configured address (fixed values for containers)
+    let host = "0.0.0.0";
+    let port = 5000;
+    let bind_addr = format!("{}:{}", host, port);
     let listener = tokio::net::TcpListener::bind(&bind_addr)
         .await
         .expect("Failed to bind to address");

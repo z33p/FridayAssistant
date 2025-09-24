@@ -44,14 +44,6 @@ pub struct TodoListsResponse {
     pub total: usize,
 }
 
-/// Generic API response wrapper matching OpenAPI Response schema
-#[derive(Debug, Serialize, Deserialize)]
-pub struct ApiResponse<T> {
-    pub success: bool,
-    pub data: Option<T>,
-    pub errors: Vec<String>,
-}
-
 impl TodoList {
     pub fn create_new(display_name: String) -> Self {
         let now = chrono::Utc::now().timestamp_millis();

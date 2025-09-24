@@ -1,11 +1,12 @@
 use axum::{Router, extract::State, http::StatusCode, response::Json, routing::post};
 use std::sync::Arc;
 use tower_http::cors::CorsLayer;
+use tracing::{error, info, warn};
 
+use crate::load_env::EnvVariables;
 use crate::mcp_protocol::*;
 use crate::todo_mod::todo_controller::{get_todo_list_tools, handle_todo_list_tool};
 use crate::todo_mod::todo_logic::TodoListClient;
-use crate::load_env::Config;
 
 /// Shared application state
 #[derive(Clone)]
@@ -14,7 +15,7 @@ pub struct AppState {
 }
 
 /// Create the HTTP router for MCP endpoints
-pub fn create_router(config: &Config) -> Router {
+pub fn create_router(config: &EnvVariables) -> Router {
     let todo_client = Arc::new(TodoListClient::new(config.todo_api_base_url.clone()));
     let state = AppState { todo_client };
 
@@ -29,20 +30,37 @@ async fn handle_mcp_request(
     State(state): State<AppState>,
     Json(request): Json<JsonRpcRequest>,
 ) -> Result<Json<JsonRpcResponse>, StatusCode> {
+    info!(
+        "Received MCP request: method={}, id={:?}",
+        request.method, request.id
+    );
+
     let response = match request.method.as_str() {
-        "initialize" => handle_initialize(request),
-        "tools/list" => handle_list_tools(request),
-        "tools/call" => handle_call_tool(state, request).await,
-        _ => JsonRpcResponse {
-            jsonrpc: "2.0".to_string(),
-            id: request.id,
-            result: None,
-            error: Some(JsonRpcError {
-                code: -32601,
-                message: format!("Method not found: {}", request.method),
-                data: None,
-            }),
-        },
+        "initialize" => {
+            info!("Handling initialize request");
+            handle_initialize(request)
+        }
+        "tools/list" => {
+            info!("Handling tools/list request");
+            handle_list_tools(request)
+        }
+        "tools/call" => {
+            info!("Handling tools/call request");
+            handle_call_tool(state, request).await
+        }
+        _ => {
+            warn!("Unknown method: {}", request.method);
+            JsonRpcResponse {
+                jsonrpc: "2.0".to_string(),
+                id: request.id,
+                result: None,
+                error: Some(JsonRpcError {
+                    code: -32601,
+                    message: format!("Method not found: {}", request.method),
+                    data: None,
+                }),
+            }
+        }
     };
 
     Ok(Json(response))

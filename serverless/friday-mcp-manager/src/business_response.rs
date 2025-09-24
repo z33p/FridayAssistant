@@ -1,13 +1,13 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct Response<T> {
+pub struct BusinessResponse<T> {
     pub success: bool,
     pub data: Option<T>,
     pub errors: Vec<String>,
 }
 
-impl<T> Response<T> {
+impl<T> BusinessResponse<T> {
     /// Create a successful response with data
     pub fn success(data: T) -> Self {
         Self {

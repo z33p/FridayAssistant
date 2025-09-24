@@ -1,11 +1,13 @@
 use serde_json::{Value, json};
-use tracing::instrument;
 
-use super::todo_list::{CreateTodoListRequest, UpdateTodoListRequest, DeleteTodoListRequest};
+use super::todo_list::{CreateTodoListRequest, DeleteTodoListRequest, UpdateTodoListRequest};
 use super::todo_logic::{self, TodoListClient};
 use crate::mcp_protocol::{CallToolRequest, CallToolResponse, Tool, ToolContent, ToolInputSchema};
 
-pub async fn handle_todo_list_tool(client: &TodoListClient, request: CallToolRequest) -> CallToolResponse {
+pub async fn handle_todo_list_tool(
+    client: &TodoListClient,
+    request: CallToolRequest,
+) -> CallToolResponse {
     match request.name.as_str() {
         "create_todo_list" => handle_create_todo_list(client, request.arguments).await,
         "list_todo_lists" => handle_list_todo_lists(client).await,
@@ -97,7 +99,10 @@ pub fn get_todo_list_tools() -> Vec<Tool> {
     ]
 }
 
-async fn handle_create_todo_list(client: &TodoListClient, arguments: Option<Value>) -> CallToolResponse {
+async fn handle_create_todo_list(
+    client: &TodoListClient,
+    arguments: Option<Value>,
+) -> CallToolResponse {
     match arguments {
         Some(args) => match serde_json::from_value::<CreateTodoListRequest>(args) {
             Ok(request) => {
@@ -159,7 +164,10 @@ async fn handle_list_todo_lists(client: &TodoListClient) -> CallToolResponse {
     }
 }
 
-async fn handle_get_todo_list(client: &TodoListClient, arguments: Option<Value>) -> CallToolResponse {
+async fn handle_get_todo_list(
+    client: &TodoListClient,
+    arguments: Option<Value>,
+) -> CallToolResponse {
     match arguments {
         Some(args) => {
             if let Some(list_id) = args.get("list_id").and_then(|v| v.as_str()) {
@@ -201,7 +209,10 @@ async fn handle_get_todo_list(client: &TodoListClient, arguments: Option<Value>)
     }
 }
 
-async fn handle_update_todo_list(client: &TodoListClient, arguments: Option<Value>) -> CallToolResponse {
+async fn handle_update_todo_list(
+    client: &TodoListClient,
+    arguments: Option<Value>,
+) -> CallToolResponse {
     match arguments {
         Some(args) => match serde_json::from_value::<UpdateTodoListRequest>(args) {
             Ok(request) => {
@@ -242,13 +253,14 @@ async fn handle_update_todo_list(client: &TodoListClient, arguments: Option<Valu
     }
 }
 
-async fn handle_delete_todo_list(client: &TodoListClient, arguments: Option<Value>) -> CallToolResponse {
+async fn handle_delete_todo_list(
+    client: &TodoListClient,
+    arguments: Option<Value>,
+) -> CallToolResponse {
     match arguments {
         Some(args) => {
             if let Some(id) = args.get("id").and_then(|v| v.as_str()) {
-                let request = DeleteTodoListRequest {
-                    id: id.to_string(),
-                };
+                let request = DeleteTodoListRequest { id: id.to_string() };
                 let response = todo_logic::delete_todo_list(client, request).await;
                 if response.success {
                     CallToolResponse {

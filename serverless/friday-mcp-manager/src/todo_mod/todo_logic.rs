@@ -1,11 +1,12 @@
 use reqwest;
-use tracing::instrument;
+use tracing::{error, info, warn};
 
 use super::todo_list::{
-    ApiResponse, CreateTodoListRequest, DeleteTodoListRequest, TodoList, TodoListResponse,
-    TodoListsResponse, UpdateTodoListRequest,
+    CreateTodoListRequest, DeleteTodoListRequest, TodoList, TodoListResponse, TodoListsResponse,
+    UpdateTodoListRequest,
 };
-use crate::business_response::Response;
+
+use crate::business_response::BusinessResponse;
 
 #[derive(Debug, Clone)]
 pub struct TodoListClient {
@@ -29,157 +30,163 @@ impl TodoListClient {
 pub async fn create_todo_list(
     client: &TodoListClient,
     request: CreateTodoListRequest,
-) -> Response<TodoListResponse> {
+) -> BusinessResponse<TodoListResponse> {
     let url = client.get_api_url("/todo-lists");
 
     match client.client.post(&url).json(&request).send().await {
         Ok(response) => {
             if response.status().is_success() {
-                match response.json::<ApiResponse<TodoList>>().await {
+                match response.json::<BusinessResponse<TodoList>>().await {
                     Ok(api_response) => {
                         if api_response.success {
                             if let Some(todo_list) = api_response.data {
-                                Response::success(TodoListResponse { todo_list })
+                                BusinessResponse::success(TodoListResponse { todo_list })
                             } else {
-                                Response::error("No data in API response".to_string())
+                                BusinessResponse::error("No data in API response".to_string())
                             }
                         } else {
-                            Response::error(api_response.errors.join(", "))
+                            BusinessResponse::error(api_response.errors.join(", "))
                         }
                     }
-                    Err(e) => Response::error(format!("Failed to parse response: {}", e)),
+                    Err(e) => BusinessResponse::error(format!("Failed to parse response: {}", e)),
                 }
             } else {
-                Response::error(format!(
+                BusinessResponse::error(format!(
                     "API request failed with status: {}",
                     response.status()
                 ))
             }
         }
-        Err(e) => Response::error(format!("Network error: {}", e)),
+        Err(e) => BusinessResponse::error(format!("Network error: {}", e)),
     }
 }
 
-pub async fn get_todo_lists(client: &TodoListClient) -> Response<TodoListsResponse> {
+pub async fn get_todo_lists(client: &TodoListClient) -> BusinessResponse<TodoListsResponse> {
     let url = client.get_api_url("/todo-lists");
+    info!("Making request to: {}", url);
 
     match client.client.get(&url).send().await {
         Ok(response) => {
+            info!("Received response with status: {}", response.status());
             if response.status().is_success() {
-                match response.json::<ApiResponse<Vec<TodoList>>>().await {
+                info!("Response successful, parsing JSON...");
+                match response.json::<BusinessResponse<Vec<TodoList>>>().await {
                     Ok(api_response) => {
                         if api_response.success {
                             if let Some(todo_lists) = api_response.data {
                                 let total = todo_lists.len();
-                                Response::success(TodoListsResponse { todo_lists, total })
+                                BusinessResponse::success(TodoListsResponse { todo_lists, total })
                             } else {
-                                Response::error("No data in API response".to_string())
+                                BusinessResponse::error("No data in API response".to_string())
                             }
                         } else {
-                            Response::error(api_response.errors.join(", "))
+                            BusinessResponse::error(api_response.errors.join(", "))
                         }
                     }
-                    Err(e) => Response::error(format!("Failed to parse response: {}", e)),
+                    Err(e) => BusinessResponse::error(format!("Failed to parse response: {}", e)),
                 }
             } else {
-                Response::error(format!(
+                BusinessResponse::error(format!(
                     "API request failed with status: {}",
                     response.status()
                 ))
             }
         }
-        Err(e) => Response::error(format!("Network error: {}", e)),
+        Err(e) => BusinessResponse::error(format!("Network error: {}", e)),
     }
 }
 
-pub async fn get_todo_list(client: &TodoListClient, list_id: String) -> Response<TodoListResponse> {
+pub async fn get_todo_list(
+    client: &TodoListClient,
+    list_id: String,
+) -> BusinessResponse<TodoListResponse> {
     let url = client.get_api_url(&format!("/todo-lists/{}", list_id));
 
     match client.client.get(&url).send().await {
         Ok(response) => {
             if response.status().is_success() {
-                match response.json::<ApiResponse<TodoList>>().await {
+                match response.json::<BusinessResponse<TodoList>>().await {
                     Ok(api_response) => {
                         if api_response.success {
                             if let Some(todo_list) = api_response.data {
-                                Response::success(TodoListResponse { todo_list })
+                                BusinessResponse::success(TodoListResponse { todo_list })
                             } else {
-                                Response::error("No data in API response".to_string())
+                                BusinessResponse::error("No data in API response".to_string())
                             }
                         } else {
-                            Response::error(api_response.errors.join(", "))
+                            BusinessResponse::error(api_response.errors.join(", "))
                         }
                     }
-                    Err(e) => Response::error(format!("Failed to parse response: {}", e)),
+                    Err(e) => BusinessResponse::error(format!("Failed to parse response: {}", e)),
                 }
             } else if response.status() == 404 {
-                Response::error(format!("Todo list with id {} not found", list_id))
+                BusinessResponse::error(format!("Todo list with id {} not found", list_id))
             } else {
-                Response::error(format!(
+                BusinessResponse::error(format!(
                     "API request failed with status: {}",
                     response.status()
                 ))
             }
         }
-        Err(e) => Response::error(format!("Network error: {}", e)),
+        Err(e) => BusinessResponse::error(format!("Network error: {}", e)),
     }
 }
 
 pub async fn update_todo_list(
     client: &TodoListClient,
     request: UpdateTodoListRequest,
-) -> Response<TodoListResponse> {
+) -> BusinessResponse<TodoListResponse> {
     let url = client.get_api_url("/todo-lists");
 
     match client.client.put(&url).json(&request).send().await {
         Ok(response) => {
             if response.status().is_success() {
-                match response.json::<ApiResponse<TodoList>>().await {
+                match response.json::<BusinessResponse<TodoList>>().await {
                     Ok(api_response) => {
                         if api_response.success {
                             if let Some(todo_list) = api_response.data {
-                                Response::success(TodoListResponse { todo_list })
+                                BusinessResponse::success(TodoListResponse { todo_list })
                             } else {
-                                Response::error("No data in API response".to_string())
+                                BusinessResponse::error("No data in API response".to_string())
                             }
                         } else {
-                            Response::error(api_response.errors.join(", "))
+                            BusinessResponse::error(api_response.errors.join(", "))
                         }
                     }
-                    Err(e) => Response::error(format!("Failed to parse response: {}", e)),
+                    Err(e) => BusinessResponse::error(format!("Failed to parse response: {}", e)),
                 }
             } else if response.status() == 404 {
-                Response::error(format!("Todo list with id {} not found", request.id))
+                BusinessResponse::error(format!("Todo list with id {} not found", request.id))
             } else {
-                Response::error(format!(
+                BusinessResponse::error(format!(
                     "API request failed with status: {}",
                     response.status()
                 ))
             }
         }
-        Err(e) => Response::error(format!("Network error: {}", e)),
+        Err(e) => BusinessResponse::error(format!("Network error: {}", e)),
     }
 }
 
 pub async fn delete_todo_list(
     client: &TodoListClient,
     request: DeleteTodoListRequest,
-) -> Response<()> {
+) -> BusinessResponse<()> {
     let url = client.get_api_url("/todo-lists");
 
     match client.client.delete(&url).json(&request).send().await {
         Ok(response) => {
             if response.status().is_success() {
-                Response::success_empty()
+                BusinessResponse::success_empty()
             } else if response.status() == 404 {
-                Response::error(format!("Todo list with id {} not found", request.id))
+                BusinessResponse::error(format!("Todo list with id {} not found", request.id))
             } else {
-                Response::error(format!(
+                BusinessResponse::error(format!(
                     "API request failed with status: {}",
                     response.status()
                 ))
             }
         }
-        Err(e) => Response::error(format!("Network error: {}", e)),
+        Err(e) => BusinessResponse::error(format!("Network error: {}", e)),
     }
 }
