@@ -5,7 +5,7 @@ use tracing::{error, info, warn};
 
 use crate::load_env::EnvVariables;
 use crate::mcp_protocol::*;
-use crate::todo_mod::todo_controller::{get_todo_list_tools, handle_todo_list_tool};
+use crate::todo_mod::todo_controller::{get_todo_tools, handle_todo_tool};
 use crate::todo_mod::todo_logic::TodoListClient;
 
 /// Shared application state
@@ -91,7 +91,7 @@ fn handle_initialize(request: JsonRpcRequest) -> JsonRpcResponse {
 
 /// Handle tools/list request
 fn handle_list_tools(request: JsonRpcRequest) -> JsonRpcResponse {
-    let tools = get_todo_list_tools();
+    let tools = get_todo_tools();
     let response = ToolsListResponse { tools };
 
     JsonRpcResponse {
@@ -107,7 +107,7 @@ async fn handle_call_tool(state: AppState, request: JsonRpcRequest) -> JsonRpcRe
     match request.params {
         Some(params) => match serde_json::from_value::<CallToolRequest>(params) {
             Ok(call_request) => {
-                let response = handle_todo_list_tool(&state.todo_client, call_request).await;
+                let response = handle_todo_tool(&state.todo_client, call_request).await;
                 JsonRpcResponse {
                     jsonrpc: "2.0".to_string(),
                     id: request.id,
