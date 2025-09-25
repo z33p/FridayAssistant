@@ -4,7 +4,7 @@ use load_env::{load_env_variables, EnvVariables};
 use once_cell::sync::Lazy;
 use tracing::Level;
 
-use crate::todo_mod::todo_list_controller;
+use crate::todo_mod::{task_controller, todo_list_controller};
 
 mod business_response;
 mod load_env;
@@ -37,6 +37,11 @@ async fn main() -> std::io::Result<()> {
             .service(todo_list_controller::create_todo_list)
             .service(todo_list_controller::update_todo_list)
             .service(todo_list_controller::delete_todo_list)
+            .service(task_controller::get_all_tasks)
+            .service(task_controller::get_task)
+            .service(task_controller::create_task)
+            .service(task_controller::update_task)
+            .service(task_controller::delete_task)
             .service(openapi::swagger_config())
     })
     .workers(4)

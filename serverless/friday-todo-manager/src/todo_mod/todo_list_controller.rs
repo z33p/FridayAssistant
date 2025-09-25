@@ -11,7 +11,7 @@ use crate::todo_mod::{
 
 #[utoipa::path(
     get,
-    path = "/api/friday-todo-manager/todo-lists/{list_id}",
+    path = "/api/friday-todo-manager/lists/{list_id}",
     tag = "Todo Lists",
     params(
         ("list_id", Path, description = "Todo list ID to retrieve")
@@ -22,7 +22,7 @@ use crate::todo_mod::{
         (status = 500, description = "Internal server error")
     )
 )]
-#[get("/api/friday-todo-manager/todo-lists/{list_id}")]
+#[get("/api/friday-todo-manager/lists/{list_id}")]
 pub async fn get_todo_list(list_id: web::Path<String>) -> impl Responder {
     info!(
         "Attempting to retrieve todo list with ID: {}",
@@ -61,14 +61,14 @@ pub async fn get_todo_list(list_id: web::Path<String>) -> impl Responder {
 
 #[utoipa::path(
     get,
-    path = "/api/friday-todo-manager/todo-lists",
+    path = "/api/friday-todo-manager/lists",
     tag = "Todo Lists",
     responses(
         (status = 200, description = "All todo lists retrieved successfully", body = Vec<TodoList>),
         (status = 500, description = "Internal server error")
     )
 )]
-#[get("/api/friday-todo-manager/todo-lists")]
+#[get("/api/friday-todo-manager/lists")]
 pub async fn get_all_todo_lists() -> impl Responder {
     info!("Attempting to retrieve all todo lists");
 
@@ -99,7 +99,7 @@ pub async fn get_all_todo_lists() -> impl Responder {
 
 #[utoipa::path(
     post,
-    path = "/api/friday-todo-manager/todo-lists",
+    path = "/api/friday-todo-manager/lists",
     tag = "Todo Lists",
     request_body = CreateTodoListRequest,
     responses(
@@ -108,7 +108,7 @@ pub async fn get_all_todo_lists() -> impl Responder {
         (status = 500, description = "Internal server error")
     )
 )]
-#[post("/api/friday-todo-manager/todo-lists")]
+#[post("/api/friday-todo-manager/lists")]
 pub async fn create_todo_list(
     request: actix_web::web::Json<CreateTodoListRequest>,
 ) -> impl Responder {
@@ -139,7 +139,7 @@ pub async fn create_todo_list(
 
 #[utoipa::path(
     put,
-    path = "/api/friday-todo-manager/todo-lists",
+    path = "/api/friday-todo-manager/lists",
     tag = "Todo Lists",
     request_body = UpdateTodoListRequest,
     responses(
@@ -149,7 +149,7 @@ pub async fn create_todo_list(
         (status = 500, description = "Internal server error")
     )
 )]
-#[put("/api/friday-todo-manager/todo-lists")]
+#[put("/api/friday-todo-manager/lists")]
 pub async fn update_todo_list(
     request: actix_web::web::Json<UpdateTodoListRequest>,
 ) -> impl Responder {
@@ -189,7 +189,7 @@ pub async fn update_todo_list(
 
 #[utoipa::path(
     delete,
-    path = "/api/friday-todo-manager/todo-lists",
+    path = "/api/friday-todo-manager/lists",
     tag = "Todo Lists",
     request_body = DeleteTodoListRequest,
     responses(
@@ -198,7 +198,7 @@ pub async fn update_todo_list(
         (status = 500, description = "Internal server error")
     )
 )]
-#[delete("/api/friday-todo-manager/todo-lists")]
+#[delete("/api/friday-todo-manager/lists")]
 pub async fn delete_todo_list(
     request: actix_web::web::Json<DeleteTodoListRequest>,
 ) -> impl Responder {

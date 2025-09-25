@@ -31,7 +31,7 @@ pub async fn create_todo_list(
     client: &TodoListClient,
     request: CreateTodoListRequest,
 ) -> BusinessResponse<TodoListResponse> {
-    let url = client.get_api_url("/todo-lists");
+    let url = client.get_api_url("/lists");
 
     match client.client.post(&url).json(&request).send().await {
         Ok(response) => {
@@ -62,7 +62,7 @@ pub async fn create_todo_list(
 }
 
 pub async fn get_todo_lists(client: &TodoListClient) -> BusinessResponse<TodoListsResponse> {
-    let url = client.get_api_url("/todo-lists");
+    let url = client.get_api_url("/lists");
     info!("Making request to: {}", url);
 
     match client.client.get(&url).send().await {
@@ -100,7 +100,7 @@ pub async fn get_todo_list(
     client: &TodoListClient,
     list_id: String,
 ) -> BusinessResponse<TodoListResponse> {
-    let url = client.get_api_url(&format!("/todo-lists/{}", list_id));
+    let url = client.get_api_url(&format!("/lists/{}", list_id));
 
     match client.client.get(&url).send().await {
         Ok(response) => {
@@ -136,7 +136,7 @@ pub async fn update_todo_list(
     client: &TodoListClient,
     request: UpdateTodoListRequest,
 ) -> BusinessResponse<TodoListResponse> {
-    let url = client.get_api_url("/todo-lists");
+    let url = client.get_api_url("/lists");
 
     match client.client.put(&url).json(&request).send().await {
         Ok(response) => {
@@ -172,7 +172,7 @@ pub async fn delete_todo_list(
     client: &TodoListClient,
     request: DeleteTodoListRequest,
 ) -> BusinessResponse<()> {
-    let url = client.get_api_url("/todo-lists");
+    let url = client.get_api_url("/lists");
 
     match client.client.delete(&url).json(&request).send().await {
         Ok(response) => {
