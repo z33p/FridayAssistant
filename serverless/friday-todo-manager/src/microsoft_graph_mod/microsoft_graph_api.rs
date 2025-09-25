@@ -1,18 +1,18 @@
 use crate::business_response::BusinessResponse;
-use crate::todo_mod::todo_list::{
-    CreateTodoListRequest, TodoList, TodoListResponse, TodoListsResponse, UpdateTodoListRequest,
-};
+use crate::microsoft_graph_mod::todo_list_response::TodoListResponse;
+use crate::microsoft_graph_mod::todo_lists_response::TodoListsResponse;
+use crate::todo_list_mod::todo_list::{CreateTodoListRequest, TodoList, UpdateTodoListRequest};
 use reqwest::Client;
 use serde_json::json;
 use tracing::{error, info};
 
 #[derive(Debug)]
-pub struct MicrosoftGraphClient {
+pub struct MicrosoftGraphApi {
     client: Client,
     base_url: String,
 }
 
-impl MicrosoftGraphClient {
+impl MicrosoftGraphApi {
     pub fn new() -> Self {
         Self {
             client: Client::new(),
@@ -53,7 +53,6 @@ impl MicrosoftGraphClient {
         info!("Data layer: Received response with status: {}", status);
 
         if response.status().is_success() {
-            // First get the response text for debugging
             let response_text = match response.text().await {
                 Ok(text) => text,
                 Err(e) => {
@@ -150,7 +149,6 @@ impl MicrosoftGraphClient {
         info!("Data layer: Received response with status: {}", status);
 
         if response.status().is_success() {
-            // First get the response text for debugging
             let response_text = match response.text().await {
                 Ok(text) => text,
                 Err(e) => {
@@ -251,7 +249,6 @@ impl MicrosoftGraphClient {
         info!("Data layer: Received response with status: {}", status);
 
         if response.status().is_success() {
-            // First get the response text for debugging
             let response_text = match response.text().await {
                 Ok(text) => text,
                 Err(e) => {
@@ -352,7 +349,6 @@ impl MicrosoftGraphClient {
         info!("Data layer: Received response with status: {}", status);
 
         if response.status().is_success() {
-            // First get the response text for debugging
             let response_text = match response.text().await {
                 Ok(text) => text,
                 Err(e) => {

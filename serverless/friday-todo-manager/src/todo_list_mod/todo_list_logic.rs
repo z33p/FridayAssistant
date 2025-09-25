@@ -1,7 +1,7 @@
 use crate::business_response::BusinessResponse;
+use crate::microsoft_graph_mod::microsoft_graph_api::MicrosoftGraphApi;
 use crate::oauth_mod::oauth_api::OAuthApi;
-use crate::todo_mod::microsoft_graph_client::MicrosoftGraphClient;
-use crate::todo_mod::todo_list::{CreateTodoListRequest, TodoList, UpdateTodoListRequest};
+use crate::todo_list_mod::todo_list::{CreateTodoListRequest, TodoList, UpdateTodoListRequest};
 use tracing::{debug, error, info, warn};
 
 pub async fn get_all_todo_lists(
@@ -23,7 +23,7 @@ pub async fn get_all_todo_lists(
         }
     };
 
-    let graph_client = MicrosoftGraphClient::new();
+    let graph_client = MicrosoftGraphApi::new();
     match graph_client.get_todo_lists(&access_token).await {
         Ok(response) => {
             if response.success {
@@ -74,7 +74,7 @@ pub async fn get_todo_list(
         }
     };
 
-    let graph_client = MicrosoftGraphClient::new();
+    let graph_client = MicrosoftGraphApi::new();
     match graph_client.get_todo_list(list_id, &access_token).await {
         Ok(response) => {
             if response.success {
@@ -139,7 +139,7 @@ pub async fn create_todo_list(
         }
     };
 
-    let graph_client = MicrosoftGraphClient::new();
+    let graph_client = MicrosoftGraphApi::new();
     match graph_client.create_todo_list(request, &access_token).await {
         Ok(result) => {
             if result.success {
@@ -203,7 +203,7 @@ pub async fn update_todo_list(
         }
     };
 
-    let graph_client = MicrosoftGraphClient::new();
+    let graph_client = MicrosoftGraphApi::new();
     match graph_client.update_todo_list(request, &access_token).await {
         Ok(result) => {
             if result.success {
@@ -248,7 +248,7 @@ pub async fn delete_todo_list(
         }
     };
 
-    let graph_client = MicrosoftGraphClient::new();
+    let graph_client = MicrosoftGraphApi::new();
     match graph_client.delete_todo_list(list_id, &access_token).await {
         Ok(response) => {
             if response.success {
