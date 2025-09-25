@@ -6,7 +6,7 @@ extern crate dotenv;
 use crate::business_response::BusinessResponse;
 use crate::todo_mod::{
     todo_list::{CreateTodoListRequest, DeleteTodoListRequest, UpdateTodoListRequest},
-    todo_logic,
+    todo_list_logic,
 };
 
 #[utoipa::path(
@@ -29,7 +29,7 @@ pub async fn get_todo_list(list_id: web::Path<String>) -> impl Responder {
         list_id.as_ref()
     );
 
-    match todo_logic::get_todo_list(&list_id).await {
+    match todo_list_logic::get_todo_list(&list_id).await {
         Ok(response) => {
             if response.success {
                 info!(
@@ -72,7 +72,7 @@ pub async fn get_todo_list(list_id: web::Path<String>) -> impl Responder {
 pub async fn get_all_todo_lists() -> impl Responder {
     info!("Attempting to retrieve all todo lists");
 
-    match todo_logic::get_all_todo_lists().await {
+    match todo_list_logic::get_all_todo_lists().await {
         Ok(response) => {
             if response.success {
                 info!(
@@ -118,7 +118,7 @@ pub async fn create_todo_list(
         request_data.display_name
     );
 
-    match todo_logic::create_todo_list(request_data).await {
+    match todo_list_logic::create_todo_list(request_data).await {
         Ok(response) => {
             if response.success {
                 info!("Successfully created todo list");
@@ -159,7 +159,7 @@ pub async fn update_todo_list(
         request_data.id, request_data.display_name
     );
 
-    match todo_logic::update_todo_list(request_data).await {
+    match todo_list_logic::update_todo_list(request_data).await {
         Ok(response) => {
             if response.success {
                 info!("Successfully updated todo list");
@@ -205,7 +205,7 @@ pub async fn delete_todo_list(
     let list_id = &request.id;
     info!("Attempting to delete todo list with ID: {}", list_id);
 
-    match todo_logic::delete_todo_list(list_id).await {
+    match todo_list_logic::delete_todo_list(list_id).await {
         Ok(response) => {
             if response.success {
                 info!("Successfully deleted todo list with ID: {}", list_id);
