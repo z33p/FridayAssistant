@@ -1,7 +1,7 @@
 use crate::business_response::BusinessResponse;
 use crate::microsoft_graph_mod::todo_list_response::TodoListResponse;
 use crate::microsoft_graph_mod::todo_lists_response::TodoListsResponse;
-use crate::todo_list_mod::todo_list::{CreateTodoListRequest, TodoList, UpdateTodoListRequest};
+use crate::todo_mod::todo_list::{CreateTodoListRequest, TodoList, UpdateTodoListRequest};
 use reqwest::Client;
 use serde_json::json;
 use tracing::{error, info};

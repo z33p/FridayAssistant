@@ -1,7 +1,7 @@
 use crate::business_response::BusinessResponse;
-use crate::microsoft_graph_mod::microsoft_graph_api::MicrosoftGraphApi;
+use crate::microsoft_graph_mod::lists_microsoft_graph_api::MicrosoftGraphApi;
 use crate::oauth_mod::oauth_api::OAuthApi;
-use crate::todo_list_mod::todo_list::{CreateTodoListRequest, TodoList, UpdateTodoListRequest};
+use crate::todo_mod::todo_list::{CreateTodoListRequest, TodoList, UpdateTodoListRequest};
 use tracing::{debug, error, info, warn};
 
 pub async fn get_all_todo_lists(

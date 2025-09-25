@@ -3,7 +3,7 @@ use utoipa_swagger_ui::SwaggerUi;
 
 use crate::{
     business_response::BusinessResponse,
-    todo_list_mod::todo_list::{
+    todo_mod::todo_list::{
         CreateTodoListRequest, DeleteTodoListRequest, TodoList, UpdateTodoListRequest,
     },
 };

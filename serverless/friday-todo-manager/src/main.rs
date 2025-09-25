@@ -4,7 +4,7 @@ use load_env::{load_env_variables, EnvVariables};
 use once_cell::sync::Lazy;
 use tracing::Level;
 
-use crate::todo_list_mod::todo_list_controller;
+use crate::todo_mod::todo_list_controller;
 
 mod business_response;
 mod load_env;
@@ -12,7 +12,7 @@ mod microsoft_graph_mod;
 mod oauth_mod;
 mod openapi;
 mod secret_manager_mod;
-mod todo_list_mod;
+mod todo_mod;
 
 extern crate dotenv;
 
