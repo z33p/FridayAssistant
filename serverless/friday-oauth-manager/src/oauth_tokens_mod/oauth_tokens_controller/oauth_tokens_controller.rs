@@ -1,6 +1,6 @@
 use actix_web::{get, post, Responder};
 use serde_json::json;
-use tracing::{error, info};
+use tracing::{error, info, warn};
 use utoipa;
 
 use crate::{
@@ -32,12 +32,19 @@ extern crate dotenv;
 )]
 #[get("/api/friday-oauth-manager/oauth/generate-access-token")]
 pub async fn generate_access_token() -> impl Responder {
-    info!("Gerando access token");
+    info!("Solicitação recebida para gerar access token");
 
     match oauth_tokens_logic::generate_access_token().await {
-        Ok(response) => actix_web::web::Json(response),
+        Ok(response) => {
+            if response.success {
+                info!("Access token gerado com sucesso");
+            } else {
+                warn!("Falha ao gerar access token: {:?}", response.errors);
+            }
+            actix_web::web::Json(response)
+        }
         Err(e) => {
-            error!("Erro ao gerar access token: {}", e);
+            error!("Erro crítico ao gerar access token: {}", e);
             actix_web::web::Json(BusinessResponse {
                 success: false,
                 data: Some(serde_json::Value::Null),

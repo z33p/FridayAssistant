@@ -28,6 +28,7 @@ use crate::{
         crate::oauth_tokens_mod::oauth_tokens_controller::generate_microsoft_oauth_url,
         crate::oauth_tokens_mod::oauth_tokens_controller::get_oauth_tokens,
         crate::oauth_tokens_mod::oauth_tokens_controller::health_check,
+        crate::oauth_tokens_mod::oauth_tokens_controller::debug_tokens,
     ),
     components(schemas(
         BusinessResponse<serde_json::Value>,

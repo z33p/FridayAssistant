@@ -83,12 +83,21 @@ fn extract_oauth_tokens(
 ) -> OAuthTokens {
     let now = Utc::now();
     let access_token = tokens_response.access_token().secret().to_string();
-    debug!("Access Token: {}", access_token);
+    debug!(
+        "Access Token obtido: {}",
+        &access_token[..20.min(access_token.len())]
+    ); // Log apenas o início do token
 
     let refresh_token = handle_get_refresh_token(&tokens_response);
 
     let expires_in = tokens_response.expires_in().unwrap().as_millis();
+    let expires_in_seconds = expires_in / 1000;
     let expiry_date = now + Duration::from_millis(expires_in.try_into().unwrap());
+
+    info!(
+        "Token criado: expires_in={}ms ({}s), current_time={}, expiry_date={}",
+        expires_in, expires_in_seconds, now, expiry_date
+    );
 
     let oauth_tokens = OAuthTokens {
         id_oauth_tokens: None,
@@ -181,11 +190,20 @@ pub async fn generate_access_token(
 
     match response_oauth_tokens {
         Some(oauth_tokens) => {
-            // Consider token expired if it will expire in the next 60 seconds
+            // Consider token expired if it will expire in the next 30 seconds (reduced buffer)
             let now = chrono::Utc::now();
-            let expiry_buffer = chrono::Duration::seconds(60);
+            let expiry_buffer = chrono::Duration::seconds(30);
+
+            info!(
+                "Checking token expiry: current_time={}, token_expiry={}, buffer_time={}",
+                now,
+                oauth_tokens.expiry_date,
+                now + expiry_buffer
+            );
+
             if oauth_tokens.expiry_date > now + expiry_buffer {
                 // Token is still valid
+                info!("Token is still valid, returning existing access_token");
                 let response = BusinessResponse {
                     success: true,
                     data: Some(json!(oauth_tokens.access_token)),
@@ -194,16 +212,40 @@ pub async fn generate_access_token(
                 Ok(response)
             } else {
                 // Token expired or about to expire, refresh it
-                let response = refresh_access_token(RefreshAccessTokenRequest {
+                info!("Token expired or expiring soon, refreshing token");
+                let refresh_response = refresh_access_token(RefreshAccessTokenRequest {
                     refresh_token: oauth_tokens.refresh_token,
                     provider: oauth_tokens.id_provider,
                 })
-                .await;
+                .await?;
 
-                response
+                // Extract just the access_token from the refresh response to maintain consistency
+                if refresh_response.success {
+                    if let Some(data) = refresh_response.data {
+                        if let Some(oauth_tokens_obj) = data.get("oauth_tokens") {
+                            if let Some(access_token) = oauth_tokens_obj.get("access_token") {
+                                info!("Token refreshed successfully, returning new access_token");
+                                return Ok(BusinessResponse {
+                                    success: true,
+                                    data: Some(json!(access_token.as_str().unwrap_or(""))),
+                                    errors: vec![],
+                                });
+                            }
+                        }
+                    }
+                }
+
+                // If refresh failed, return the error
+                error!("Token refresh failed");
+                Ok(BusinessResponse {
+                    success: false,
+                    data: Some(serde_json::Value::Null),
+                    errors: refresh_response.errors,
+                })
             }
         }
         None => {
+            warn!("No refresh tokens found in database");
             let response = BusinessResponse {
                 success: false,
                 data: Some(serde_json::Value::Null),
