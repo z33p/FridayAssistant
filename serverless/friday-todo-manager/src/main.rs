@@ -4,7 +4,7 @@ use load_env::{load_env_variables, EnvVariables};
 use once_cell::sync::Lazy;
 use tracing::Level;
 
-use crate::todo_list_mod::todo_controller;
+use crate::todo_list_mod::todo_list_controller;
 
 mod business_response;
 mod load_env;
@@ -32,11 +32,11 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(|| {
         App::new()
             .service(index)
-            .service(todo_controller::get_todo_list)
-            .service(todo_controller::get_all_todo_lists)
-            .service(todo_controller::create_todo_list)
-            .service(todo_controller::update_todo_list)
-            .service(todo_controller::delete_todo_list)
+            .service(todo_list_controller::get_todo_list)
+            .service(todo_list_controller::get_all_todo_lists)
+            .service(todo_list_controller::create_todo_list)
+            .service(todo_list_controller::update_todo_list)
+            .service(todo_list_controller::delete_todo_list)
             .service(openapi::swagger_config())
     })
     .workers(4)
