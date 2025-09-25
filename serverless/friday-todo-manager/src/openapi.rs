@@ -16,11 +16,11 @@ use crate::{
         version = "1.0.0",
     ),
     paths(
-        crate::todo_controller::get_todo_list,
-        crate::todo_controller::get_all_todo_lists,
-        crate::todo_controller::create_todo_list,
-        crate::todo_controller::update_todo_list,
-        crate::todo_controller::delete_todo_list,
+        crate::todo_list_mod::todo_list_controller::get_todo_list,
+        crate::todo_list_mod::todo_list_controller::get_all_todo_lists,
+        crate::todo_list_mod::todo_list_controller::create_todo_list,
+        crate::todo_list_mod::todo_list_controller::update_todo_list,
+        crate::todo_list_mod::todo_list_controller::delete_todo_list,
     ),
     components(schemas(
         BusinessResponse<TodoList>,
