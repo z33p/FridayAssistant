@@ -4,6 +4,7 @@ metadata:
   name: friday-oauth-manager
 spec:
   replicas: 1
+  revisionHistoryLimit: 5 # Manter apenas 5 versões antigas para rollback
   selector:
     matchLabels:
       app: friday-oauth-manager

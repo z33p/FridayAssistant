@@ -1,0 +1,65 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: replicaset-cleaner
+  namespace: default
+spec:
+  # Executar todo domingo às 3h da manhã (UTC)
+  schedule: "0 3 * * 0"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: replicaset-cleaner
+          containers:
+          - name: kubectl
+            image: bitnami/kubectl:latest
+            command:
+            - /bin/bash
+            - -c
+            - |
+              echo "🧹 Iniciando limpeza automática de ReplicaSets..."
+              
+              # Remover ReplicaSets antigos com DESIRED=0 e mais de 7 dias
+              kubectl get replicasets --all-namespaces -o json | jq -r '
+                .items[] | 
+                select(.spec.replicas == 0) | 
+                select((now - (.metadata.creationTimestamp | fromdateiso8601)) > (7 * 24 * 3600)) |
+                "\(.metadata.namespace) \(.metadata.name)"
+              ' | while read namespace name; do
+                echo "Removendo ReplicaSet antigo: $namespace/$name"
+                kubectl delete replicaset "$name" -n "$namespace" --ignore-not-found=true
+              done
+              
+              echo "✅ Limpeza concluída!"
+          restartPolicy: OnFailure
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: replicaset-cleaner
+  namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: replicaset-cleaner
+rules:
+- apiGroups: ["apps"]
+  resources: ["replicasets"]
+  verbs: ["get", "list", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: replicaset-cleaner
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: replicaset-cleaner
+subjects:
+- kind: ServiceAccount
+  name: replicaset-cleaner
+  namespace: default
