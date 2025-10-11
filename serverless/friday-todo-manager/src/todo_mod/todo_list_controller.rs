@@ -14,12 +14,12 @@ use crate::todo_mod::{
     path = "/api/friday-todo-manager/lists/{list_id}",
     tag = "Todo Lists",
     params(
-        ("list_id", Path, description = "Todo list ID to retrieve")
+        ("list_id" = String, Path, description = "The unique identifier of the todo list to retrieve. This is typically a Microsoft Graph ID.")
     ),
     responses(
-        (status = 200, description = "Todo list retrieved successfully", body = TodoList),
-        (status = 404, description = "Todo list not found"),
-        (status = 500, description = "Internal server error")
+        (status = 200, description = "Todo list retrieved successfully", body = BusinessResponse<TodoList>),
+        (status = 404, description = "Todo list not found - the specified ID does not exist or is inaccessible"),
+        (status = 500, description = "Internal server error - Microsoft Graph API error or system failure")
     )
 )]
 #[get("/api/friday-todo-manager/lists/{list_id}")]
@@ -64,8 +64,8 @@ pub async fn get_todo_list(list_id: web::Path<String>) -> impl Responder {
     path = "/api/friday-todo-manager/lists",
     tag = "Todo Lists",
     responses(
-        (status = 200, description = "All todo lists retrieved successfully", body = Vec<TodoList>),
-        (status = 500, description = "Internal server error")
+        (status = 200, description = "All todo lists retrieved successfully. Returns all todo lists accessible to the authenticated user.", body = BusinessResponse<Vec<TodoList>>),
+        (status = 500, description = "Internal server error - Microsoft Graph API error or system failure")
     )
 )]
 #[get("/api/friday-todo-manager/lists")]
@@ -103,9 +103,9 @@ pub async fn get_all_todo_lists() -> impl Responder {
     tag = "Todo Lists",
     request_body = CreateTodoListRequest,
     responses(
-        (status = 200, description = "Todo list created successfully", body = TodoList),
-        (status = 400, description = "Invalid todo list data"),
-        (status = 500, description = "Internal server error")
+        (status = 200, description = "Todo list created successfully. Returns the newly created todo list with its unique ID.", body = BusinessResponse<TodoList>),
+        (status = 400, description = "Invalid todo list data - missing or invalid display name"),
+        (status = 500, description = "Internal server error - Microsoft Graph API error or system failure")
     )
 )]
 #[post("/api/friday-todo-manager/lists")]
@@ -143,10 +143,10 @@ pub async fn create_todo_list(
     tag = "Todo Lists",
     request_body = UpdateTodoListRequest,
     responses(
-        (status = 200, description = "Todo list updated successfully", body = TodoList),
-        (status = 404, description = "Todo list not found"),
-        (status = 400, description = "Invalid todo list data"),
-        (status = 500, description = "Internal server error")
+        (status = 200, description = "Todo list updated successfully. Returns the updated todo list.", body = BusinessResponse<TodoList>),
+        (status = 404, description = "Todo list not found - the specified ID does not exist or is inaccessible"),
+        (status = 400, description = "Invalid todo list data - missing or invalid fields"),
+        (status = 500, description = "Internal server error - Microsoft Graph API error or system failure")
     )
 )]
 #[put("/api/friday-todo-manager/lists")]
@@ -193,9 +193,9 @@ pub async fn update_todo_list(
     tag = "Todo Lists",
     request_body = DeleteTodoListRequest,
     responses(
-        (status = 200, description = "Todo list deleted successfully", body = String),
-        (status = 404, description = "Todo list not found"),
-        (status = 500, description = "Internal server error")
+        (status = 200, description = "Todo list deleted successfully. Returns confirmation message.", body = BusinessResponse<String>),
+        (status = 404, description = "Todo list not found - the specified ID does not exist or is inaccessible"),
+        (status = 500, description = "Internal server error - Microsoft Graph API error or system failure")
     )
 )]
 #[delete("/api/friday-todo-manager/lists")]

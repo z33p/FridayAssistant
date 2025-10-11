@@ -5,8 +5,8 @@ use crate::{
     business_response::BusinessResponse,
     todo_mod::{
         task::{
-            CreateTaskRequest, DeleteTaskRequest, Task, TaskImportance, TaskStatus,
-            UpdateTaskRequest,
+            CreateTaskRequest, CreateTaskRequestBody, DeleteTaskRequest, Task, TaskImportance,
+            TaskStatus, UpdateTaskRequest, UpdateTaskRequestBody,
         },
         todo_list::{
             CreateTodoListRequest, DeleteTodoListRequest, TodoList, UpdateTodoListRequest,
@@ -18,8 +18,36 @@ use crate::{
 #[openapi(
     info(
         title = "Friday Todo Manager API",
-        description = "Todo list management service integrating with Microsoft Graph API",
+        description = r#"
+A comprehensive todo list management service that integrates with Microsoft Graph API.
+
+This API allows you to:
+- Create, read, update, and delete todo lists
+- Manage tasks within todo lists
+- Track task status, importance, and due dates
+- Set reminders for tasks
+- Synchronize with Microsoft To-Do through Graph API
+
+Perfect for AI agents and automation systems that need to manage personal or team productivity.
+
+## Authentication
+This service requires valid OAuth tokens for Microsoft Graph API access.
+
+## Response Format
+All endpoints return a consistent BusinessResponse format with success indicators and error handling.
+        "#,
         version = "1.0.0",
+        contact(
+            name = "Friday Assistant",
+            email = "support@friday-assistant.com"
+        ),
+        license(
+            name = "MIT",
+            url = "https://opensource.org/licenses/MIT"
+        )
+    ),
+    servers(
+        (url = "https://k8s.z33p.com", description = "Production server")
     ),
     paths(
         crate::todo_mod::todo_list_controller::get_todo_list,
@@ -47,13 +75,15 @@ use crate::{
         TaskStatus,
         TaskImportance,
         CreateTaskRequest,
+        CreateTaskRequestBody,
         UpdateTaskRequest,
+        UpdateTaskRequestBody,
         DeleteTaskRequest,
     )),
     tags(
-        (name = "Todo Lists", description = "Todo list management endpoints"),
-        (name = "Tasks", description = "Task management endpoints"),
-        (name = "Operations", description = "Administrative operations")
+        (name = "Todo Lists", description = "Operations for managing todo lists. Use these endpoints to organize tasks into collections."),
+        (name = "Tasks", description = "Operations for managing individual tasks within todo lists. Control task lifecycle, status, and metadata."),
+        (name = "Operations", description = "Administrative and utility operations for system management.")
     )
 )]
 pub struct ApiDoc;

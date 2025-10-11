@@ -58,7 +58,10 @@ pub async fn get_task(
     list_id: &str,
     task_id: &str,
 ) -> Result<BusinessResponse<Task>, Box<dyn std::error::Error>> {
-    info!("Logic layer: Getting task with ID: {} from list: {}", task_id, list_id);
+    info!(
+        "Logic layer: Getting task with ID: {} from list: {}",
+        task_id, list_id
+    );
 
     if list_id.trim().is_empty() {
         warn!("Logic layer: Invalid list_id provided (empty or whitespace)");
@@ -110,9 +113,17 @@ pub async fn get_task(
 pub async fn create_task(
     request: CreateTaskRequest,
 ) -> Result<BusinessResponse<Task>, Box<dyn std::error::Error>> {
+    let list_id = match &request.list_id {
+        Some(id) => id,
+        None => {
+            warn!("Logic layer: List ID is required");
+            return Ok(BusinessResponse::error("List ID cannot be empty"));
+        }
+    };
+
     info!(
         "Logic layer: Creating task with title: {} in list: {}",
-        request.title, request.list_id
+        request.title, list_id
     );
 
     if request.title.trim().is_empty() {
@@ -120,7 +131,7 @@ pub async fn create_task(
         return Ok(BusinessResponse::error("Task title cannot be empty"));
     }
 
-    if request.list_id.trim().is_empty() {
+    if list_id.trim().is_empty() {
         warn!("Logic layer: Invalid list_id provided (empty or whitespace)");
         return Ok(BusinessResponse::error("List ID cannot be empty"));
     }
@@ -153,10 +164,7 @@ pub async fn create_task(
             Ok(result)
         }
         Err(e) => {
-            error!(
-                "Logic layer: Error creating task in Microsoft Graph: {}",
-                e
-            );
+            error!("Logic layer: Error creating task in Microsoft Graph: {}", e);
             Err(e)
         }
     }
@@ -165,17 +173,33 @@ pub async fn create_task(
 pub async fn update_task(
     request: UpdateTaskRequest,
 ) -> Result<BusinessResponse<Task>, Box<dyn std::error::Error>> {
+    let task_id = match &request.id {
+        Some(id) => id,
+        None => {
+            warn!("Logic layer: Task ID is required");
+            return Ok(BusinessResponse::error("Task ID cannot be empty"));
+        }
+    };
+
+    let list_id = match &request.list_id {
+        Some(id) => id,
+        None => {
+            warn!("Logic layer: List ID is required");
+            return Ok(BusinessResponse::error("List ID cannot be empty"));
+        }
+    };
+
     info!(
         "Logic layer: Updating task with ID: {} in list: {}",
-        request.id, request.list_id
+        task_id, list_id
     );
 
-    if request.id.trim().is_empty() {
+    if task_id.trim().is_empty() {
         warn!("Logic layer: Invalid task ID provided (empty or whitespace)");
         return Ok(BusinessResponse::error("Task ID cannot be empty"));
     }
 
-    if request.list_id.trim().is_empty() {
+    if list_id.trim().is_empty() {
         warn!("Logic layer: Invalid list_id provided (empty or whitespace)");
         return Ok(BusinessResponse::error("List ID cannot be empty"));
     }
@@ -208,10 +232,7 @@ pub async fn update_task(
             Ok(response)
         }
         Err(e) => {
-            error!(
-                "Logic layer: Error updating task in Microsoft Graph: {}",
-                e
-            );
+            error!("Logic layer: Error updating task in Microsoft Graph: {}", e);
             Err(e)
         }
     }
@@ -221,7 +242,10 @@ pub async fn delete_task(
     list_id: &str,
     task_id: &str,
 ) -> Result<BusinessResponse<String>, Box<dyn std::error::Error>> {
-    info!("Logic layer: Deleting task with ID: {} from list: {}", task_id, list_id);
+    info!(
+        "Logic layer: Deleting task with ID: {} from list: {}",
+        task_id, list_id
+    );
 
     if list_id.trim().is_empty() {
         warn!("Logic layer: Invalid list_id provided (empty or whitespace)");
@@ -248,7 +272,10 @@ pub async fn delete_task(
     };
 
     let graph_client = TasksMicrosoftGraphApi::new();
-    match graph_client.delete_task(list_id, task_id, &access_token).await {
+    match graph_client
+        .delete_task(list_id, task_id, &access_token)
+        .await
+    {
         Ok(response) => {
             if response.success {
                 info!("Logic layer: Successfully deleted task");

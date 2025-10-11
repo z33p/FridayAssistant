@@ -16,7 +16,7 @@ spec:
       - name: docker-hub-secret
       containers:
       - name: friday-todo-manager
-        image: z33p/friday-todo-manager:2025-09-25.v1
+        image: z33p/friday-todo-manager:2025-10-11.v2
         resources:
           requests:
             cpu: "10m"

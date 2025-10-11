@@ -4,22 +4,39 @@ use serde_derive::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
 #[derive(Debug, Deserialize, Serialize, ToSchema, Clone)]
+#[schema(title = "Task")]
 pub struct Task {
+    #[schema(
+        example = "AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhNGY2NAAuAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T_KzowKTAAAAAAEKAAA"
+    )]
     pub id: String,
+
+    #[schema(example = "Buy groceries")]
     pub title: String,
+
+    #[schema(example = "Milk, bread, eggs, and vegetables")]
     pub body: Option<String>,
+
     pub status: TaskStatus,
     pub importance: TaskImportance,
+
+    #[schema(example = true)]
     pub is_reminder_on: bool,
+
     pub reminder_date_time: Option<DateTime<Utc>>,
     pub due_date_time: Option<DateTime<Utc>>,
+
     #[serde(with = "chrono::serde::ts_milliseconds")]
+    #[schema(example = "1699876543000")]
     pub created_date_time: DateTime<Utc>,
+
     #[serde(with = "chrono::serde::ts_milliseconds")]
+    #[schema(example = "1699876543000")]
     pub last_modified_date_time: DateTime<Utc>,
 }
 
 #[derive(Debug, Deserialize, Serialize, ToSchema, Clone)]
+#[schema(title = "TaskStatus")]
 pub enum TaskStatus {
     #[serde(rename = "notStarted")]
     NotStarted,
@@ -34,6 +51,7 @@ pub enum TaskStatus {
 }
 
 #[derive(Debug, Deserialize, Serialize, ToSchema, Clone)]
+#[schema(title = "TaskImportance")]
 pub enum TaskImportance {
     #[serde(rename = "low")]
     Low,
@@ -44,32 +62,99 @@ pub enum TaskImportance {
 }
 
 #[derive(Debug, Deserialize, Serialize, ToSchema)]
+#[schema(title = "CreateTaskRequest")]
 pub struct CreateTaskRequest {
-    pub list_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub list_id: Option<String>,
+
+    #[schema(example = "Buy groceries", min_length = 1, max_length = 255)]
     pub title: String,
+
+    #[schema(example = "Milk, bread, eggs, and vegetables")]
     pub body: Option<String>,
+
     pub importance: Option<TaskImportance>,
+
+    #[schema(example = true)]
     pub is_reminder_on: Option<bool>,
+
     pub reminder_date_time: Option<DateTime<Utc>>,
     pub due_date_time: Option<DateTime<Utc>>,
 }
 
 #[derive(Debug, Deserialize, Serialize, ToSchema)]
-pub struct UpdateTaskRequest {
-    pub id: String,
-    pub list_id: String,
-    pub title: Option<String>,
+#[schema(title = "CreateTaskRequestBody")]
+pub struct CreateTaskRequestBody {
+    #[schema(example = "Buy groceries", min_length = 1, max_length = 255)]
+    pub title: String,
+
+    #[schema(example = "Milk, bread, eggs, and vegetables")]
     pub body: Option<String>,
+
+    pub importance: Option<TaskImportance>,
+
+    #[schema(example = true)]
+    pub is_reminder_on: Option<bool>,
+
+    pub reminder_date_time: Option<DateTime<Utc>>,
+    pub due_date_time: Option<DateTime<Utc>>,
+}
+
+#[derive(Debug, Deserialize, Serialize, ToSchema)]
+#[schema(title = "UpdateTaskRequest")]
+pub struct UpdateTaskRequest {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub list_id: Option<String>,
+
+    #[schema(example = "Updated task title", min_length = 1, max_length = 255)]
+    pub title: Option<String>,
+
+    #[schema(example = "Updated task description")]
+    pub body: Option<String>,
+
     pub status: Option<TaskStatus>,
     pub importance: Option<TaskImportance>,
+
+    #[schema(example = false)]
     pub is_reminder_on: Option<bool>,
+
     pub reminder_date_time: Option<DateTime<Utc>>,
     pub due_date_time: Option<DateTime<Utc>>,
 }
 
 #[derive(Debug, Deserialize, Serialize, ToSchema)]
+#[schema(title = "UpdateTaskRequestBody")]
+pub struct UpdateTaskRequestBody {
+    #[schema(example = "Updated task title", min_length = 1, max_length = 255)]
+    pub title: Option<String>,
+
+    #[schema(example = "Updated task description")]
+    pub body: Option<String>,
+
+    pub status: Option<TaskStatus>,
+    pub importance: Option<TaskImportance>,
+
+    #[schema(example = false)]
+    pub is_reminder_on: Option<bool>,
+
+    pub reminder_date_time: Option<DateTime<Utc>>,
+    pub due_date_time: Option<DateTime<Utc>>,
+}
+
+#[derive(Debug, Deserialize, Serialize, ToSchema)]
+#[schema(title = "DeleteTaskRequest")]
 pub struct DeleteTaskRequest {
+    #[schema(
+        example = "AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhNGY2NAAuAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T_KzowKTAAAAAAEKAAA"
+    )]
     pub id: String,
+
+    #[schema(
+        example = "AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhNGY2NAAuAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T_KzowKTAAAAAAESAAA"
+    )]
     pub list_id: String,
 }
 

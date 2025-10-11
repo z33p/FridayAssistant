@@ -76,16 +76,10 @@ impl TasksMicrosoftGraphApi {
 
             match serde_json::from_str::<TasksResponse>(&response_text) {
                 Ok(tasks_response) => {
-                    let tasks: Vec<Task> = tasks_response
-                        .value
-                        .into_iter()
-                        .map(Task::from)
-                        .collect();
+                    let tasks: Vec<Task> =
+                        tasks_response.value.into_iter().map(Task::from).collect();
 
-                    info!(
-                        "Data layer: Successfully parsed {} tasks",
-                        tasks.len()
-                    );
+                    info!("Data layer: Successfully parsed {} tasks", tasks.len());
                     Ok(BusinessResponse::success(tasks))
                 }
                 Err(_e) => {
@@ -127,7 +121,10 @@ impl TasksMicrosoftGraphApi {
         task_id: &str,
         access_token: &str,
     ) -> Result<BusinessResponse<Task>, Box<dyn std::error::Error>> {
-        info!("Data layer: Fetching task with ID: {} from list: {}", task_id, list_id);
+        info!(
+            "Data layer: Fetching task with ID: {} from list: {}",
+            task_id, list_id
+        );
 
         if access_token.trim().is_empty() {
             error!("Data layer: Access token is empty");
@@ -144,7 +141,10 @@ impl TasksMicrosoftGraphApi {
             return Ok(BusinessResponse::error("Task ID is required"));
         }
 
-        let url = format!("{}/me/todo/lists/{}/tasks/{}", self.base_url, list_id, task_id);
+        let url = format!(
+            "{}/me/todo/lists/{}/tasks/{}",
+            self.base_url, list_id, task_id
+        );
         info!("Data layer: Making GET request to: {}", url);
 
         let response = match self
@@ -199,7 +199,10 @@ impl TasksMicrosoftGraphApi {
                 }
             }
         } else if status == 404 {
-            info!("Data layer: Task not found with ID: {} in list: {}", task_id, list_id);
+            info!(
+                "Data layer: Task not found with ID: {} in list: {}",
+                task_id, list_id
+            );
             Ok(BusinessResponse::error("Task not found"))
         } else {
             match response.text().await {
@@ -230,7 +233,7 @@ impl TasksMicrosoftGraphApi {
         access_token: &str,
     ) -> Result<BusinessResponse<Task>, Box<dyn std::error::Error>> {
         info!(
-            "Data layer: Creating task with title: {} in list: {}",
+            "Data layer: Creating task with title: {} in list: {:?}",
             request.title, request.list_id
         );
 
@@ -276,7 +279,8 @@ impl TasksMicrosoftGraphApi {
             });
         }
 
-        let url = format!("{}/me/todo/lists/{}/tasks", self.base_url, request.list_id);
+        let list_id = request.list_id.as_deref().unwrap_or("");
+        let url = format!("{}/me/todo/lists/{}/tasks", self.base_url, list_id);
         info!("Data layer: Making POST request to: {}", url);
 
         let response = match self
@@ -321,10 +325,7 @@ impl TasksMicrosoftGraphApi {
                     Ok(BusinessResponse::success(task))
                 }
                 Err(e) => {
-                    error!(
-                        "Data layer: Failed to parse create task response: {}",
-                        e
-                    );
+                    error!("Data layer: Failed to parse create task response: {}", e);
                     error!(
                         "Data layer: Response that failed to parse: {}",
                         response_text
@@ -363,7 +364,7 @@ impl TasksMicrosoftGraphApi {
         access_token: &str,
     ) -> Result<BusinessResponse<Task>, Box<dyn std::error::Error>> {
         info!(
-            "Data layer: Updating task with ID: {} in list: {}",
+            "Data layer: Updating task with ID: {:?} in list: {:?}",
             request.id, request.list_id
         );
 
@@ -421,7 +422,12 @@ impl TasksMicrosoftGraphApi {
             });
         }
 
-        let url = format!("{}/me/todo/lists/{}/tasks/{}", self.base_url, request.list_id, request.id);
+        let list_id = request.list_id.as_deref().unwrap_or("");
+        let task_id = request.id.as_deref().unwrap_or("");
+        let url = format!(
+            "{}/me/todo/lists/{}/tasks/{}",
+            self.base_url, list_id, task_id
+        );
         info!("Data layer: Making PATCH request to: {}", url);
 
         let response = match self
@@ -466,10 +472,7 @@ impl TasksMicrosoftGraphApi {
                     Ok(BusinessResponse::success(task))
                 }
                 Err(e) => {
-                    error!(
-                        "Data layer: Failed to parse update task response: {}",
-                        e
-                    );
+                    error!("Data layer: Failed to parse update task response: {}", e);
                     error!(
                         "Data layer: Response that failed to parse: {}",
                         response_text
@@ -481,7 +484,7 @@ impl TasksMicrosoftGraphApi {
             }
         } else if status == 404 {
             info!(
-                "Data layer: Task not found for update with ID: {} in list: {}",
+                "Data layer: Task not found for update with ID: {:?} in list: {:?}",
                 request.id, request.list_id
             );
             Ok(BusinessResponse::error("Task not found"))
@@ -514,7 +517,10 @@ impl TasksMicrosoftGraphApi {
         task_id: &str,
         access_token: &str,
     ) -> Result<BusinessResponse<String>, Box<dyn std::error::Error>> {
-        info!("Data layer: Deleting task with ID: {} from list: {}", task_id, list_id);
+        info!(
+            "Data layer: Deleting task with ID: {} from list: {}",
+            task_id, list_id
+        );
 
         if access_token.trim().is_empty() {
             error!("Data layer: Access token is empty");
@@ -531,7 +537,10 @@ impl TasksMicrosoftGraphApi {
             return Ok(BusinessResponse::error("Task ID is required"));
         }
 
-        let url = format!("{}/me/todo/lists/{}/tasks/{}", self.base_url, list_id, task_id);
+        let url = format!(
+            "{}/me/todo/lists/{}/tasks/{}",
+            self.base_url, list_id, task_id
+        );
         info!("Data layer: Making DELETE request to: {}", url);
 
         let response = match self
