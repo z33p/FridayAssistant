@@ -17,6 +17,27 @@ data:
         keepalive_timeout 65;
         types_hash_max_size 2048;
         
+        # Rate Limiting Zones
+        limit_req_zone $binary_remote_addr zone=api:10m rate=10r/s;
+        limit_req_zone $binary_remote_addr zone=login:10m rate=1r/s;
+        limit_req_zone $binary_remote_addr zone=general:10m rate=5r/s;
+        
+        # SSL Security Configuration
+        ssl_protocols TLSv1.2 TLSv1.3;
+        ssl_ciphers ECDHE-RSA-AES256-GCM-SHA512:DHE-RSA-AES256-GCM-SHA512:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384;
+        ssl_prefer_server_ciphers off;
+        ssl_session_cache shared:SSL:10m;
+        ssl_session_timeout 10m;
+        ssl_session_tickets off;
+        
+        # Security Headers Globais
+        add_header X-Frame-Options "SAMEORIGIN" always;
+        add_header X-Content-Type-Options "nosniff" always;
+        add_header X-XSS-Protection "1; mode=block" always;
+        add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
+        add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+        add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self';" always;
+        
         # Logs
         access_log /var/log/nginx/access.log;
         error_log /var/log/nginx/error.log;
@@ -24,6 +45,19 @@ data:
         # MIME types
         include /etc/nginx/mime.types;
         default_type application/octet-stream;
+        
+        # IP será injetado via variável de ambiente do secret
+        geo $allowed_ip {
+            default 0;
+            ${AUTHORIZED_IP} 1;
+        }
+        
+        # Validação do API Key para MCP
+        # API key será injetado via variável de ambiente do secret friday-mcp-proxy
+        map $http_x_api_key $mcp_api_key_ok {
+            default 0;
+            "${FRIDAY_MCP_API_KEY}" 1;
+        }
         
         # Upstream para o Dashboard do Kubernetes
         upstream kubernetes-dashboard {
@@ -71,8 +105,12 @@ data:
             
             # Dashboard do Kubernetes
             location / {
+                if ($allowed_ip != 1) { return 403; }
+                
+                # Rate limiting para dashboard
+                limit_req zone=general burst=15 nodelay;
+
                 proxy_pass https://kubernetes-dashboard/;
-                proxy_ssl_verify off;
                 proxy_ssl_server_name on;
                 proxy_set_header Host $host;
                 proxy_set_header X-Real-IP $remote_addr;
@@ -111,6 +149,11 @@ data:
             
             # RabbitMQ Management Interface
             location / {
+                if ($allowed_ip != 1) { return 403; }
+                
+                # Rate limiting para RabbitMQ Management
+                limit_req zone=general burst=10 nodelay;
+
                 proxy_pass http://rabbitmq-management/;
                 proxy_set_header Host $host;
                 proxy_set_header X-Real-IP $remote_addr;
@@ -126,8 +169,47 @@ data:
             }
         }
 
+        # Server HTTP para MCP (sem redirect)
         server {
             listen 80;
+            server_name k8s.z33p.com;
+            
+            # Apenas o endpoint MCP permitido em HTTP
+            location /mcp/friday-mcp-manager/ {
+                # Permite acesso se IP está na whitelist OU se API key é válido
+                set $access_denied 1;
+                if ($allowed_ip = 1) { set $access_denied 0; }
+                if ($mcp_api_key_ok = 1) { set $access_denied 0; }
+                if ($access_denied = 1) { return 403; }
+                
+                # Rate limiting para MCP
+                limit_req zone=api burst=30 nodelay;
+
+                proxy_pass http://friday-mcp-manager/;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+                proxy_set_header X-Forwarded-Host $host;
+                proxy_set_header X-Forwarded-Port $server_port;
+                
+                # Headers específicos para MCP Protocol
+                proxy_set_header X-Original-URI $request_uri;
+                proxy_set_header X-Original-Method $request_method;
+                
+                # Configurações para MCP/JSON-RPC
+                proxy_buffering off;
+                proxy_request_buffering off;
+            }
+            
+            # Todas as outras rotas redirecionam para HTTPS
+            location / {
+                return 301 https://$host$request_uri;
+            }
+        }
+
+        # Server HTTPS principal
+        server {
             listen 443 ssl;
             server_name k8s.z33p.com;
             
@@ -135,13 +217,13 @@ data:
             ssl_certificate /etc/letsencrypt/live/k8s.z33p.com/fullchain.pem;
             ssl_certificate_key /etc/letsencrypt/live/k8s.z33p.com/privkey.pem;
             
-            # Redirect HTTP to HTTPS
-            if ($scheme != "https") {
-                return 301 https://$host$request_uri;
-            }
-            
             # APIs e serviços principais
             location /api/friday-secret-manager/ {
+                if ($allowed_ip != 1) { return 403; }
+                
+                # Rate limiting
+                limit_req zone=api burst=20 nodelay;
+
                 proxy_pass http://friday-secret-manager/api/friday-secret-manager/;
                 proxy_set_header Host $host;
                 proxy_set_header X-Real-IP $remote_addr;
@@ -160,6 +242,11 @@ data:
             }
             
             location /api/friday-oauth-manager/ {
+                if ($allowed_ip != 1) { return 403; }
+                
+                # Rate limiting mais restritivo para OAuth (autenticação)
+                limit_req zone=login burst=5 nodelay;
+
                 proxy_pass http://friday-oauth-manager/api/friday-oauth-manager/;
                 proxy_set_header Host $host;
                 proxy_set_header X-Real-IP $remote_addr;
@@ -178,6 +265,15 @@ data:
             }
             
             location /api/friday-todo-manager/ {
+                # Permite acesso se IP está na whitelist OU se API key é válido
+                set $access_denied 1;
+                if ($allowed_ip = 1) { set $access_denied 0; }
+                if ($mcp_api_key_ok = 1) { set $access_denied 0; }
+                if ($access_denied = 1) { return 403; }
+                
+                # Rate limiting
+                limit_req zone=api burst=20 nodelay;
+
                 proxy_pass http://friday-todo-manager/api/friday-todo-manager/;
                 proxy_set_header Host $host;
                 proxy_set_header X-Real-IP $remote_addr;
@@ -195,25 +291,12 @@ data:
                 proxy_request_buffering off;
             }
             
-            location /mcp/friday-mcp-manager/ {
-                proxy_pass http://friday-mcp-manager/;
-                proxy_set_header Host $host;
-                proxy_set_header X-Real-IP $remote_addr;
-                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-                proxy_set_header X-Forwarded-Proto $scheme;
-                proxy_set_header X-Forwarded-Host $host;
-                proxy_set_header X-Forwarded-Port $server_port;
-                
-                # Headers específicos para MCP Protocol
-                proxy_set_header X-Original-URI $request_uri;
-                proxy_set_header X-Original-Method $request_method;
-                
-                # Configurações para MCP/JSON-RPC
-                proxy_buffering off;
-                proxy_request_buffering off;
-            }
-
             location /api/ {
+                if ($allowed_ip != 1) { return 403; }
+                
+                # Rate limiting para endpoint genérico
+                limit_req zone=general burst=10 nodelay;
+
                 # Outras futuras APIs aqui
                 return 200 'APIs endpoint - Available: /api/friday-secret-manager/ | /api/friday-oauth-manager/ | /api/friday-todo-manager/ | MCP: /mcp/friday-mcp-manager/';
                 add_header Content-Type text/plain;
@@ -221,6 +304,8 @@ data:
             
             # RabbitMQ Management Interface (legacy path)
             location /rabbitmq/ {
+                if ($allowed_ip != 1) { return 403; }
+
                 proxy_pass http://rabbitmq-management/;
                 proxy_set_header Host $host;
                 proxy_set_header X-Real-IP $remote_addr;
@@ -237,12 +322,16 @@ data:
             
             # Landing page principal
             location / {
+                if ($allowed_ip != 1) { return 403; }
+
                 return 200 'Kubernetes Platform - Services: k8s-dashboard.z33p.com | rabbitmq.z33p.com | APIs: /api/friday-secret-manager/ | /api/friday-oauth-manager/ | /api/friday-todo-manager/ | MCP: /mcp/friday-mcp-manager/';
                 add_header Content-Type text/plain;
             }
             
             # Health check
             location /health {
+                if ($allowed_ip != 1) { return 403; }
+
                 return 200 'OK';
                 add_header Content-Type text/plain;
             }
