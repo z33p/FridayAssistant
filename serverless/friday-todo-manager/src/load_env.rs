@@ -10,7 +10,6 @@ pub fn load_env_variables() -> EnvVariables {
         // Valores padrão para desenvolvimento
         EnvVariables {
             is_prod: false,
-            secret_manager_url: "https://k8s.z33p.com/api/friday-secret-manager".to_string(),
             oauth_manager_url: "https://k8s.z33p.com/api/friday-oauth-manager".to_string(),
         }
     };
@@ -28,6 +27,5 @@ fn release_mode() -> bool {
 pub struct EnvVariables {
     #[serde(skip)]
     pub is_prod: bool,
-    pub secret_manager_url: String,
     pub oauth_manager_url: String,
 }

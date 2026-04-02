@@ -11,7 +11,6 @@ mod load_env;
 mod microsoft_graph_mod;
 mod oauth_mod;
 mod openapi;
-mod secret_manager_mod;
 mod todo_mod;
 
 extern crate dotenv;

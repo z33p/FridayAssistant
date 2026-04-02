@@ -4,6 +4,7 @@ use tracing::{error, info};
 use super::secret_response::SecretResponse;
 use crate::ENV_CONFIG;
 
+#[allow(dead_code)]
 pub struct SecretManagerApi {
     client: reqwest::Client,
     base_url: String,

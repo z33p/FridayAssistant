@@ -9,14 +9,6 @@ pub struct BusinessResponse<T> {
 }
 
 impl<T> BusinessResponse<T> {
-    pub fn new(success: bool, data: Option<T>, errors: Vec<String>) -> Self {
-        BusinessResponse {
-            success,
-            data,
-            errors,
-        }
-    }
-
     pub fn success(data: T) -> Self {
         BusinessResponse {
             success: true,

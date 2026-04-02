@@ -1,8 +1,10 @@
 use super::secret_manager_api::SecretManagerApi;
 use once_cell::sync::OnceCell;
 
+#[allow(dead_code)]
 static DATABASE_URL: OnceCell<String> = OnceCell::new();
 
+#[allow(dead_code)]
 pub async fn get_database_url() -> Result<String, Box<dyn std::error::Error>> {
     if let Some(url) = DATABASE_URL.get() {
         return Ok(url.clone());
