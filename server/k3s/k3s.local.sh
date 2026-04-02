@@ -9,17 +9,15 @@
 
 echo "🔗 Configurando acesso local ao cluster K3s..."
 
-# Baixar kubeconfig do servidor remoto via SCP
+# Buscar kubeconfig diretamente do /etc/rancher/k3s/k3s.yaml no servidor remoto
+# (mais confiável que o kube_config salvo manualmente, sempre tem as credenciais atualizadas)
 echo "📥 Baixando kubeconfig do servidor..."
-scp -i ~/.ssh/MyPrivateLightsail.pem admin@100.27.66.245:kube_config ~/.kube/config
+ssh -i ~/.ssh/MyPrivateLightsail.pem admin@100.27.66.245 "sudo cat /etc/rancher/k3s/k3s.yaml" > ~/.kube/config
+chmod 600 ~/.kube/config
 
-# ATENÇÃO: Após baixar, edite o arquivo ~/.kube/config
-# Substitua: server: https://127.0.0.1:6443
-# Por:       server: https://k8s.z33p.com:6443
+# Substituir o endereço local pelo domínio público
+echo "🔧 Atualizando endereço do servidor..."
+sed -i 's|https://127.0.0.1:6443|https://k8s.z33p.com:6443|g' ~/.kube/config
 
-echo "⚠️  IMPORTANTE: Edite ~/.kube/config e altere:"
-echo "   server: https://127.0.0.1:6443"
-echo "   para:   server: https://k8s.z33p.com:6443"
-echo ""
 echo "✅ Configuração local concluída!"
 echo "📋 Teste com: kubectl get nodes"

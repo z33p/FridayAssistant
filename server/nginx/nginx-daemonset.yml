@@ -53,6 +53,9 @@ spec:
         - name: ssl-certs
           mountPath: /etc/letsencrypt
           readOnly: true
+        - name: certbot-webroot
+          mountPath: /var/www/certbot
+          readOnly: true
         resources:
           requests:
             memory: "64Mi"
@@ -70,6 +73,10 @@ spec:
         hostPath:
           path: /etc/letsencrypt
           type: Directory
+      - name: certbot-webroot
+        hostPath:
+          path: /var/www/certbot
+          type: DirectoryOrCreate
       tolerations:
       - operator: Exists
 ---

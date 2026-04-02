@@ -91,18 +91,27 @@ data:
         
         server {
             listen 80;
+            server_name k8s-dashboard.z33p.com;
+
+            # ACME challenge para renovação de certificados SSL
+            location /.well-known/acme-challenge/ {
+                root /var/www/certbot;
+                allow all;
+            }
+
+            location / {
+                return 301 https://$host$request_uri;
+            }
+        }
+
+        server {
             listen 443 ssl;
             server_name k8s-dashboard.z33p.com;
-            
+
             # Certificados SSL
             ssl_certificate /etc/letsencrypt/live/k8s.z33p.com/fullchain.pem;
             ssl_certificate_key /etc/letsencrypt/live/k8s.z33p.com/privkey.pem;
-            
-            # Redirect HTTP to HTTPS
-            if ($scheme != "https") {
-                return 301 https://$host$request_uri;
-            }
-            
+
             # Dashboard do Kubernetes
             location / {
                 if ($allowed_ip != 1) { return 403; }
@@ -135,18 +144,27 @@ data:
         
         server {
             listen 80;
+            server_name rabbitmq.z33p.com;
+
+            # ACME challenge para renovação de certificados SSL
+            location /.well-known/acme-challenge/ {
+                root /var/www/certbot;
+                allow all;
+            }
+
+            location / {
+                return 301 https://$host$request_uri;
+            }
+        }
+
+        server {
             listen 443 ssl;
             server_name rabbitmq.z33p.com;
-            
+
             # Certificados SSL
             ssl_certificate /etc/letsencrypt/live/k8s.z33p.com/fullchain.pem;
             ssl_certificate_key /etc/letsencrypt/live/k8s.z33p.com/privkey.pem;
-            
-            # Redirect HTTP to HTTPS
-            if ($scheme != "https") {
-                return 301 https://$host$request_uri;
-            }
-            
+
             # RabbitMQ Management Interface
             location / {
                 if ($allowed_ip != 1) { return 403; }
@@ -202,6 +220,12 @@ data:
                 proxy_request_buffering off;
             }
             
+            # ACME challenge para renovação de certificados SSL
+            location /.well-known/acme-challenge/ {
+                root /var/www/certbot;
+                allow all;
+            }
+
             # Todas as outras rotas redirecionam para HTTPS
             location / {
                 return 301 https://$host$request_uri;

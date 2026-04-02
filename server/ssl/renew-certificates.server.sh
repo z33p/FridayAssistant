@@ -9,19 +9,22 @@
 
 echo "🔄 Verificando renovação de certificados SSL..."
 
-# Tentar renovar certificados
-sudo certbot renew --quiet --no-self-upgrade
+# Garantir que o diretório webroot existe com permissões corretas
+mkdir -p /var/www/certbot
+chmod 755 /var/www/certbot
 
-# Verificar se houve renovação
-if [ $? -eq 0 ]; then
+# Tentar renovar certificados via webroot (nginx deve estar rodando)
+sudo certbot renew --quiet --no-self-upgrade \
+    --webroot --webroot-path /var/www/certbot
+
+CERTBOT_EXIT=$?
+
+if [ $CERTBOT_EXIT -eq 0 ]; then
     echo "✅ Verificação de renovação concluída"
-    
-    # Reiniciar nginx no Kubernetes se certificados foram renovados
-    # (só executa se houver mudanças)
-    if sudo certbot renew --dry-run --quiet; then
-        echo "🔄 Reiniciando nginx para aplicar novos certificados..."
-        kubectl rollout restart daemonset/nginx-proxy
-    fi
+
+    # Reiniciar nginx para carregar novos certificados (se houve renovação)
+    echo "🔄 Reiniciando nginx para aplicar novos certificados..."
+    kubectl rollout restart daemonset/nginx-proxy
 else
     echo "❌ Erro na verificação de renovação"
     exit 1
