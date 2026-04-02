@@ -52,7 +52,7 @@ pub async fn set_value(key: &str, value: &str) -> Result<(), Box<dyn std::error:
     let client = get_redis_client()?;
     let mut conn = client.get_multiplexed_async_connection().await?;
 
-    conn.set(key, value).await?;
+    conn.set::<_, _, ()>(key, value).await?;
 
     Ok(())
 }
@@ -60,7 +60,7 @@ pub async fn set_value(key: &str, value: &str) -> Result<(), Box<dyn std::error:
 pub async fn delete_key_value(key: &str) -> Result<(), Box<dyn std::error::Error>> {
     let client = get_redis_client()?;
     let mut conn = client.get_multiplexed_async_connection().await?;
-    conn.del(key).await?;
+    conn.del::<_, ()>(key).await?;
 
     Ok(())
 }

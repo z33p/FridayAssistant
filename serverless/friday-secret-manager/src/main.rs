@@ -1,4 +1,4 @@
-use actix_web::{get, web, App, HttpServer, Responder};
+use actix_web::{get, App, HttpServer, Responder};
 use load_env::{load_env_variables, EnvVariables};
 use once_cell::sync::Lazy;
 use tracing::Level;
@@ -34,6 +34,7 @@ async fn main() -> std::io::Result<()> {
             .service(secrets_controller::update_secret)
             .service(secrets_controller::delete_secret)
             .service(secrets_controller::refresh_secrets)
+            .service(secrets_controller::sync_redis_to_database)
     })
     .workers(4)
     .bind(("0.0.0.0", 5000))?

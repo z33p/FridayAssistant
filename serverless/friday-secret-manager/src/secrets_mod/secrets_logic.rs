@@ -105,3 +105,45 @@ pub async fn refresh_secrets(
         vec![],
     ))
 }
+
+pub async fn sync_redis_to_database(
+) -> Result<business_response::Response<String>, Box<dyn std::error::Error>> {
+    let secrets_result = get_all_secrets().await?;
+
+    let secrets_list = match secrets_result.data {
+        Some(secrets) => secrets,
+        None => {
+            return Ok(business_response::Response::new(
+                false,
+                None,
+                vec!["No secrets data available to sync".to_string()],
+            ));
+        }
+    };
+
+    let mut updated_count = 0usize;
+
+    for secret_option in secrets_list {
+        if let Some(secret) = secret_option {
+            if let Some(redis_value) = friday_redis_client::get_value(&secret.key).await? {
+                if redis_value != secret.value {
+                    secrets_data::update_secret(Secret {
+                        key: secret.key.clone(),
+                        value: redis_value,
+                    })
+                    .await?;
+                    updated_count += 1;
+                }
+            }
+        }
+    }
+
+    Ok(business_response::Response::new(
+        true,
+        Some(format!(
+            "Sync completed. {} secret(s) updated in database.",
+            updated_count
+        )),
+        vec![],
+    ))
+}

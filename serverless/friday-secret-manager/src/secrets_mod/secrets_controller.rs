@@ -157,6 +157,29 @@ pub async fn refresh_secrets() -> impl Responder {
     }
 }
 
+#[utoipa::path(
+    post,
+    path = "/api/friday-secret-manager/secrets/sync_redis_to_database",
+    tag = "Operations",
+    responses(
+        (status = 200, description = "Sync from Redis to database completed successfully", body = String),
+    )
+)]
+#[post("/api/friday-secret-manager/secrets/sync_redis_to_database")]
+pub async fn sync_redis_to_database() -> impl Responder {
+    match secrets_logic::sync_redis_to_database().await {
+        Ok(result) => HttpResponse::Ok().json(result),
+        Err(e) => {
+            let error_response = business_response::Response::<String>::new(
+                false,
+                None,
+                vec![format!("Failed to sync Redis to database: {}", e)],
+            );
+            HttpResponse::InternalServerError().json(error_response)
+        }
+    }
+}
+
 #[derive(Deserialize, ToSchema)]
 pub struct DeleteSecretRequest {
     pub key: String,

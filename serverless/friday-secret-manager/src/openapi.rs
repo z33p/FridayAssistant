@@ -20,6 +20,7 @@ use crate::{
         crate::secrets_controller::update_secret,
         crate::secrets_controller::delete_secret,
         crate::secrets_controller::refresh_secrets,
+        crate::secrets_controller::sync_redis_to_database,
     ),
     components(schemas(
         Response<Secret>,
@@ -36,6 +37,8 @@ use crate::{
 pub struct ApiDoc;
 
 pub fn swagger_config() -> SwaggerUi {
-    SwaggerUi::new("/api/friday-secret-manager/swagger/{_:.*}")
-        .url("/api/friday-secret-manager/api-docs/openapi.json", ApiDoc::openapi())
+    SwaggerUi::new("/api/friday-secret-manager/swagger/{_:.*}").url(
+        "/api/friday-secret-manager/api-docs/openapi.json",
+        ApiDoc::openapi(),
+    )
 }
