@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # Caminho do arquivo de deployment
 DEPLOYMENT_FILE="k8s/friday-secret-manager-deployment.yml"
