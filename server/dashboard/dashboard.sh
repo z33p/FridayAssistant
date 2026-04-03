@@ -17,9 +17,9 @@ helm repo add kubernetes-dashboard https://kubernetes.github.io/dashboard/
 echo "🔄 Atualizando repositórios Helm..."
 helm repo update
 
-# Instalar Dashboard usando Helm com configurações padrão
+# Instalar Dashboard usando Helm com configurações personalizadas
 echo "⚙️ Instalando Dashboard via Helm..."
-helm upgrade --install kubernetes-dashboard kubernetes-dashboard/kubernetes-dashboard --create-namespace --namespace kubernetes-dashboard
+helm upgrade --install kubernetes-dashboard kubernetes-dashboard/kubernetes-dashboard --create-namespace --namespace kubernetes-dashboard -f dashboard-values.yml
 
 # Aguardar deployment ficar pronto
 echo "⏳ Aguardando Dashboard ficar pronto..."

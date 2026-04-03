@@ -1,0 +1,56 @@
+## Kubernetes Dashboard Helm values — rightsized for low-memory single-node k3s
+## Uso real observado (kubectl top pods -n kubernetes-dashboard):
+##   kong:              ~132Mi / 3m CPU
+##   api:                ~40Mi / 2m CPU
+##   auth:               ~11Mi / 1m CPU
+##   web:                 ~9Mi / 1m CPU
+##   metrics-scraper:    ~18Mi / 1m CPU
+
+auth:
+  containers:
+    resources:
+      requests:
+        cpu: 10m
+        memory: 16Mi
+      limits:
+        cpu: 50m
+        memory: 64Mi
+
+api:
+  containers:
+    resources:
+      requests:
+        cpu: 10m
+        memory: 48Mi
+      limits:
+        cpu: 100m
+        memory: 96Mi
+
+web:
+  containers:
+    resources:
+      requests:
+        cpu: 10m
+        memory: 16Mi
+      limits:
+        cpu: 30m
+        memory: 32Mi
+
+metricsScraper:
+  containers:
+    resources:
+      requests:
+        cpu: 10m
+        memory: 24Mi
+      limits:
+        cpu: 30m
+        memory: 48Mi
+
+kong:
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
