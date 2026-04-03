@@ -1,0 +1,48 @@
+## Bitnami PostgreSQL Helm values — tuned for low memory (single-node Lightsail)
+## Target idle RAM: ~50 MB
+## helm install friday-postgres bitnami/postgresql -f k8s/postgres-values.yaml -n friday
+
+auth:
+  database: postgres
+  username: postgres
+  # password: ""
+  # postgresPassword: ""
+
+primary:
+  resources:
+    requests:
+      cpu: "10m"
+      memory: "64Mi"
+    limits:
+      cpu: "100m"
+      memory: "128Mi"
+
+  ## Persistent storage for data
+  persistence:
+    enabled: true
+    size: 1Gi
+    storageClass: "" # vazio = usa o StorageClass padrão do cluster
+
+  ## PostgreSQL config tuned for minimal RAM
+  extendedConfiguration: |
+    shared_buffers = 16MB
+    max_connections = 10
+    work_mem = 1MB
+    maintenance_work_mem = 8MB
+    effective_cache_size = 32MB
+    wal_buffers = 1MB
+    min_wal_size = 32MB
+    max_wal_size = 64MB
+    autovacuum_work_mem = 4MB
+    temp_buffers = 2MB
+    log_min_duration_statement = 1000
+
+## Disable unused components
+metrics:
+  enabled: false
+
+volumePermissions:
+  enabled: false
+
+backup:
+  enabled: false
