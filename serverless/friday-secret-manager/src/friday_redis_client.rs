@@ -64,3 +64,10 @@ pub async fn delete_key_value(key: &str) -> Result<(), Box<dyn std::error::Error
 
     Ok(())
 }
+
+pub async fn get_all_keys() -> Result<Vec<String>, Box<dyn std::error::Error>> {
+    let client = get_redis_client()?;
+    let mut conn = client.get_multiplexed_async_connection().await?;
+    let keys: Vec<String> = conn.keys("*").await?;
+    Ok(keys)
+}

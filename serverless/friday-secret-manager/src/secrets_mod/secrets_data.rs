@@ -84,3 +84,16 @@ pub async fn delete_secret(key: &str) -> Result<(), Box<dyn std::error::Error>> 
 
     Ok(())
 }
+
+pub async fn upsert_secret(secret: Secret) -> Result<(), Box<dyn std::error::Error>> {
+    let query = "CALL pr_ups_secret($1, $2)";
+
+    let pool = create_database_pool().await?;
+    sqlx::query(query)
+        .bind(&secret.key)
+        .bind(&secret.value)
+        .execute(&pool)
+        .await?;
+
+    Ok(())
+}
