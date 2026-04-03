@@ -45,11 +45,10 @@ pub async fn generate_access_token() -> impl Responder {
         }
         Err(e) => {
             error!("Erro crítico ao gerar access token: {}", e);
-            actix_web::web::Json(BusinessResponse {
-                success: false,
-                data: Some(serde_json::Value::Null),
-                errors: vec![format!("Erro interno: {}", e)],
-            })
+            actix_web::web::Json(BusinessResponse::<serde_json::Value>::error(&format!(
+                "Erro interno: {}",
+                e
+            )))
         }
     }
 }
@@ -78,11 +77,10 @@ pub async fn refresh_access_token(
         Ok(response) => actix_web::web::Json(response),
         Err(e) => {
             error!("Erro ao fazer refresh do access token: {}", e);
-            actix_web::web::Json(BusinessResponse {
-                success: false,
-                data: Some(serde_json::Value::Null),
-                errors: vec![format!("Erro interno: {}", e)],
-            })
+            actix_web::web::Json(BusinessResponse::<serde_json::Value>::error(&format!(
+                "Erro interno: {}",
+                e
+            )))
         }
     }
 }
@@ -108,11 +106,10 @@ pub async fn generate_oauth_url_endpoint() -> impl Responder {
         Ok(response) => actix_web::web::Json(response),
         Err(e) => {
             error!("Erro ao gerar URL OAuth: {}", e);
-            actix_web::web::Json(BusinessResponse {
-                success: false,
-                data: Some(serde_json::Value::Null),
-                errors: vec![format!("Erro interno: {}", e)],
-            })
+            actix_web::web::Json(BusinessResponse::<serde_json::Value>::error(&format!(
+                "Erro interno: {}",
+                e
+            )))
         }
     }
 }
@@ -138,11 +135,10 @@ pub async fn generate_google_oauth_url() -> impl Responder {
         Ok(response) => actix_web::web::Json(response),
         Err(e) => {
             error!("Erro ao gerar URL OAuth do Google: {}", e);
-            actix_web::web::Json(BusinessResponse {
-                success: false,
-                data: Some(serde_json::Value::Null),
-                errors: vec![format!("Erro interno: {}", e)],
-            })
+            actix_web::web::Json(BusinessResponse::<serde_json::Value>::error(&format!(
+                "Erro interno: {}",
+                e
+            )))
         }
     }
 }
@@ -168,11 +164,10 @@ pub async fn generate_microsoft_oauth_url() -> impl Responder {
         Ok(response) => actix_web::web::Json(response),
         Err(e) => {
             error!("Erro ao gerar URL OAuth da Microsoft: {}", e);
-            actix_web::web::Json(BusinessResponse {
-                success: false,
-                data: Some(serde_json::Value::Null),
-                errors: vec![format!("Erro interno: {}", e)],
-            })
+            actix_web::web::Json(BusinessResponse::<serde_json::Value>::error(&format!(
+                "Erro interno: {}",
+                e
+            )))
         }
     }
 }
@@ -195,17 +190,17 @@ pub async fn generate_microsoft_oauth_url() -> impl Responder {
 pub async fn get_oauth_tokens(
     request: actix_web::web::Json<GetOAuthTokensRequest>,
 ) -> impl Responder {
-    info!("Fazendo exchange de tokens OAuth");
+    let request = request.into_inner();
+    info!(provider = %request.provider, "Fazendo exchange de tokens OAuth");
 
-    match oauth_tokens_logic::get_oauth_tokens(request.into_inner()).await {
+    match oauth_tokens_logic::get_oauth_tokens(request).await {
         Ok(response) => actix_web::web::Json(response),
         Err(e) => {
             error!("Erro ao fazer exchange de tokens OAuth: {}", e);
-            actix_web::web::Json(BusinessResponse {
-                success: false,
-                data: Some(serde_json::Value::Null),
-                errors: vec![format!("Erro interno: {}", e)],
-            })
+            actix_web::web::Json(BusinessResponse::<serde_json::Value>::error(&format!(
+                "Erro interno: {}",
+                e
+            )))
         }
     }
 }

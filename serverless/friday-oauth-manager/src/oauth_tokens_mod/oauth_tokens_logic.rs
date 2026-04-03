@@ -1,7 +1,7 @@
 use std::time::Duration;
 
 use chrono::Utc;
-use oauth2::{AuthorizationCode, CsrfToken, RefreshToken, TokenResponse};
+use oauth2::{AuthorizationCode, CsrfToken, RefreshToken, RequestTokenError, TokenResponse};
 
 use serde_json::json;
 use tracing::{debug, error, info, warn};
@@ -43,18 +43,49 @@ pub async fn get_oauth_tokens(
         token_request = token_request.add_extra_param(key, value);
     }
 
-    let tokens_response = token_request
+    let tokens_response = match token_request
         .request_async(oauth2::reqwest::async_http_client)
-        .await?;
+        .await
+    {
+        Ok(resp) => resp,
+        Err(e) => {
+            let detailed_msg = match &e {
+                RequestTokenError::ServerResponse(err) => {
+                    let desc = err
+                        .error_description()
+                        .map(|d| format!(", description: {}", d))
+                        .unwrap_or_default();
+                    format!(
+                        "OAuth server rejected the authorization code: error={}{}",
+                        err.error(),
+                        desc
+                    )
+                }
+                RequestTokenError::Request(req_err) => {
+                    format!("Network error during token exchange: {}", req_err)
+                }
+                RequestTokenError::Parse(parse_err, raw) => {
+                    format!(
+                        "Failed to parse token response: {} | raw body: {}",
+                        parse_err,
+                        String::from_utf8_lossy(raw)
+                    )
+                }
+                RequestTokenError::Other(msg) => {
+                    format!("Token exchange error: {}", msg)
+                }
+            };
+            error!(provider = %request.provider, "{}", detailed_msg);
+            return Err(detailed_msg.into());
+        }
+    };
 
     let oauth_tokens = extract_oauth_tokens(tokens_response, request.provider);
     oauth_tokens_data::insert_oauth_token(&oauth_tokens).await?;
 
-    Ok(BusinessResponse {
-        success: true,
-        data: Some(json!({ "oauth_tokens": oauth_tokens })),
-        errors: vec![],
-    })
+    Ok(BusinessResponse::success(
+        json!({ "oauth_tokens": oauth_tokens }),
+    ))
 }
 
 fn handle_get_refresh_token(
@@ -169,11 +200,9 @@ pub async fn refresh_access_token(
 
             info!("Access Token gerado com sucesso");
 
-            Ok(BusinessResponse {
-                success: true,
-                data: Some(json!({ "oauth_tokens": oauth_tokens })),
-                errors: vec![],
-            })
+            Ok(BusinessResponse::success(
+                json!({ "oauth_tokens": oauth_tokens }),
+            ))
         }
         Err(e) => {
             error!("Failed to refresh access token: {}", e);
@@ -204,12 +233,7 @@ pub async fn generate_access_token(
             if oauth_tokens.expiry_date > now + expiry_buffer {
                 // Token is still valid
                 info!("Token is still valid, returning existing access_token");
-                let response = BusinessResponse {
-                    success: true,
-                    data: Some(json!(oauth_tokens.access_token)),
-                    errors: vec![],
-                };
-                Ok(response)
+                Ok(BusinessResponse::success(json!(oauth_tokens.access_token)))
             } else {
                 // Token expired or about to expire, refresh it
                 info!("Token expired or expiring soon, refreshing token");
@@ -225,11 +249,9 @@ pub async fn generate_access_token(
                         if let Some(oauth_tokens_obj) = data.get("oauth_tokens") {
                             if let Some(access_token) = oauth_tokens_obj.get("access_token") {
                                 info!("Token refreshed successfully, returning new access_token");
-                                return Ok(BusinessResponse {
-                                    success: true,
-                                    data: Some(json!(access_token.as_str().unwrap_or(""))),
-                                    errors: vec![],
-                                });
+                                return Ok(BusinessResponse::success(json!(access_token
+                                    .as_str()
+                                    .unwrap_or(""))));
                             }
                         }
                     }
@@ -237,24 +259,14 @@ pub async fn generate_access_token(
 
                 // If refresh failed, return the error
                 error!("Token refresh failed");
-                Ok(BusinessResponse {
-                    success: false,
-                    data: Some(serde_json::Value::Null),
-                    errors: refresh_response.errors,
-                })
+                Ok(BusinessResponse::new(false, None, refresh_response.errors))
             }
         }
         None => {
             warn!("No refresh tokens found in database");
-            let response = BusinessResponse {
-                success: false,
-                data: Some(serde_json::Value::Null),
-                errors: vec![String::from(
-                    "Não foram encontrados refresh_token disponíveis para geração do access_token",
-                )],
-            };
-
-            Ok(response)
+            Ok(BusinessResponse::error(
+                "Não foram encontrados refresh_token disponíveis para geração do access_token",
+            ))
         }
     }
 }
@@ -295,12 +307,8 @@ pub async fn generate_oauth_url_for_provider(
 
     debug!("Generated {} OAuth URL: {}", provider, auth_url.to_string());
 
-    Ok(BusinessResponse {
-        success: true,
-        data: Some(json!({
-            "url": auth_url.to_string(),
-            "provider": provider.to_string()
-        })),
-        errors: vec![],
-    })
+    Ok(BusinessResponse::success(json!({
+        "url": auth_url.to_string(),
+        "provider": provider.to_string()
+    })))
 }

@@ -15,10 +15,11 @@ pub async fn insert_oauth_token(
 ) -> Result<(), Box<dyn std::error::Error>> {
     let pool = create_database_pool().await?;
 
-    let result = sqlx::query("CALL pr_ins_oauth_tokens($1, $2, $3)")
+    let result = sqlx::query("CALL pr_ins_oauth_tokens($1, $2, $3, $4)")
         .bind(&oauth_tokens.access_token)
         .bind(&oauth_tokens.refresh_token)
         .bind(oauth_tokens.expiry_date)
+        .bind(oauth_tokens.id_provider.clone() as i32)
         .execute(&pool)
         .await;
 
@@ -54,7 +55,7 @@ pub async fn fn_get_first_oauth_tokens_by_last_expiry_date(
     let pool = create_database_pool().await?;
 
     let query = "SELECT * FROM fn_get_first_oauth_tokens_by_last_expiry_date()";
-    
+
     debug!("Executando query para buscar tokens: {}", query);
 
     let row = sqlx::query(query).fetch_optional(&pool).await?;
@@ -64,7 +65,10 @@ pub async fn fn_get_first_oauth_tokens_by_last_expiry_date(
             debug!("Token encontrado no banco de dados");
             let oauth_tokens = OAuthTokens::from_row(&row)?;
             if let Some(ref token) = oauth_tokens {
-                debug!("Token parsed com sucesso, expiry_date: {}", token.expiry_date);
+                debug!(
+                    "Token parsed com sucesso, expiry_date: {}",
+                    token.expiry_date
+                );
             }
             Ok(oauth_tokens)
         }
